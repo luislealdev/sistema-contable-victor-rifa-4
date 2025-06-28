@@ -1,3 +1,12 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
 model User {
     id        Int      @id @default(autoincrement())
     name      String
@@ -14,11 +23,14 @@ model Section {
 }
 
 model Client {
-    id          Int      @id @default(autoincrement())
-    name        String
-    phoneNumber String
-    section     Section? @relation(fields: [sectionId], references: [id])
-    sectionId   Int?
+    id        Int      @id @default(autoincrement())
+    name      String
+    phone     String
+    address   String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    section   Section? @relation(fields: [sectionId], references: [id])
+    sectionId Int?
 
     transactions  Transaction[]
     payments      Payment[]
@@ -29,7 +41,7 @@ model Transaction {
     id          Int             @id @default(autoincrement())
     type        TransactionType // 'SALE', 'LOAN', 'SERVICE'
     isActive    Boolean         @default(true)
-    description String
+    description String?
     totalAmount Float
     remaining   Float
     createdAt   DateTime        @default(now())
@@ -41,12 +53,12 @@ model Transaction {
 }
 
 model Payment {
-    id            Int         @id @default(autoincrement())
+    id            Int          @id @default(autoincrement())
     amount        Float
-    date          DateTime    @default(now())
+    date          DateTime     @default(now())
     description   String?
-    transaction   Transaction @relation(fields: [transactionId], references: [id])
-    transactionId Int
+    transaction   Transaction? @relation(fields: [transactionId], references: [id])
+    transactionId Int?
 
     client   Client @relation(fields: [clientId], references: [id])
     clientId Int
