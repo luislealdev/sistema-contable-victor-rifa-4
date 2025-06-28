@@ -22,7 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
 
         session({ session, token }) {
-            // Ignore the type error for now
+
             /* eslint-disable  @typescript-eslint/no-explicit-any */
             session.user = token.data as any;
             return session;
