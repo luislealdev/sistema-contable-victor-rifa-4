@@ -81,7 +81,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     return {
                         ...rest,
                         id: String(user.id), // Ensure id is a string
-                        role: user.role.toString() // Ensure role is a string
                     }; // Asegurarse de que siempre haya un rol
                 } catch (error) {
                     console.error("Error en authorize:", error);
