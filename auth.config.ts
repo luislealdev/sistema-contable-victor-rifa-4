@@ -22,7 +22,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
 
         session({ session, token }) {
-
             /* eslint-disable  @typescript-eslint/no-explicit-any */
             session.user = token.data as any;
             return session;
