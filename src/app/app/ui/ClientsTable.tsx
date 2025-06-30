@@ -33,7 +33,7 @@ interface Props {
     }
     sectionId?: number
     search?: string
-    hideMoneyData?: boolean
+    // hideMoneyData?: boolean
 }
 
 export const ClientsTable: FC<Props> = ({
@@ -45,7 +45,7 @@ export const ClientsTable: FC<Props> = ({
     debtSummary,
     sectionId,
     search,
-    hideMoneyData = false
+    // hideMoneyData = false
 }) => {
     const [showForm, setShowForm] = useState(false)
     const [showSectionForm, setShowSectionForm] = useState(false)
@@ -117,7 +117,7 @@ export const ClientsTable: FC<Props> = ({
     }
 
     const handleSectionFilter = (sectionId?: number) => {
-        const url = buildURL(1, sectionId?.toString(), searchTerm, hideMoneyData)
+        const url = buildURL(1, sectionId?.toString(), searchTerm)
         window.location.href = url
     }
 
@@ -136,14 +136,14 @@ export const ClientsTable: FC<Props> = ({
     }
 
     const handleFilter = () => {
-        const url = buildURL(1, sectionId?.toString(), searchTerm, hideMoneyData)
+        const url = buildURL(1, sectionId?.toString(), searchTerm)
         window.location.href = url
     }
 
-    const handleToggleMoneyData = () => {
-        const url = buildURL(currentPage, sectionId?.toString(), searchTerm, !hideMoneyData)
-        window.location.href = url
-    }
+    // const handleToggleMoneyData = () => {
+    //     const url = buildURL(currentPage, sectionId?.toString(), searchTerm, !hideMoneyData)
+    //     window.location.href = url
+    // }
 
     const getSectionName = (sectionId: number | null) => {
         if (!sectionId) return 'Sin sección'
@@ -184,7 +184,7 @@ export const ClientsTable: FC<Props> = ({
                     <h1 className="text-3xl font-bold text-gray-800">Gestión de Clientes</h1>
                     <div className="flex flex-col sm:flex-row gap-3">
                         {/* Toggle para ocultar datos monetarios */}
-                        <button
+                        {/* <button
                             onClick={handleToggleMoneyData}
                             className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${hideMoneyData
                                     ? 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200'
@@ -198,7 +198,7 @@ export const ClientsTable: FC<Props> = ({
                             <span className="text-sm font-medium">
                                 {hideMoneyData ? 'Datos Ocultos' : 'Ocultar Montos'}
                             </span>
-                        </button>
+                        </button> */}
 
                         <button
                             onClick={() => setShowSectionForm(true)}
@@ -312,11 +312,9 @@ export const ClientsTable: FC<Props> = ({
                                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Sección
                                 </th>
-                                {!hideMoneyData && (
-                                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Deuda
-                                    </th>
-                                )}
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Deuda
+                                </th>
                                 <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Acciones
                                 </th>
@@ -325,7 +323,7 @@ export const ClientsTable: FC<Props> = ({
                         <tbody className="bg-white divide-y divide-gray-200">
                             {clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={hideMoneyData ? 4 : 5} className="px-3 py-4 text-center text-gray-500">
+                                    <td colSpan={5} className="px-3 py-4 text-center text-gray-500">
                                         No se encontraron clientes
                                     </td>
                                 </tr>
@@ -377,29 +375,29 @@ export const ClientsTable: FC<Props> = ({
                                                 <span className="font-medium truncate">{getSectionName(client.sectionId)}</span>
                                             </div>
                                         </td>
-                                        {!hideMoneyData && (
-                                            <td className="px-3 py-4">
-                                                <div className="text-right">
-                                                    <span className={`text-sm font-medium ${client.debt.totalDebt > 0
-                                                        ? 'text-red-600'
-                                                        : 'text-green-600'
-                                                        }`}>
-                                                        ${client.debt.totalDebt.toFixed(0)}
-                                                    </span>
-                                                    {client.debt.totalDebt > 0 && (
-                                                        <div className="text-xs text-gray-500">
-                                                            T: ${client.debt.transactionDebt.toFixed(0)}
-                                                            {client.debt.raffleDebt > 0 && (
-                                                                <> | R: ${client.debt.raffleDebt.toFixed(0)}</>
-                                                            )}
-                                                            {client.debt.monthlyServiceDebt > 0 && (
-                                                                <> | S: ${client.debt.monthlyServiceDebt.toFixed(0)}</>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        )}
+
+                                        <td className="px-3 py-4">
+                                            <div className="text-right">
+                                                <span className={`text-sm font-medium ${client.debt.totalDebt > 0
+                                                    ? 'text-red-600'
+                                                    : 'text-green-600'
+                                                    }`}>
+                                                    ${client.debt.totalDebt.toFixed(0)}
+                                                </span>
+                                                {client.debt.totalDebt > 0 && (
+                                                    <div className="text-xs text-gray-500">
+                                                        T: ${client.debt.transactionDebt.toFixed(0)}
+                                                        {client.debt.raffleDebt > 0 && (
+                                                            <> | R: ${client.debt.raffleDebt.toFixed(0)}</>
+                                                        )}
+                                                        {client.debt.monthlyServiceDebt > 0 && (
+                                                            <> | S: ${client.debt.monthlyServiceDebt.toFixed(0)}</>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+
                                         <td className="px-3 py-4 text-right">
                                             <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
                                                 <Link
@@ -446,7 +444,7 @@ export const ClientsTable: FC<Props> = ({
                             <div className="flex space-x-2">
                                 {currentPage > 1 && (
                                     <Link
-                                        href={buildURL(currentPage - 1, sectionId?.toString(), searchTerm, hideMoneyData)}
+                                        href={buildURL(currentPage - 1, sectionId?.toString(), searchTerm)}
                                         className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         Anterior
@@ -467,7 +465,7 @@ export const ClientsTable: FC<Props> = ({
                                                     <span className="px-2 py-1 text-gray-500">...</span>
                                                 )}
                                                 <Link
-                                                    href={buildURL(page, sectionId?.toString(), searchTerm, hideMoneyData)}
+                                                    href={buildURL(page, sectionId?.toString(), searchTerm)}
                                                     className={`px-3 py-1 border rounded-md text-sm transition-colors ${page === currentPage
                                                         ? 'border-blue-500 bg-blue-500 text-white'
                                                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -481,7 +479,7 @@ export const ClientsTable: FC<Props> = ({
 
                                 {currentPage < totalPages && (
                                     <Link
-                                        href={buildURL(currentPage + 1, sectionId?.toString(), searchTerm, hideMoneyData)}
+                                        href={buildURL(currentPage + 1, sectionId?.toString(), searchTerm)}
                                         className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         Siguiente
@@ -493,7 +491,7 @@ export const ClientsTable: FC<Props> = ({
                 )}
 
             </div>
-            {debtSummary && !hideMoneyData && (
+            {debtSummary && (
                 <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3">
                         <h3 className="text-lg font-semibold text-gray-800 mb-2 md:mb-0">
