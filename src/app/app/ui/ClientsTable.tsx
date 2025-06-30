@@ -25,6 +25,8 @@ interface Props {
     currentPage: number
     totalPages: number
     totalClients: number
+    sectionCounts: Record<string, number>
+    totalClientsCount: number
     debtSummary?: {
         totalTransactionDebt: number
         totalRaffleDebt: number
@@ -42,6 +44,8 @@ export const ClientsTable: FC<Props> = ({
     currentPage,
     totalPages,
     totalClients,
+    sectionCounts,
+    totalClientsCount,
     debtSummary,
     sectionId,
     search,
@@ -121,10 +125,13 @@ export const ClientsTable: FC<Props> = ({
         window.location.href = url
     }
 
-    // Cuenta clientes por sección
+    // Cuenta clientes por sección (usando contadores reales de la base de datos)
     const getClientsCountBySection = (sectionId: number | null) => {
-        return clients.filter(client => client.sectionId === sectionId).length
-    }
+        if (sectionId === null) {
+            return sectionCounts['null'] || 0;
+        }
+        return sectionCounts[sectionId.toString()] || 0;
+    };
 
     const buildURL = (page: number, section?: string, searchValue?: string, hideMoneyDataValue?: boolean) => {
         const params = new URLSearchParams()
@@ -268,7 +275,7 @@ export const ClientsTable: FC<Props> = ({
                         >
                             <div className="text-center">
                                 <div className="font-semibold text-xs">Todas</div>
-                                <div className="text-xs mt-1">{clients.length}</div>
+                                <div className="text-xs mt-1">{totalClientsCount}</div>
                             </div>
                         </button>
 

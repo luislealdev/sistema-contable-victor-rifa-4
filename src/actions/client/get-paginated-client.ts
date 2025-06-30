@@ -190,12 +190,32 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
             grandTotalDebt: 0
         });
 
+        // Get client counts by section (for all clients, not just current page)
+        const sectionCounts = await prisma.client.groupBy({
+            by: ['sectionId'],
+            _count: {
+                id: true
+            }
+        });
+
+        // Transform section counts to a more usable format
+        const sectionCountsMap: Record<string, number> = {};
+        sectionCounts.forEach(count => {
+            const key = count.sectionId ? count.sectionId.toString() : 'null';
+            sectionCountsMap[key] = count._count.id;
+        });
+
+        // Get total clients count (for "Todas" section)
+        const totalClientsCount = await prisma.client.count();
+
         return {
             ok: true,
             clients: clientsWithDebt,
             totalPages: Math.ceil(totalClients / pageSize),
             currentPage: page,
             totalClients,
+            sectionCounts: sectionCountsMap,
+            totalClientsCount,
             debtSummary: {
                 totalTransactionDebt: Number(totalDebtSummary.totalTransactionDebt.toFixed(2)),
                 totalRaffleDebt: Number(totalDebtSummary.totalRaffleDebt.toFixed(2)),
