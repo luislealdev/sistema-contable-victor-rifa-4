@@ -1,16 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Sistema Contable",
@@ -25,10 +15,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
       </body>
+      <footer>
+        <div className="text-center text-sm text-gray-500 p-4">
+          © {new Date().getFullYear()} Sistema Contable. Todos los derechos
+          reservados. <br />
+          Creado por: <Link href="https://luisrrleal.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">luisrrleal.com</Link>
+        </div>
+      </footer>
     </html>
   );
 }
