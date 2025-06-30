@@ -13,17 +13,17 @@ export async function getClientById(id: number) {
                     orderBy: {
                         createdAt: 'desc', // Order by most recent transaction
                     },
-                    include: {
-                        payments: true, // Include payments for the transaction
-                    }
+                    // include: {
+                    //     // payments: true, // Include payments for the transaction
+                    // }
                 },
                 raffleTickets: {
                     include: {
                         raffle: true, // Include raffle details
-                        payments: true, // Include payments for the raffle ticket
+                        // payments: true, // Include payments for the raffle ticket
                     },
                 },
-
+                payments: true, // Include payments for the client
             },
         });
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Client, Payment, Raffle, RaffleTicket, RaffleTicketPayment, Section, Transaction } from "@prisma/client"
+import { Client, Payment, Raffle, RaffleTicket, Section, Transaction } from "@prisma/client"
 import { FC, useState } from "react"
 import TransactionForm from "@/components/forms/TransactionForm"
 import PaymentForm from "@/components/forms/PaymentForm"
@@ -8,20 +8,21 @@ import { useRouter } from "next/navigation"
 import { deleteTransaction } from "@/actions/transaction/delete-transaction"
 import { deletePayment } from "@/actions/payment/delete-payment"
 
-type TransactionWithPayments = Transaction & {
-    payments: Payment[];
-};
+// type TransactionWithPayments = Transaction & {
+//     payments: Payment[];
+// };
 
-type RaffleTicketWithRaffleAndPayments = RaffleTicket & {
+type RaffleTicketWithRaffle = RaffleTicket & {
     raffle: Raffle;
-    payments: RaffleTicketPayment[];  // Cambié a RaffleTicketPayment
+    // payments: RaffleTicketPayment[];  // Cambié a RaffleTicketPayment
 };
 
 interface Props {
     client: (Client & {
         section: Section | null;
-        transactions: TransactionWithPayments[];
-        raffleTickets: RaffleTicketWithRaffleAndPayments[];
+        transactions: Transaction[];
+        raffleTickets: RaffleTicketWithRaffle[];
+        payments: Payment[];
     }) | null;
 }
 export const ClientInfo: FC<Props> = ({ client }) => {
@@ -46,17 +47,25 @@ export const ClientInfo: FC<Props> = ({ client }) => {
         );
     }
 
-    // Calcular deudas
-    const transactionDebt = client.transactions.reduce((total, transaction) => {
-        return total + transaction.remaining;
+    // Calcular totales financieros
+    const totalTransactions = client.transactions.reduce((total: number, transaction) => {
+        return total + transaction.totalAmount;
     }, 0);
 
-    const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
-        const ticketPrice = ticket.raffle.ticketPrice;
-        const totalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-        const remainingTicketDebt = ticketPrice - totalPaid;
-        return total + Math.max(0, remainingTicketDebt);
+    const totalPayments = client.payments.reduce((total: number, payment) => {
+        return total + payment.amount;
     }, 0);
+
+    const transactionDebt = totalTransactions - totalPayments;
+
+    const totalRaffleValue = client.raffleTickets.reduce((total: number, ticket) => {
+        return total + ticket.raffle.ticketPrice;
+    }, 0);
+
+    // Para rifas, asumiré que por ahora no hay pagos específicos de rifas
+    // Si implementas pagos de rifas después, aquí calcularías los pagos de rifas
+    const totalRafflePayments = 0; // client.raffleTickets.reduce...
+    const raffleDebt = totalRaffleValue - totalRafflePayments;
 
     const totalDebt = transactionDebt + raffleDebt;
 
@@ -101,7 +110,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
         if (!confirm('¿Estás seguro de que quieres eliminar esta transacción? También se eliminarán todos los pagos asociados.')) {
             return;
         }
-        
+
         setIsDeleting(true);
         try {
             const result = await deleteTransaction(transactionId);
@@ -122,7 +131,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
         if (!confirm('¿Estás seguro de que quieres eliminar este pago?')) {
             return;
         }
-        
+
         setIsDeleting(true);
         try {
             const result = await deletePayment(paymentId);
@@ -258,24 +267,56 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                 {/* Resumen Financiero */}
                 <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-4">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Resumen Financiero</h2>
-                    <div className="space-y-3">
-                        <div className="bg-blue-50 p-3 rounded-lg">
-                            <div className="flex justify-between items-center">
-                                <span className="text-blue-700 font-medium text-sm">Transacciones</span>
-                                <span className="text-blue-900 font-bold text-lg">{formatMoney(transactionDebt)}</span>
+                    
+                    {/* Transacciones - Compacto */}
+                    <div className="mb-4">
+                        <h3 className="text-sm font-medium text-gray-700 mb-2">Transacciones</h3>
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                            <div className="bg-blue-50 p-2 rounded text-center">
+                                <div className="text-blue-700 font-medium">Total</div>
+                                <div className="text-blue-900 font-bold">{formatMoney(totalTransactions)}</div>
+                            </div>
+                            <div className="bg-green-50 p-2 rounded text-center">
+                                <div className="text-green-700 font-medium">Pagos</div>
+                                <div className="text-green-900 font-bold">{formatMoney(totalPayments)}</div>
+                            </div>
+                            <div className="bg-gray-50 p-2 rounded text-center">
+                                <div className="text-gray-700 font-medium">Deuda</div>
+                                <div className={`font-bold ${transactionDebt > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                    {formatMoney(transactionDebt)}
+                                </div>
                             </div>
                         </div>
-                        <div className="bg-green-50 p-3 rounded-lg">
-                            <div className="flex justify-between items-center">
-                                <span className="text-green-700 font-medium text-sm">Rifas</span>
-                                <span className="text-green-900 font-bold text-lg">{formatMoney(raffleDebt)}</span>
+                    </div>
+
+                    {/* Rifas - Compacto */}
+                    {totalRaffleValue > 0 && (
+                        <div className="mb-4">
+                            <h3 className="text-sm font-medium text-gray-700 mb-2">Rifas</h3>
+                            <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div className="bg-purple-50 p-2 rounded text-center">
+                                    <div className="text-purple-700 font-medium">Total</div>
+                                    <div className="text-purple-900 font-bold">{formatMoney(totalRaffleValue)}</div>
+                                </div>
+                                <div className="bg-green-50 p-2 rounded text-center">
+                                    <div className="text-green-700 font-medium">Pagos</div>
+                                    <div className="text-green-900 font-bold">{formatMoney(totalRafflePayments)}</div>
+                                </div>
+                                <div className="bg-gray-50 p-2 rounded text-center">
+                                    <div className="text-gray-700 font-medium">Deuda</div>
+                                    <div className={`font-bold ${raffleDebt > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                        {formatMoney(raffleDebt)}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="bg-red-50 p-3 rounded-lg border-2 border-red-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-red-700 font-bold text-sm">TOTAL ADEUDADO</span>
-                                <span className="text-red-900 font-bold text-xl">{formatMoney(totalDebt)}</span>
-                            </div>
+                    )}
+
+                    {/* Total General */}
+                    <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                        <div className="flex justify-between items-center">
+                            <span className="text-red-700 font-bold text-sm">DEUDA TOTAL</span>
+                            <span className="text-red-900 font-bold text-lg">{formatMoney(totalDebt)}</span>
                         </div>
                     </div>
                 </div>
@@ -301,8 +342,11 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                         {/* Mobile/Tablet Card View */}
                         <div className="block md:hidden space-y-3">
                             {client.transactions.map((transaction) => {
-                                const totalPaid = transaction.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                const isPaid = transaction.remaining === 0;
+                                // Calcular pagos relacionados con esta transacción específica
+                                const transactionPayments = client.payments.filter(p => p.transactionId === transaction.id);
+                                const totalPaidForTransaction = transactionPayments.reduce((sum, payment) => sum + payment.amount, 0);
+                                const remaining = transaction.totalAmount - totalPaidForTransaction;
+                                const isPaid = remaining <= 0;
 
                                 return (
                                     <div key={transaction.id} className="border rounded-lg p-3 bg-gray-50">
@@ -324,40 +368,36 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                                 <p className="text-sm font-medium text-gray-900 mb-1">{transaction.description}</p>
                                                 <p className="text-xs text-gray-600">{formatDate(transaction.createdAt)}</p>
                                             </div>
-                                            <div className="flex space-x-1 ml-2">
-                                                <button
-                                                    onClick={() => handleEditTransaction(transaction)}
-                                                    className="text-blue-600 hover:text-blue-900 transition-colors p-1"
-                                                    disabled={isDeleting}
-                                                    title="Editar"
-                                                >
-                                                    ✏️
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteTransaction(transaction.id)}
-                                                    className="text-red-600 hover:text-red-900 transition-colors p-1"
-                                                    disabled={isDeleting}
-                                                    title="Eliminar"
-                                                >
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-3 gap-2 text-xs">
-                                            <div>
-                                                <span className="text-gray-600">Total:</span>
-                                                <div className="font-medium text-gray-900">{formatMoney(transaction.totalAmount)}</div>
-                                            </div>
-                                            <div>
-                                                <span className="text-gray-600">Pagado:</span>
-                                                <div className="text-green-600">{formatMoney(totalPaid)}</div>
-                                            </div>
-                                            {transaction.remaining > 0 && (
-                                                <div>
-                                                    <span className="text-gray-600">Restante:</span>
-                                                    <div className="text-red-600 font-medium">{formatMoney(transaction.remaining)}</div>
+                                            <div className="flex flex-col items-end ml-2">
+                                                <div className="text-right mb-2">
+                                                    <div className="text-lg font-bold text-gray-900">
+                                                        {formatMoney(transaction.totalAmount)}
+                                                    </div>
+                                                    {!isPaid && (
+                                                        <div className="text-sm text-red-600 font-medium">
+                                                            Pendiente: {formatMoney(remaining)}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
+                                                <div className="flex space-x-1">
+                                                    <button
+                                                        onClick={() => handleEditTransaction(transaction)}
+                                                        className="text-blue-600 hover:text-blue-900 transition-colors p-1"
+                                                        disabled={isDeleting}
+                                                        title="Editar"
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteTransaction(transaction.id)}
+                                                        className="text-red-600 hover:text-red-900 transition-colors p-1"
+                                                        disabled={isDeleting}
+                                                        title="Eliminar"
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -376,11 +416,11 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                             Descripción
                                         </th>
                                         <th className="w-1/6 px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Total/Pagado
+                                            Total
                                         </th>
-                                        <th className="w-1/12 px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        {/* <th className="w-1/12 px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Estado
-                                        </th>
+                                        </th> */}
                                         <th className="w-1/12 px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                                             Acciones
                                         </th>
@@ -388,8 +428,8 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
                                     {client.transactions.map((transaction) => {
-                                        const totalPaid = transaction.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                        const isPaid = transaction.remaining === 0;
+                                        // const totalPaid = transaction.payments.reduce((sum, payment) => sum + payment.amount, 0);
+                                        // const isPaid = transaction.remaining === 0;
 
                                         return (
                                             <tr key={transaction.id} className="hover:bg-gray-50">
@@ -415,22 +455,22 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                                         <div className="font-medium text-gray-900">
                                                             {formatMoney(transaction.totalAmount)}
                                                         </div>
-                                                        <div className="text-green-600">
+                                                        {/* <div className="text-green-600">
                                                             Pagado: {formatMoney(totalPaid)}
                                                         </div>
                                                         {transaction.remaining > 0 && (
                                                             <div className="text-red-600 font-medium">
                                                                 Restante: {formatMoney(transaction.remaining)}
                                                             </div>
-                                                        )}
+                                                        )} */}
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-3">
+                                                {/* <td className="px-2 py-3">
                                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${isPaid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                                         }`}>
                                                         {isPaid ? 'Pagado' : 'Pendiente'}
                                                     </span>
-                                                </td>
+                                                </td> */}
                                                 <td className="px-2 py-3 text-right">
                                                     <div className="flex justify-end space-x-1">
                                                         <button
@@ -476,40 +516,41 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                 </div>
 
                 {/* Aquí podríamos mostrar todos los pagos del cliente */}
-                {client.transactions.some(t => t.payments.length > 0) ? (
+                {/* {client.transactions.some(t => t.payments.length > 0) ? ( */}
+                {client.payments.length > 0 ? (
                     <div className="space-y-3 md:space-y-0">
                         {/* Mobile/Tablet Card View */}
                         <div className="block md:hidden space-y-3">
-                            {client.transactions
-                                .flatMap(transaction =>
-                                    transaction.payments.map(payment => ({
-                                        ...payment,
-                                        transaction
-                                    }))
-                                )
+                            {client.payments
+                                // .flatMap(transaction =>
+                                //     transaction.payments.map(payment => ({
+                                //         ...payment,
+                                //         transaction
+                                //     }))
+                                // )
                                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                                 .map((payment) => (
                                     <div key={payment.id} className="border rounded-lg p-3 bg-gray-50">
                                         <div className="flex justify-between items-start mb-2">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${payment.transaction.type === 'SALE' ? 'bg-blue-100 text-blue-800' :
+                                                    {/* <span className={`px-2 py-1 rounded-full text-xs font-medium ${payment.transaction.type === 'SALE' ? 'bg-blue-100 text-blue-800' :
                                                         payment.transaction.type === 'LOAN' ? 'bg-yellow-100 text-yellow-800' :
                                                             'bg-purple-100 text-purple-800'
                                                         }`}>
                                                         {payment.transaction.type === 'SALE' ? 'Venta' :
                                                             payment.transaction.type === 'LOAN' ? 'Préstamo' : 'Servicio'}
-                                                    </span>
+                                                    </span> */}
                                                     <span className="text-lg font-bold text-green-600">
                                                         {formatMoney(payment.amount)}
                                                     </span>
                                                 </div>
                                                 <p className="text-xs text-gray-600 mb-1">{formatDate(payment.date)}</p>
-                                                {payment.transaction.description && (
+                                                {/* {payment.transaction.description && (
                                                     <p className="text-xs text-gray-500">
                                                         Transacción: {payment.transaction.description}
                                                     </p>
-                                                )}
+                                                )} */}
                                                 {payment.description && (
                                                     <p className="text-xs text-gray-700">
                                                         Nota: {payment.description}
@@ -548,9 +589,9 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                         <th className="w-1/6 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Monto
                                         </th>
-                                        <th className="w-2/6 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        {/* <th className="w-2/6 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Transacción
-                                        </th>
+                                        </th> */}
                                         <th className="w-1/6 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             Descripción
                                         </th>
@@ -560,13 +601,13 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {client.transactions
-                                        .flatMap(transaction =>
-                                            transaction.payments.map(payment => ({
-                                                ...payment,
-                                                transaction
-                                            }))
-                                        )
+                                    {client.payments
+                                        // .flatMap(transaction =>
+                                        //     transaction.payments.map(payment => ({
+                                        //         ...payment,
+                                        //         transaction
+                                        //     }))
+                                        // )
                                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                                         .map((payment) => (
                                             <tr key={payment.id} className="hover:bg-gray-50">
@@ -576,7 +617,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                                 <td className="px-3 py-3 text-sm font-bold text-green-600">
                                                     {formatMoney(payment.amount)}
                                                 </td>
-                                                <td className="px-3 py-3 text-sm">
+                                                {/* <td className="px-3 py-3 text-sm">
                                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${payment.transaction.type === 'SALE' ? 'bg-blue-100 text-blue-800' :
                                                         payment.transaction.type === 'LOAN' ? 'bg-yellow-100 text-yellow-800' :
                                                             'bg-purple-100 text-purple-800'
@@ -589,7 +630,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                                             {payment.transaction.description}
                                                         </div>
                                                     )}
-                                                </td>
+                                                </td> */}
                                                 <td className="px-3 py-3 text-sm text-gray-900">
                                                     <div className="truncate" title={payment.description || ''}>
                                                         {payment.description || '-'}
@@ -634,8 +675,9 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                         {client.raffleTickets.map((ticket) => {
-                            const totalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                            const remaining = ticket.raffle.ticketPrice - totalPaid;
+                            // const totalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
+                            // const remaining = ticket.raffle.ticketPrice - totalPaid;
+                            const remaining = ticket.raffle.ticketPrice;
 
                             return (
                                 <div key={ticket.id} className="border rounded-lg p-3 hover:shadow-md transition-shadow">
@@ -664,10 +706,10 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                             <span>Precio:</span>
                                             <span className="font-medium">{formatMoney(ticket.raffle.ticketPrice)}</span>
                                         </div>
-                                        <div className="flex justify-between">
+                                        {/* <div className="flex justify-between">
                                             <span>Pagado:</span>
                                             <span className="text-green-600 font-medium">{formatMoney(totalPaid)}</span>
-                                        </div>
+                                        </div> */}
                                         {remaining > 0 && (
                                             <div className="flex justify-between">
                                                 <span>Restante:</span>
