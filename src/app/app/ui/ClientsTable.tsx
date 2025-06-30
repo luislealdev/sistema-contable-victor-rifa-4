@@ -262,105 +262,6 @@ export const ClientsTable: FC<Props> = ({
             {/* Tabla de Clientes */}
             <div className="bg-white rounded-lg shadow-md">
                 {/* Resumen de Deudas */}
-                {debtSummary && (
-                    <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
-                        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2 md:mb-0">
-                                📊 Resumen Financiero
-                                {sectionId
-                                    ? ` - ${sections.find(s => s.id === sectionId)?.name || 'Sección'}`
-                                    : searchTerm
-                                        ? ` - Búsqueda: "${searchTerm}"`
-                                        : ' - Total General'
-                                }
-                            </h3>
-                            <div className="text-sm text-gray-600">
-                                {totalClients} cliente{totalClients !== 1 ? 's' : ''}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-4 gap-3">
-                            {/* Deuda de Transacciones */}
-                            <div className="bg-white rounded-lg p-3 border border-blue-200">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                    <h4 className="text-xs font-medium text-gray-700">Transacciones</h4>
-                                </div>
-                                <p className="text-lg font-bold text-blue-600 mt-1">
-                                    ${debtSummary.totalTransactionDebt.toLocaleString()}
-                                </p>
-                            </div>
-
-                            {/* Deuda de Rifas */}
-                            <div className="bg-white rounded-lg p-3 border border-green-200">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <h4 className="text-xs font-medium text-gray-700">Rifas</h4>
-                                </div>
-                                <p className="text-lg font-bold text-green-600 mt-1">
-                                    ${debtSummary.totalRaffleDebt.toLocaleString()}
-                                </p>
-                            </div>
-
-                            {/* Servicios Mensuales */}
-                            <div className="bg-white rounded-lg p-3 border border-purple-200">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                    <h4 className="text-xs font-medium text-gray-700">Servicios</h4>
-                                </div>
-                                <p className="text-lg font-bold text-purple-600 mt-1">
-                                    ${debtSummary.totalMonthlyServiceDebt.toLocaleString()}
-                                </p>
-                            </div>
-
-                            {/* Total General */}
-                            <div className="bg-white rounded-lg p-3 border-2 border-red-300 shadow-md">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                    <h4 className="text-xs font-bold text-gray-800">TOTAL</h4>
-                                </div>
-                                <p className="text-lg font-bold text-red-600 mt-1">
-                                    ${debtSummary.grandTotalDebt.toLocaleString()}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Barra de progreso visual - Solo en pantallas grandes */}
-                        <div className="mt-3 hidden lg:block">
-                            <div className="flex items-center space-x-2 text-xs text-gray-600 mb-1">
-                                <span>Distribución de deudas:</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2 flex overflow-hidden">
-                                {debtSummary.grandTotalDebt > 0 && (
-                                    <>
-                                        <div
-                                            className="bg-blue-500 h-full"
-                                            style={{
-                                                width: `${(debtSummary.totalTransactionDebt / debtSummary.grandTotalDebt) * 100}%`
-                                            }}
-                                            title={`Transacciones: ${((debtSummary.totalTransactionDebt / debtSummary.grandTotalDebt) * 100).toFixed(1)}%`}
-                                        ></div>
-                                        <div
-                                            className="bg-green-500 h-full"
-                                            style={{
-                                                width: `${(debtSummary.totalRaffleDebt / debtSummary.grandTotalDebt) * 100}%`
-                                            }}
-                                            title={`Rifas: ${((debtSummary.totalRaffleDebt / debtSummary.grandTotalDebt) * 100).toFixed(1)}%`}
-                                        ></div>
-                                        <div
-                                            className="bg-purple-500 h-full"
-                                            style={{
-                                                width: `${(debtSummary.totalMonthlyServiceDebt / debtSummary.grandTotalDebt) * 100}%`
-                                            }}
-                                            title={`Servicios: ${((debtSummary.totalMonthlyServiceDebt / debtSummary.grandTotalDebt) * 100).toFixed(1)}%`}
-                                        ></div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 <div className="p-4 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-800">
                         {sectionId
@@ -404,8 +305,8 @@ export const ClientsTable: FC<Props> = ({
                                     <tr
                                         key={client.id}
                                         className={`hover:bg-gray-50 border-l-4 cursor-pointer transition-colors group ${client.sectionId
-                                                ? getSectionColor(client.sectionId).split(' ')[2] // border color
-                                                : 'border-gray-300'
+                                            ? getSectionColor(client.sectionId).split(' ')[2] // border color
+                                            : 'border-gray-300'
                                             }`}
                                         onClick={() => window.location.href = `/app/${client.id}`}
                                         title={`Click para ver detalles de ${client.name}`}
@@ -437,12 +338,12 @@ export const ClientsTable: FC<Props> = ({
                                         </td>
                                         <td className="px-3 py-4">
                                             <div className={`text-xs ${client.sectionId
-                                                    ? getSectionColor(client.sectionId)
-                                                    : 'bg-gray-50 text-gray-500 border-gray-200'
+                                                ? getSectionColor(client.sectionId)
+                                                : 'bg-gray-50 text-gray-500 border-gray-200'
                                                 } rounded-md px-2 py-1 inline-flex items-center space-x-1 max-w-full`}>
                                                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${client.sectionId
-                                                        ? getSectionColor(client.sectionId).split(' ')[1] // text color converted to bg
-                                                        : 'bg-gray-400'
+                                                    ? getSectionColor(client.sectionId).split(' ')[1] // text color converted to bg
+                                                    : 'bg-gray-400'
                                                     } border-white border`}></div>
                                                 <span className="font-medium truncate">{getSectionName(client.sectionId)}</span>
                                             </div>
@@ -559,7 +460,106 @@ export const ClientsTable: FC<Props> = ({
                         </div>
                     </div>
                 )}
+
             </div>
+            {debtSummary && (
+                <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-2 md:mb-0">
+                            📊 Resumen Financiero
+                            {sectionId
+                                ? ` - ${sections.find(s => s.id === sectionId)?.name || 'Sección'}`
+                                : searchTerm
+                                    ? ` - Búsqueda: "${searchTerm}"`
+                                    : ' - Total General'
+                            }
+                        </h3>
+                        <div className="text-sm text-gray-600">
+                            {totalClients} cliente{totalClients !== 1 ? 's' : ''}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-3">
+                        {/* Deuda de Transacciones */}
+                        <div className="bg-white rounded-lg p-3 border border-blue-200">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <h4 className="text-xs font-medium text-gray-700">Transacciones</h4>
+                            </div>
+                            <p className="text-lg font-bold text-blue-600 mt-1">
+                                ${debtSummary.totalTransactionDebt.toLocaleString()}
+                            </p>
+                        </div>
+
+                        {/* Deuda de Rifas */}
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <h4 className="text-xs font-medium text-gray-700">Rifas</h4>
+                            </div>
+                            <p className="text-lg font-bold text-green-600 mt-1">
+                                ${debtSummary.totalRaffleDebt.toLocaleString()}
+                            </p>
+                        </div>
+
+                        {/* Servicios Mensuales */}
+                        <div className="bg-white rounded-lg p-3 border border-purple-200">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                <h4 className="text-xs font-medium text-gray-700">Servicios</h4>
+                            </div>
+                            <p className="text-lg font-bold text-purple-600 mt-1">
+                                ${debtSummary.totalMonthlyServiceDebt.toLocaleString()}
+                            </p>
+                        </div>
+
+                        {/* Total General */}
+                        <div className="bg-white rounded-lg p-3 border-2 border-red-300 shadow-md">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                <h4 className="text-xs font-bold text-gray-800">TOTAL</h4>
+                            </div>
+                            <p className="text-lg font-bold text-red-600 mt-1">
+                                ${debtSummary.grandTotalDebt.toLocaleString()}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Barra de progreso visual - Solo en pantallas grandes */}
+                    <div className="mt-3 hidden lg:block">
+                        <div className="flex items-center space-x-2 text-xs text-gray-600 mb-1">
+                            <span>Distribución de deudas:</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 flex overflow-hidden">
+                            {debtSummary.grandTotalDebt > 0 && (
+                                <>
+                                    <div
+                                        className="bg-blue-500 h-full"
+                                        style={{
+                                            width: `${(debtSummary.totalTransactionDebt / debtSummary.grandTotalDebt) * 100}%`
+                                        }}
+                                        title={`Transacciones: ${((debtSummary.totalTransactionDebt / debtSummary.grandTotalDebt) * 100).toFixed(1)}%`}
+                                    ></div>
+                                    <div
+                                        className="bg-green-500 h-full"
+                                        style={{
+                                            width: `${(debtSummary.totalRaffleDebt / debtSummary.grandTotalDebt) * 100}%`
+                                        }}
+                                        title={`Rifas: ${((debtSummary.totalRaffleDebt / debtSummary.grandTotalDebt) * 100).toFixed(1)}%`}
+                                    ></div>
+                                    <div
+                                        className="bg-purple-500 h-full"
+                                        style={{
+                                            width: `${(debtSummary.totalMonthlyServiceDebt / debtSummary.grandTotalDebt) * 100}%`
+                                        }}
+                                        title={`Servicios: ${((debtSummary.totalMonthlyServiceDebt / debtSummary.grandTotalDebt) * 100).toFixed(1)}%`}
+                                    ></div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
