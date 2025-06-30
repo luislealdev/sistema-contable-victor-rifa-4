@@ -8,6 +8,7 @@ const ClientsPage = async ({ searchParams }: {
         page?: string;
         sectionId?: string;
         search?: string;
+        hideMoneyData?: string;
     }>;
 }) => {
 
@@ -15,6 +16,7 @@ const ClientsPage = async ({ searchParams }: {
     const page = parseInt(params.page || '1', 10);
     const sectionId = params.sectionId ? parseInt(params.sectionId, 10) : undefined;
     const search = params.search || '';
+    const hideMoneyData = params.hideMoneyData === 'true' || params.hideMoneyData === '1';
 
     const clientsResult = await getPaginatedClients(
         page,
@@ -35,6 +37,7 @@ const ClientsPage = async ({ searchParams }: {
 
     return (
         <ClientsTable 
+            hideMoneyData={hideMoneyData}
             clients={clientsResult.clients || []} 
             sections={sectionsResult.sections || []}
             currentPage={clientsResult.currentPage || 1}

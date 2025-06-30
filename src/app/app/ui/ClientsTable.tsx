@@ -33,6 +33,7 @@ interface Props {
     }
     sectionId?: number
     search?: string
+    hideMoneyData?: boolean
 }
 
 export const ClientsTable: FC<Props> = ({
@@ -43,7 +44,8 @@ export const ClientsTable: FC<Props> = ({
     totalClients,
     debtSummary,
     sectionId,
-    search
+    search,
+    hideMoneyData = false
 }) => {
     const [showForm, setShowForm] = useState(false)
     const [showSectionForm, setShowSectionForm] = useState(false)
@@ -51,6 +53,7 @@ export const ClientsTable: FC<Props> = ({
     // const [filterSection, setFilterSection] = useState(sectionId?.toString() || '')
     const [searchTerm, setSearchTerm] = useState(search || '')
     const [loading, setLoading] = useState(false)
+    // const [hideMoneyData, setHideMoneyData] = useState(false)
 
     const handleDelete = async (clientId: number, clientName: string) => {
         if (!confirm(`¿Estás seguro de que quieres eliminar a ${clientName}?`)) {
@@ -113,7 +116,7 @@ export const ClientsTable: FC<Props> = ({
     }
 
     const handleSectionFilter = (sectionId?: number) => {
-        const url = buildURL(1, sectionId?.toString(), searchTerm)
+        const url = buildURL(1, sectionId?.toString(), searchTerm, hideMoneyData)
         window.location.href = url
     }
 
@@ -122,16 +125,22 @@ export const ClientsTable: FC<Props> = ({
         return clients.filter(client => client.sectionId === sectionId).length
     }
 
-    const buildURL = (page: number, section?: string, searchValue?: string) => {
+    const buildURL = (page: number, section?: string, searchValue?: string, hideMoneyDataValue?: boolean) => {
         const params = new URLSearchParams()
         params.set('page', page.toString())
         if (section) params.set('sectionId', section)
         if (searchValue) params.set('search', searchValue)
+        if (hideMoneyDataValue) params.set('hideMoneyData', 'true')
         return `/app?${params.toString()}`
     }
 
     const handleFilter = () => {
-        const url = buildURL(1, sectionId?.toString(), searchTerm)
+        const url = buildURL(1, sectionId?.toString(), searchTerm, hideMoneyData)
+        window.location.href = url
+    }
+
+    const handleToggleMoneyData = () => {
+        const url = buildURL(currentPage, sectionId?.toString(), searchTerm, !hideMoneyData)
         window.location.href = url
     }
 
@@ -170,9 +179,27 @@ export const ClientsTable: FC<Props> = ({
         <div className="container mx-auto p-6 space-y-6">
             {/* Header */}
             <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
                     <h1 className="text-3xl font-bold text-gray-800">Gestión de Clientes</h1>
-                    <div className="flex space-x-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        {/* Toggle para ocultar datos monetarios */}
+                        <button
+                            onClick={handleToggleMoneyData}
+                            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                                hideMoneyData 
+                                    ? 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200' 
+                                    : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                            }`}
+                            title={hideMoneyData ? 'Mostrar datos monetarios' : 'Ocultar datos monetarios'}
+                        >
+                            <span className="text-sm">
+                                {hideMoneyData ? '🔒' : '👁️'}
+                            </span>
+                            <span className="text-sm font-medium">
+                                {hideMoneyData ? 'Datos Ocultos' : 'Ocultar Montos'}
+                            </span>
+                        </button>
+                        
                         <button
                             onClick={() => setShowSectionForm(true)}
                             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
@@ -285,9 +312,11 @@ export const ClientsTable: FC<Props> = ({
                                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Sección
                                 </th>
-                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Deuda
-                                </th>
+                                {!hideMoneyData && (
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Deuda
+                                    </th>
+                                )}
                                 <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Acciones
                                 </th>
@@ -296,7 +325,7 @@ export const ClientsTable: FC<Props> = ({
                         <tbody className="bg-white divide-y divide-gray-200">
                             {clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-3 py-4 text-center text-gray-500">
+                                    <td colSpan={hideMoneyData ? 4 : 5} className="px-3 py-4 text-center text-gray-500">
                                         No se encontraron clientes
                                     </td>
                                 </tr>
@@ -348,27 +377,29 @@ export const ClientsTable: FC<Props> = ({
                                                 <span className="font-medium truncate">{getSectionName(client.sectionId)}</span>
                                             </div>
                                         </td>
-                                        <td className="px-3 py-4">
-                                            <div className="text-right">
-                                                <span className={`text-sm font-medium ${client.debt.totalDebt > 0
-                                                    ? 'text-red-600'
-                                                    : 'text-green-600'
-                                                    }`}>
-                                                    ${client.debt.totalDebt.toFixed(0)}
-                                                </span>
-                                                {client.debt.totalDebt > 0 && (
-                                                    <div className="text-xs text-gray-500">
-                                                        T: ${client.debt.transactionDebt.toFixed(0)}
-                                                        {client.debt.raffleDebt > 0 && (
-                                                            <> | R: ${client.debt.raffleDebt.toFixed(0)}</>
-                                                        )}
-                                                        {client.debt.monthlyServiceDebt > 0 && (
-                                                            <> | S: ${client.debt.monthlyServiceDebt.toFixed(0)}</>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </td>
+                                        {!hideMoneyData && (
+                                            <td className="px-3 py-4">
+                                                <div className="text-right">
+                                                    <span className={`text-sm font-medium ${client.debt.totalDebt > 0
+                                                        ? 'text-red-600'
+                                                        : 'text-green-600'
+                                                        }`}>
+                                                        ${client.debt.totalDebt.toFixed(0)}
+                                                    </span>
+                                                    {client.debt.totalDebt > 0 && (
+                                                        <div className="text-xs text-gray-500">
+                                                            T: ${client.debt.transactionDebt.toFixed(0)}
+                                                            {client.debt.raffleDebt > 0 && (
+                                                                <> | R: ${client.debt.raffleDebt.toFixed(0)}</>
+                                                            )}
+                                                            {client.debt.monthlyServiceDebt > 0 && (
+                                                                <> | S: ${client.debt.monthlyServiceDebt.toFixed(0)}</>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        )}
                                         <td className="px-3 py-4 text-right">
                                             <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
                                                 <Link
@@ -415,7 +446,7 @@ export const ClientsTable: FC<Props> = ({
                             <div className="flex space-x-2">
                                 {currentPage > 1 && (
                                     <Link
-                                        href={buildURL(currentPage - 1, sectionId?.toString(), searchTerm)}
+                                        href={buildURL(currentPage - 1, sectionId?.toString(), searchTerm, hideMoneyData)}
                                         className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         Anterior
@@ -436,7 +467,7 @@ export const ClientsTable: FC<Props> = ({
                                                     <span className="px-2 py-1 text-gray-500">...</span>
                                                 )}
                                                 <Link
-                                                    href={buildURL(page, sectionId?.toString(), searchTerm)}
+                                                    href={buildURL(page, sectionId?.toString(), searchTerm, hideMoneyData)}
                                                     className={`px-3 py-1 border rounded-md text-sm transition-colors ${page === currentPage
                                                         ? 'border-blue-500 bg-blue-500 text-white'
                                                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -450,7 +481,7 @@ export const ClientsTable: FC<Props> = ({
 
                                 {currentPage < totalPages && (
                                     <Link
-                                        href={buildURL(currentPage + 1, sectionId?.toString(), searchTerm)}
+                                        href={buildURL(currentPage + 1, sectionId?.toString(), searchTerm, hideMoneyData)}
                                         className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         Siguiente
@@ -462,7 +493,7 @@ export const ClientsTable: FC<Props> = ({
                 )}
 
             </div>
-            {debtSummary && (
+            {debtSummary && !hideMoneyData && (
                 <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3">
                         <h3 className="text-lg font-semibold text-gray-800 mb-2 md:mb-0">
