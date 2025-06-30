@@ -155,7 +155,9 @@ export const ClientInfo: FC<Props> = ({ client }) => {
 
     // Formatear fecha
     const formatDate = (date: Date) => {
-        return new Date(date).toLocaleDateString('es-ES', {
+        // Crear una nueva fecha ajustando la zona horaria para evitar el desfase
+        const adjustedDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        return adjustedDate.toLocaleDateString('es-MX', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -164,7 +166,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
 
     // Formatear dinero
     const formatMoney = (amount: number) => {
-        return `$${amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`;
+        return `$${amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
     };
 
     // Mostrar el formulario de transacciones si está activo
@@ -267,7 +269,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                 {/* Resumen Financiero */}
                 <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-4">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Resumen Financiero</h2>
-                    
+
                     {/* Transacciones - Compacto */}
                     <div className="mb-4">
                         <h3 className="text-sm font-medium text-gray-700 mb-2">Transacciones</h3>
