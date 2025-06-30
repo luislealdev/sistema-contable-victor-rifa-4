@@ -224,14 +224,34 @@ export const ClientsTable: FC<Props> = ({
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleFilter()
+                                }
+                            }}
                         />
                     </div>
-                    <button
-                        onClick={handleFilter}
-                        className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-                    >
-                        Buscar
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleFilter}
+                            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                        >
+                            Buscar
+                        </button>
+                        {searchTerm && (
+                            <button
+                                onClick={() => {
+                                    setSearchTerm('')
+                                    const url = buildURL(1, sectionId?.toString(), '')
+                                    window.location.href = url
+                                }}
+                                className="px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-md hover:bg-red-200 transition-colors"
+                                title="Limpiar búsqueda"
+                            >
+                                ✕ Limpiar
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Secciones con Colores */}
