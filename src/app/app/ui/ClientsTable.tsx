@@ -103,16 +103,17 @@ export const ClientsTable: FC<Props> = ({
     // Genera colores consistentes para las secciones
     const getSectionColor = (sectionId: number) => {
         const colors = [
-            'bg-blue-100 text-blue-800 border-blue-200',
-            'bg-green-100 text-green-800 border-green-200',
-            'bg-purple-100 text-purple-800 border-purple-200',
-            'bg-yellow-100 text-yellow-800 border-yellow-200',
-            'bg-pink-100 text-pink-800 border-pink-200',
-            'bg-indigo-100 text-indigo-800 border-indigo-200',
-            'bg-red-100 text-red-800 border-red-200',
+            'bg-blue-100 text-orange-800 border-blue-200',
             'bg-orange-100 text-orange-800 border-orange-200',
+            'bg-blue-100 text-blue-800 border-blue-200',
+            'bg-pink-100 text-pink-800 border-pink-200',
+            'bg-yellow-100 text-yellow-800 border-yellow-200',
+            'bg-green-100 text-green-800 border-green-200',
+            'bg-red-100 text-red-800 border-red-200',
+            'bg-indigo-100 text-indigo-800 border-indigo-200',
+            'bg-purple-100 text-purple-800 border-purple-200',
         ]
-        return colors[sectionId % colors.length]
+        return colors[sectionId]
     }
 
     const handleSectionFilter = (sectionId?: number) => {
@@ -185,11 +186,10 @@ export const ClientsTable: FC<Props> = ({
                         {/* Toggle para ocultar datos monetarios */}
                         <button
                             onClick={handleToggleMoneyData}
-                            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                                hideMoneyData 
-                                    ? 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200' 
+                            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${hideMoneyData
+                                    ? 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200'
                                     : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                            }`}
+                                }`}
                             title={hideMoneyData ? 'Mostrar datos monetarios' : 'Ocultar datos monetarios'}
                         >
                             <span className="text-sm">
@@ -199,7 +199,7 @@ export const ClientsTable: FC<Props> = ({
                                 {hideMoneyData ? 'Datos Ocultos' : 'Ocultar Montos'}
                             </span>
                         </button>
-                        
+
                         <button
                             onClick={() => setShowSectionForm(true)}
                             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
