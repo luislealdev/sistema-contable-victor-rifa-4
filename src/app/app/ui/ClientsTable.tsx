@@ -210,32 +210,32 @@ export const ClientsTable: FC<Props> = ({
                 {/* Secciones con Colores */}
                 <div className="space-y-4">
                     <h2 className="text-lg font-semibold text-gray-700">Filtrar por Sección</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                    <div className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2">
                         {/* Todas las secciones */}
                         <button
                             onClick={() => handleSectionFilter()}
-                            className={`p-4 rounded-lg border-2 transition-all duration-200 ${!sectionId
+                            className={`p-3 rounded-lg border-2 transition-all duration-200 ${!sectionId
                                 ? 'bg-gray-200 border-gray-400 text-gray-800 shadow-md'
                                 : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             <div className="text-center">
-                                <div className="font-semibold">Todas</div>
-                                <div className="text-sm mt-1">{clients.length} clientes</div>
+                                <div className="font-semibold text-xs">Todas</div>
+                                <div className="text-xs mt-1">{clients.length}</div>
                             </div>
                         </button>
 
                         {/* Sin sección */}
                         <button
                             onClick={() => handleSectionFilter(undefined)}
-                            className={`p-4 rounded-lg border-2 transition-all duration-200 ${sectionId === undefined
+                            className={`p-3 rounded-lg border-2 transition-all duration-200 ${sectionId === undefined
                                 ? 'bg-gray-200 border-gray-400 text-gray-800 shadow-md'
                                 : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             <div className="text-center">
-                                <div className="font-semibold">Sin Sección</div>
-                                <div className="text-sm mt-1">{getClientsCountBySection(null)} clientes</div>
+                                <div className="font-semibold text-xs">Sin Sección</div>
+                                <div className="text-xs mt-1">{getClientsCountBySection(null)}</div>
                             </div>
                         </button>
 
@@ -244,14 +244,14 @@ export const ClientsTable: FC<Props> = ({
                             <button
                                 key={section.id}
                                 onClick={() => handleSectionFilter(section.id)}
-                                className={`p-4 rounded-lg border-2 transition-all duration-200 ${sectionId === section.id
+                                className={`p-3 rounded-lg border-2 transition-all duration-200 ${sectionId === section.id
                                     ? `${getSectionColor(section.id)} shadow-md transform scale-105`
                                     : `${getSectionColor(section.id)} opacity-70 hover:opacity-100 hover:transform hover:scale-105`
                                     }`}
                             >
                                 <div className="text-center">
-                                    <div className="font-semibold truncate">{section.name}</div>
-                                    <div className="text-sm mt-1">{getClientsCountBySection(section.id)} clientes</div>
+                                    <div className="font-semibold text-xs truncate" title={section.name}>{section.name}</div>
+                                    <div className="text-xs mt-1">{getClientsCountBySection(section.id)}</div>
                                 </div>
                             </button>
                         ))}
@@ -263,9 +263,9 @@ export const ClientsTable: FC<Props> = ({
             <div className="bg-white rounded-lg shadow-md">
                 {/* Resumen de Deudas */}
                 {debtSummary && (
-                    <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-800">
+                    <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2 md:mb-0">
                                 📊 Resumen Financiero
                                 {sectionId
                                     ? ` - ${sections.find(s => s.id === sectionId)?.name || 'Sección'}`
@@ -275,62 +275,62 @@ export const ClientsTable: FC<Props> = ({
                                 }
                             </h3>
                             <div className="text-sm text-gray-600">
-                                {totalClients} cliente{totalClients !== 1 ? 's' : ''} total{totalClients !== 1 ? 'es' : ''}
+                                {totalClients} cliente{totalClients !== 1 ? 's' : ''}
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-4 gap-3">
                             {/* Deuda de Transacciones */}
-                            <div className="bg-white rounded-lg p-4 border border-blue-200">
+                            <div className="bg-white rounded-lg p-3 border border-blue-200">
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                    <h4 className="text-sm font-medium text-gray-700">Transacciones</h4>
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <h4 className="text-xs font-medium text-gray-700">Transacciones</h4>
                                 </div>
-                                <p className="text-2xl font-bold text-blue-600 mt-2">
+                                <p className="text-lg font-bold text-blue-600 mt-1">
                                     ${debtSummary.totalTransactionDebt.toLocaleString()}
                                 </p>
                             </div>
 
                             {/* Deuda de Rifas */}
-                            <div className="bg-white rounded-lg p-4 border border-green-200">
+                            <div className="bg-white rounded-lg p-3 border border-green-200">
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <h4 className="text-sm font-medium text-gray-700">Rifas</h4>
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <h4 className="text-xs font-medium text-gray-700">Rifas</h4>
                                 </div>
-                                <p className="text-2xl font-bold text-green-600 mt-2">
+                                <p className="text-lg font-bold text-green-600 mt-1">
                                     ${debtSummary.totalRaffleDebt.toLocaleString()}
                                 </p>
                             </div>
 
                             {/* Servicios Mensuales */}
-                            <div className="bg-white rounded-lg p-4 border border-purple-200">
+                            <div className="bg-white rounded-lg p-3 border border-purple-200">
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                                    <h4 className="text-sm font-medium text-gray-700">Servicios</h4>
+                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                    <h4 className="text-xs font-medium text-gray-700">Servicios</h4>
                                 </div>
-                                <p className="text-2xl font-bold text-purple-600 mt-2">
+                                <p className="text-lg font-bold text-purple-600 mt-1">
                                     ${debtSummary.totalMonthlyServiceDebt.toLocaleString()}
                                 </p>
                             </div>
 
                             {/* Total General */}
-                            <div className="bg-white rounded-lg p-4 border-2 border-red-300 shadow-md">
+                            <div className="bg-white rounded-lg p-3 border-2 border-red-300 shadow-md">
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                    <h4 className="text-sm font-bold text-gray-800">TOTAL ADEUDADO</h4>
+                                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                    <h4 className="text-xs font-bold text-gray-800">TOTAL</h4>
                                 </div>
-                                <p className="text-2xl font-bold text-red-600 mt-2">
+                                <p className="text-lg font-bold text-red-600 mt-1">
                                     ${debtSummary.grandTotalDebt.toLocaleString()}
                                 </p>
                             </div>
                         </div>
 
-                        {/* Barra de progreso visual */}
-                        <div className="mt-4">
+                        {/* Barra de progreso visual - Solo en pantallas grandes */}
+                        <div className="mt-3 hidden lg:block">
                             <div className="flex items-center space-x-2 text-xs text-gray-600 mb-1">
                                 <span>Distribución de deudas:</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-3 flex overflow-hidden">
+                            <div className="w-full bg-gray-200 rounded-full h-2 flex overflow-hidden">
                                 {debtSummary.grandTotalDebt > 0 && (
                                     <>
                                         <div
@@ -371,23 +371,23 @@ export const ClientsTable: FC<Props> = ({
                         }
                     </h2>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="w-full">
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Cliente
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                                     Teléfono
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Sección
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Deuda Total
+                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Deuda
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Acciones
                                 </th>
                             </tr>
@@ -395,7 +395,7 @@ export const ClientsTable: FC<Props> = ({
                         <tbody className="bg-white divide-y divide-gray-200">
                             {clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                                    <td colSpan={5} className="px-3 py-4 text-center text-gray-500">
                                         No se encontraron clientes
                                     </td>
                                 </tr>
@@ -410,83 +410,90 @@ export const ClientsTable: FC<Props> = ({
                                         onClick={() => window.location.href = `/app/${client.id}`}
                                         title={`Click para ver detalles de ${client.name}`}
                                     >
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-3 py-4">
                                             <div className="flex items-center justify-between">
-                                                <div>
-                                                    <div className="text-sm font-medium text-gray-900">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="text-sm font-medium text-gray-900 truncate">
                                                         {client.name}
                                                     </div>
+                                                    <div className="md:hidden text-xs text-gray-500 truncate">
+                                                        {client.phone}
+                                                    </div>
                                                     {client.address && (
-                                                        <div className="text-sm text-gray-500">
+                                                        <div className="text-xs text-gray-500 truncate">
                                                             {client.address}
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400">
+                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 ml-2">
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                                     </svg>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td className="px-3 py-4 text-sm text-gray-900 hidden md:table-cell">
                                             {client.phone}
                                         </td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${client.sectionId
-                                                ? getSectionColor(client.sectionId)
-                                                : 'bg-gray-50 text-gray-500 border-gray-200'
-                                            } rounded-md mx-2`}>
-                                            <div className="flex items-center space-x-2 py-1 px-2">
-                                                <div className={`w-2 h-2 rounded-full ${client.sectionId
+                                        <td className="px-3 py-4">
+                                            <div className={`text-xs ${client.sectionId
+                                                    ? getSectionColor(client.sectionId)
+                                                    : 'bg-gray-50 text-gray-500 border-gray-200'
+                                                } rounded-md px-2 py-1 inline-flex items-center space-x-1 max-w-full`}>
+                                                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${client.sectionId
                                                         ? getSectionColor(client.sectionId).split(' ')[1] // text color converted to bg
                                                         : 'bg-gray-400'
                                                     } border-white border`}></div>
-                                                <span className="font-medium">{getSectionName(client.sectionId)}</span>
+                                                <span className="font-medium truncate">{getSectionName(client.sectionId)}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`text-sm font-medium ${client.debt.totalDebt > 0
-                                                ? 'text-red-600'
-                                                : 'text-green-600'
-                                                }`}>
-                                                ${client.debt.totalDebt.toFixed(2)}
-                                            </span>
-                                            {client.debt.totalDebt > 0 && (
-                                                <div className="text-xs text-gray-500">
-                                                    Transacciones: ${client.debt.transactionDebt}
-                                                    {client.debt.raffleDebt > 0 && (
-                                                        <> | Rifas: ${client.debt.raffleDebt}</>
-                                                    )}
-                                                    {client.debt.monthlyServiceDebt > 0 && (
-                                                        <> | Servicios: ${client.debt.monthlyServiceDebt}</>
-                                                    )}
-                                                </div>
-                                            )}
+                                        <td className="px-3 py-4">
+                                            <div className="text-right">
+                                                <span className={`text-sm font-medium ${client.debt.totalDebt > 0
+                                                    ? 'text-red-600'
+                                                    : 'text-green-600'
+                                                    }`}>
+                                                    ${client.debt.totalDebt.toFixed(0)}
+                                                </span>
+                                                {client.debt.totalDebt > 0 && (
+                                                    <div className="text-xs text-gray-500">
+                                                        T: ${client.debt.transactionDebt.toFixed(0)}
+                                                        {client.debt.raffleDebt > 0 && (
+                                                            <> | R: ${client.debt.raffleDebt.toFixed(0)}</>
+                                                        )}
+                                                        {client.debt.monthlyServiceDebt > 0 && (
+                                                            <> | S: ${client.debt.monthlyServiceDebt.toFixed(0)}</>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <div className="flex justify-end space-x-2" onClick={(e) => e.stopPropagation()}>
+                                        <td className="px-3 py-4 text-right">
+                                            <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
                                                 <Link
                                                     href={`/app/${client.id}`}
-                                                    className="text-green-600 hover:text-green-900 transition-colors inline-flex items-center space-x-1"
+                                                    className="text-green-600 hover:text-green-900 transition-colors p-1"
+                                                    title="Ver detalles"
                                                 >
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
-                                                    <span>Ver</span>
                                                 </Link>
                                                 <button
                                                     onClick={() => handleEdit(client)}
-                                                    className="text-blue-600 hover:text-blue-900 transition-colors"
+                                                    className="text-blue-600 hover:text-blue-900 transition-colors p-1 text-xs"
+                                                    title="Editar"
                                                 >
-                                                    Editar
+                                                    ✏️
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(client.id, client.name)}
                                                     disabled={loading}
-                                                    className="text-red-600 hover:text-red-900 transition-colors disabled:opacity-50"
+                                                    className="text-red-600 hover:text-red-900 transition-colors disabled:opacity-50 p-1 text-xs"
+                                                    title="Eliminar"
                                                 >
-                                                    Eliminar
+                                                    🗑️
                                                 </button>
                                             </div>
                                         </td>
