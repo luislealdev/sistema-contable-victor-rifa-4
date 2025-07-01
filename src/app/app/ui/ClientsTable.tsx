@@ -9,17 +9,15 @@ import { deleteClient } from '@/actions/client/delete-client'
 
 interface Props {
     clients: (Client & {
-        debt: {
-            transactionDebt: number
-            raffleDebt: number
-            monthlyServiceDebt: number
-            totalDebt: number
-        },
+        transactionDebt: number
+        raffleDebt: number
+        monthlyServiceDebt: number
+        totalDebt: number
         transactions: Transaction[] | undefined,
         raffleTickets: (RaffleTicket & {
             raffle: Raffle,
-            payments: Payment[]
         })[] | undefined
+        payments: Payment[]
     })[]
     sections: Section[]
     currentPage: number
@@ -405,23 +403,23 @@ export const ClientsTable: FC<Props> = ({
 
                                         <td className="px-3 py-4">
                                             <div className="text-right">
-                                                <span className={`text-sm font-medium ${client.debt.totalDebt > 0
+                                                <span className={`text-sm font-medium ${client.totalDebt > 0
                                                     ? 'text-red-600'
                                                     : 'text-green-600'
                                                     }`}>
-                                                    ${client.debt.totalDebt.toFixed(0)}
+                                                    ${client.totalDebt.toFixed(0)}
                                                 </span>
-                                                {client.debt.totalDebt > 0 && (
+                                                {/* {client.totalDebt > 0 && (
                                                     <div className="text-xs text-gray-500">
-                                                        T: ${client.debt.transactionDebt.toFixed(0)}
-                                                        {client.debt.raffleDebt > 0 && (
-                                                            <> | R: ${client.debt.raffleDebt.toFixed(0)}</>
+                                                        T: ${client.transactionDebt.toFixed(0)}
+                                                        {client.raffleDebt > 0 && (
+                                                            <> | R: ${client.raffleDebt.toFixed(0)}</>
                                                         )}
-                                                        {client.debt.monthlyServiceDebt > 0 && (
-                                                            <> | S: ${client.debt.monthlyServiceDebt.toFixed(0)}</>
+                                                        {client.monthlyServiceDebt > 0 && (
+                                                            <> | S: ${client.monthlyServiceDebt.toFixed(0)}</>
                                                         )}
                                                     </div>
-                                                )}
+                                                )} */}
                                             </div>
                                         </td>
 

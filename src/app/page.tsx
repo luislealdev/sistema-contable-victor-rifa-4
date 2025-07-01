@@ -7,8 +7,8 @@ export default function Home() {
       <header className="container mx-auto px-6 py-8">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">Sistema Contable</h1>
-          <Link 
-            href="/auth" 
+          <Link
+            href="/auth"
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Iniciar Sesión
@@ -24,19 +24,19 @@ export default function Home() {
             <span className="text-blue-600"> Simplificada</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Sistema integral para el manejo de clientes, transacciones, pagos y rifas. 
+            Sistema integral para el manejo de clientes, transacciones, pagos y rifas.
             Diseñado para pequeñas y medianas empresas que buscan eficiencia y control.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link 
-              href="/auth" 
+            <Link
+              href="/auth"
               className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
             >
               Acceder al Sistema
             </Link>
-            <a 
-              href="https://luisrrleal.com" 
-              target="_blank" 
+            <a
+              href="https://luisrrleal.com"
+              target="_blank"
               rel="noopener noreferrer"
               className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-600 hover:text-white transition-colors font-semibold"
             >
@@ -94,13 +94,13 @@ export default function Home() {
             ¿Necesitas un Sistema Similar?
           </h3>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Desarrollo sistemas personalizados para empresas que buscan optimizar sus procesos. 
+            Desarrollo sistemas personalizados para empresas que buscan optimizar sus procesos.
             Cada proyecto se adapta a las necesidades específicas del negocio.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link 
-              href="https://luisrrleal.com" 
-              target="_blank" 
+            <Link
+              href="https://luisrrleal.com"
+              target="_blank"
               rel="noopener noreferrer"
               className="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg"
             >

@@ -29,72 +29,66 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                 transactions: {
                     where: {
                         isActive: true
-                    }
+                    },
                 },
                 raffleTickets: {
                     where: {
                         isPaid: false
                     },
                     include: {
-                        raffle: true,
-                        payments: true
+                        raffle: true
                     }
-                }
+                },
+                payments: true
             }
         });
 
         // Calculate debt for each client
         const clientsWithDebt = clients.map(client => {
-            // 1. Transaction debt (remaining amount)
-            const transactionDebt = client.transactions.reduce((total, transaction) => {
-                return total + transaction.remaining;
+            // 1. Transaction debt
+            const transactionDebt = client.transactions.filter(transaction => transaction.type != 'SERVICE').reduce((total, transaction) => {
+                return total + transaction.totalAmount;
             }, 0);
-
-            // 2. Raffle tickets debt (unpaid tickets)
+            // 2. Raffle tickets debt
             const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
                 const ticketPrice = ticket.raffle.ticketPrice;
-                const totalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                const remainingTicketDebt = ticketPrice - totalPaid;
-                return total + Math.max(0, remainingTicketDebt);
+                return total + Math.max(0, ticketPrice);
             }, 0);
-
-            // 3. Monthly service debt (check if current month is paid)
+            // 3. Monthly service debt
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
             const currentYear = currentDate.getFullYear();
-
             const monthlyServiceDebt = client.transactions
                 .filter(transaction => transaction.type === 'SERVICE')
                 .reduce((total, serviceTransaction) => {
-                    // Check if this service was paid this month
                     const serviceCreatedDate = new Date(serviceTransaction.createdAt);
                     const isCurrentMonthService =
                         serviceCreatedDate.getMonth() === currentMonth &&
                         serviceCreatedDate.getFullYear() === currentYear;
 
-                    // If it's a current month service and has remaining debt
-                    if (isCurrentMonthService && serviceTransaction.remaining > 0) {
-                        return total + serviceTransaction.remaining;
+                    if (isCurrentMonthService && serviceTransaction.totalAmount > 0) {
+                        return total + serviceTransaction.totalAmount;
                     }
 
                     return total;
                 }, 0);
 
-            const totalDebt = transactionDebt + raffleDebt + monthlyServiceDebt;
+            // 4. Payments already made by the client
+            const payments = client.payments.reduce((total, payment) => {
+                return total + payment.amount;
+            }, 0);
 
+            // Calculate total debt for the client
+            const clientTotalDebt = transactionDebt + raffleDebt + monthlyServiceDebt - payments;
             return {
                 ...client,
-                debt: {
-                    transactionDebt: Number(transactionDebt.toFixed(2)),
-                    raffleDebt: Number(raffleDebt.toFixed(2)),
-                    monthlyServiceDebt: Number(monthlyServiceDebt.toFixed(2)),
-                    totalDebt: Number(totalDebt.toFixed(2))
-                },
-                // Remove the included relations from the response to keep it clean
-                transactions: undefined,
-                raffleTickets: undefined
+                totalDebt: clientTotalDebt,
+                transactionDebt: transactionDebt,
+                raffleDebt: raffleDebt,
+                monthlyServiceDebt: monthlyServiceDebt,
             };
         });
+
 
         const totalClients = await prisma.client.count(
             {
@@ -126,33 +120,28 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                 transactions: {
                     where: {
                         isActive: true
-                    }
+                    },
                 },
                 raffleTickets: {
-                    where: {
-                        isPaid: false
-                    },
                     include: {
-                        raffle: true,
-                        payments: true
+                        raffle: true
                     }
-                }
+                },
+                payments: true
             }
         });
 
         // Calculate total debt for ALL filtered clients
         const totalDebtSummary = allClientsForDebtCalculation.reduce((summary, client) => {
             // 1. Transaction debt
-            const transactionDebt = client.transactions.reduce((total, transaction) => {
-                return total + transaction.remaining;
+            const transactionDebt = client.transactions.filter(transaction => transaction.type != 'SERVICE').reduce((total, transaction) => {
+                return total + transaction.totalAmount;
             }, 0);
 
             // 2. Raffle tickets debt
             const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
                 const ticketPrice = ticket.raffle.ticketPrice;
-                const totalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                const remainingTicketDebt = ticketPrice - totalPaid;
-                return total + Math.max(0, remainingTicketDebt);
+                return total + Math.max(0, ticketPrice);
             }, 0);
 
             // 3. Monthly service debt
@@ -168,18 +157,23 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                         serviceCreatedDate.getMonth() === currentMonth &&
                         serviceCreatedDate.getFullYear() === currentYear;
 
-                    if (isCurrentMonthService && serviceTransaction.remaining > 0) {
-                        return total + serviceTransaction.remaining;
+                    if (isCurrentMonthService) {
+                        return total + serviceTransaction.totalAmount;
                     }
 
                     return total;
                 }, 0);
 
-            const clientTotalDebt = transactionDebt + raffleDebt + monthlyServiceDebt;
+            // 4. Payments already made by the client
+            const payments = client.payments.reduce((total, payment) => {
+                return total + payment.amount;
+            }, 0);
+
+            const clientTotalDebt = transactionDebt + monthlyServiceDebt - payments;
 
             return {
                 totalTransactionDebt: summary.totalTransactionDebt + transactionDebt,
-                totalRaffleDebt: summary.totalRaffleDebt + raffleDebt,
+                totalRaffleDebt: summary.totalRaffleDebt + raffleDebt, // Ignored as per the original code
                 totalMonthlyServiceDebt: summary.totalMonthlyServiceDebt + monthlyServiceDebt,
                 grandTotalDebt: summary.grandTotalDebt + clientTotalDebt
             };
@@ -218,7 +212,7 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
             totalClientsCount,
             debtSummary: {
                 totalTransactionDebt: Number(totalDebtSummary.totalTransactionDebt.toFixed(2)),
-                totalRaffleDebt: Number(totalDebtSummary.totalRaffleDebt.toFixed(2)),
+                totalRaffleDebt: Number(totalDebtSummary.totalRaffleDebt.toFixed(2)), // Ignored as per the original cod
                 totalMonthlyServiceDebt: Number(totalDebtSummary.totalMonthlyServiceDebt.toFixed(2)),
                 grandTotalDebt: Number(totalDebtSummary.grandTotalDebt.toFixed(2))
             }
