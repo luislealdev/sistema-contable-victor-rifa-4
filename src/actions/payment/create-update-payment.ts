@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { paymentSchema } from "@/schema/transaction";
-// import { sendWhatsApp } from "@/utils/send-whatsapp";
+import { sendWhatsApp } from "@/utils/send-whatsapp";
 import { revalidatePath } from "next/cache";
 
 export async function createOrUpdatePayment(payment: unknown) {
@@ -66,8 +66,8 @@ export async function createOrUpdatePayment(payment: unknown) {
 
         if (client?.phone) {
             // Send WhatsApp message to the client
-            // const message = `Hola ${client.name}, tu pago de $${parsedPayment.data.amount.toFixed(2)} ha sido ${parsedPayment.data.id ? 'actualizado' : 'registrado'} correctamente.`;
-            // sendWhatsApp(client.phone, message);
+            const message = `Hola ${client.name}, tu pago de $${parsedPayment.data.amount.toFixed(2)} ha sido ${parsedPayment.data.id ? 'actualizado' : 'registrado'} correctamente.`;
+            sendWhatsApp(client.phone, message);
         }
 
         revalidatePath('/app');
