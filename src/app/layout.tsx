@@ -5,6 +5,10 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Sistema Contable",
   description: "Sistema de contabilidad.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
