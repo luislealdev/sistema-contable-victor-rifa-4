@@ -69,7 +69,7 @@ export async function createOrUpdateTransaction(transaction: unknown) {
                 `Monto Total: ${parsedTransaction.data.totalAmount}\n` +
                 `Descripción: ${parsedTransaction.data.description || 'Sin descripción'}\n` +
                 `Monto Restante: ${rest}\n` +
-                `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarnos.`;
+                `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarnos (TORITO).`;
 
             sendWhatsApp(client.phone, message);
         }
