@@ -190,7 +190,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                 <PaymentForm
                     payment={editingPayment}
                     clientId={client.id}
-                    transactions={client.transactions}
+                    // transactions={client.transactions}
                     onSuccess={handlePaymentFormSuccess}
                     onCancel={handlePaymentFormCancel}
                 />
