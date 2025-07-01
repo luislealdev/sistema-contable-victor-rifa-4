@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createOrUpdatePayment } from '@/actions/payment/create-update-payment';
-import { Transaction } from '@prisma/client';
+// import { Transaction } from '@prisma/client';
 
 interface PaymentFormProps {
     payment?: {
@@ -14,7 +14,7 @@ interface PaymentFormProps {
         clientId: number;
     } | null;
     clientId: number;
-    transactions?: Transaction[];
+    // transactions?: Transaction[];
     onSuccess?: () => void;
     onCancel?: () => void;
 }
@@ -23,16 +23,16 @@ type PaymentFormState = {
     amount: number;
     date: string;
     description: string;
-    transactionId: number | '';
+    // transactionId: number | '';
     clientId: number;
 };
 
-export default function PaymentForm({ payment, clientId, transactions = [], onSuccess, onCancel }: PaymentFormProps) {
+export default function PaymentForm({ payment, clientId, onSuccess, onCancel }: PaymentFormProps) {
     const [formData, setFormData] = useState<PaymentFormState>({
         amount: payment?.amount || 0,
         date: payment?.date ? new Date(payment.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         description: payment?.description || '',
-        transactionId: payment?.transactionId || '',
+        // transactionId: payment?.transactionId || '',
         clientId: payment?.clientId || clientId
     });
     const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function PaymentForm({ payment, clientId, transactions = [], onSu
             const dataToSubmit = {
                 ...formData,
                 date: new Date(formData.date),
-                transactionId: formData.transactionId || undefined,
+                // transactionId: formData.transactionId || undefined,
                 ...(payment?.id && { id: payment.id }) // Include ID if editing
             };
 
@@ -76,7 +76,7 @@ export default function PaymentForm({ payment, clientId, transactions = [], onSu
     };
 
     // Filter transactions that have remaining debt
-    const availableTransactions = transactions.filter(t => t.remaining > 0 && t.isActive);
+    // const availableTransactions = transactions.filter(t => t.remaining > 0 && t.isActive);
 
     return (
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
@@ -130,7 +130,7 @@ export default function PaymentForm({ payment, clientId, transactions = [], onSu
                 </div>
 
                 {/* Transaction */}
-                <div>
+                {/* <div>
                     <label htmlFor="transactionId" className="block text-sm font-medium text-gray-700 mb-1">
                         Transacción (Opcional)
                     </label>
@@ -154,7 +154,7 @@ export default function PaymentForm({ payment, clientId, transactions = [], onSu
                     <p className="mt-1 text-xs text-gray-500">
                         Si selecciona una transacción, el pago se aplicará automáticamente a la deuda pendiente.
                     </p>
-                </div>
+                </div> */}
 
                 {/* Description */}
                 <div>
