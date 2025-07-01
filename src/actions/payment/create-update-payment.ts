@@ -64,9 +64,36 @@ export async function createOrUpdatePayment(payment: unknown) {
             select: { phone: true, name: true }
         });
 
+        // Total client debt calculation
+        const transactionDebt = await prisma.transaction.aggregate({
+            where: { clientId: parsedPayment.data.clientId },
+            _sum: { totalAmount: true }
+        });
+
+        const raffleTicketsDebt = await prisma.raffleTicket.findMany({
+            where: { clientId: parsedPayment.data.clientId },
+            include: {
+                raffle: {
+                    select: { ticketPrice: true }
+                }
+            }
+        });
+
+        // Calculate total raffle debt
+        const totalRaffleDebt = raffleTicketsDebt.reduce((total, ticket) => {
+            return total + ticket.raffle.ticketPrice;
+        }, 0);
+
+        const payments = await prisma.payment.aggregate({
+            where: { clientId: parsedPayment.data.clientId },
+            _sum: { amount: true }
+        });
+
+        const rest = (transactionDebt._sum.totalAmount || 0) + totalRaffleDebt - (payments._sum.amount || 0);
+
         if (client?.phone) {
             // Send WhatsApp message to the client
-            const message = `Hola ${client.name}, tu pago de $${parsedPayment.data.amount.toFixed(2)} ha sido ${parsedPayment.data.id ? 'actualizado' : 'registrado'} correctamente.`;
+            const message = `Hola ${client.name}, tu pago de $${parsedPayment.data.amount.toFixed(2)} ha sido ${parsedPayment.data.id ? 'actualizado' : 'registrado'} correctamente. Tu deuda total es de $${rest.toFixed(2)}.`;
             sendWhatsApp(client.phone, message);
         }
 
