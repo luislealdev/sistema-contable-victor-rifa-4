@@ -6,6 +6,7 @@ import Link from 'next/link'
 import ClientForm from '@/components/forms/ClientForm'
 import SectionForm from '@/components/forms/SectionForm'
 import { deleteClient } from '@/actions/client/delete-client'
+import Image from 'next/image'
 
 interface Props {
     clients: (Client & {
@@ -307,6 +308,20 @@ export const ClientsTable: FC<Props> = ({
                                 </div>
                             </button>
                         ))}
+                        {/* Link to raffles with image and bottom text */}
+                        <Link
+                            href="/app/rifas"
+                            className="p-3 rounded-lg border-2 bg-purple-100 border-purple-300 text-purple-800 hover:bg-purple-200 transition-colors flex flex-col items-center justify-center"
+                        >
+                            <Image
+                                width={32}
+                                height={32}
+                                src="/logo.png"
+                                alt="Rifas"
+                                className="w-8 h-8 mb-1"
+                            />
+                            <div className="text-xs font-semibold">Rifas</div>
+                        </Link>
                     </div>
                 </div>
             </div>
