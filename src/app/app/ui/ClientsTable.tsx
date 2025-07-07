@@ -310,7 +310,7 @@ export const ClientsTable: FC<Props> = ({
                             <div
                                 key={section.id}
                                 className={`relative p-3 rounded-lg border-2 transition-all duration-200 group ${sectionId === section.id
-                                    ? `${getSectionColor(section.id)} shadow-md transform scale-105`
+                                    ? 'bg-black text-white border-black shadow-md transform scale-105'
                                     : `${getSectionColor(section.id)} opacity-70 hover:opacity-100 hover:transform hover:scale-105`
                                     }`}
                             >
@@ -329,10 +329,13 @@ export const ClientsTable: FC<Props> = ({
                                         e.stopPropagation();
                                         handleEditSection(section);
                                     }}
-                                    className="absolute top-1 right-1 bg-white rounded-full p-1.5 shadow-md hover:bg-gray-50 border border-gray-200 transition-colors"
+                                    className={`absolute top-1 right-1 rounded-full p-1.5 shadow-md border transition-colors ${sectionId === section.id
+                                        ? 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-blue-600'
+                                        : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-blue-600'
+                                        }`}
                                     title="Editar sección"
                                 >
-                                    <svg className="w-3 h-3 text-gray-500 hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                 </button>

@@ -16,7 +16,6 @@ const ClientsPage = async ({ searchParams }: {
     const page = parseInt(params.page || '1', 10);
     const sectionId = params.sectionId ? parseInt(params.sectionId, 10) : undefined;
     const search = params.search || '';
-    // const hideMoneyData = params.hideMoneyData === 'true' || params.hideMoneyData === '1';
 
     const clientsResult = await getPaginatedClients(
         page,
