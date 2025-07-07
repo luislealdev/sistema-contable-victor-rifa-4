@@ -36,7 +36,6 @@ const ClientsPage = async ({ searchParams }: {
 
     return (
         <ClientsTable 
-            // hideMoneyData={hideMoneyData}
             clients={clientsResult.clients || []} 
             sections={sectionsResult.sections || []}
             currentPage={clientsResult.currentPage || 1}

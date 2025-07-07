@@ -1,6 +1,6 @@
 'use client'
 
-import { Client, Payment, Raffle, RaffleTicket, Section, Transaction } from '@prisma/client'
+import { Client, Payment, Section, Transaction } from '@prisma/client'
 import React, { FC, useState } from 'react'
 import Link from 'next/link'
 import ClientForm from '@/components/forms/ClientForm'
@@ -11,13 +11,13 @@ import Image from 'next/image'
 interface Props {
     clients: (Client & {
         transactionDebt: number
-        raffleDebt: number
+        // raffleDebt: number
         monthlyServiceDebt: number
         totalDebt: number
         transactions: Transaction[] | undefined,
-        raffleTickets: (RaffleTicket & {
-            raffle: Raffle,
-        })[] | undefined
+        // raffleTickets: (RaffleTicket & {
+        //     raffle: Raffle,
+        // })[] | undefined
         payments: Payment[]
     })[]
     sections: Section[]

@@ -10,19 +10,14 @@ export async function getRaffleById(raffleId: number) {
             },
             include: {
                 tickets: {
-                    include: {
-                        client: {
-                            select: {
-                                id: true,
-                                name: true,
-                                phone: true,
-                            }
-                        }
-                    },
                     orderBy: {
                         number: 'asc'
+                    },
+                    include: {
+                        payments: true,
                     }
                 }
+
             }
         });
 

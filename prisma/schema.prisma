@@ -32,9 +32,8 @@ model Client {
     section   Section? @relation(fields: [sectionId], references: [id])
     sectionId Int?
 
-    transactions  Transaction[]
-    payments      Payment[]
-    raffleTickets RaffleTicket[]
+    transactions Transaction[]
+    payments     Payment[]
 }
 
 model Transaction {
@@ -86,27 +85,25 @@ model Raffle {
 model RaffleTicket {
     id        Int     @id @default(autoincrement())
     number    Int
-    // totalPaid Float   @default(0.0)
-    // isPaid    Boolean @default(false)
+    totalPaid Float   @default(0.0)
+    isPaid    Boolean @default(false)
 
-    client   Client @relation(fields: [clientId], references: [id])
-    clientId Int
+    client String
 
     raffle   Raffle @relation(fields: [raffleId], references: [id])
     raffleId Int
 
-    // payments RaffleTicketPayment[]
-
-    createdAt DateTime @default(now())
+    createdAt DateTime              @default(now())
+    payments  RaffleTicketPayment[]
 
     @@unique([raffleId, number]) // Un número por rifa, sin duplicados
 }
 
-// model RaffleTicketPayment {
-//     id     Int      @id @default(autoincrement())
-//     amount Float
-//     date   DateTime @default(now())
+model RaffleTicketPayment {
+    id     Int      @id @default(autoincrement())
+    amount Float
+    date   DateTime @default(now())
 
-//     ticket   RaffleTicket @relation(fields: [ticketId], references: [id])
-//     ticketId Int
-// }
+    ticket   RaffleTicket @relation(fields: [ticketId], references: [id])
+    ticketId Int
+}

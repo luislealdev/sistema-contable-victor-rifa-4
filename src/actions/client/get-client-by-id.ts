@@ -17,12 +17,12 @@ export async function getClientById(id: number) {
                     //     // payments: true, // Include payments for the transaction
                     // }
                 },
-                raffleTickets: {
-                    include: {
-                        raffle: true, // Include raffle details
-                        // payments: true, // Include payments for the raffle ticket
-                    },
-                },
+                // raffleTickets: {
+                //     include: {
+                //         raffle: true, // Include raffle details
+                //         // payments: true, // Include payments for the raffle ticket
+                //     },
+                // },
                 payments: true, // Include payments for the client
             },
         });

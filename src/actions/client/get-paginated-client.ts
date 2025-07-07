@@ -31,14 +31,14 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                         isActive: true
                     },
                 },
-                raffleTickets: {
-                    where: {
-                        isPaid: false
-                    },
-                    include: {
-                        raffle: true
-                    }
-                },
+                // raffleTickets: {
+                //     where: {
+                //         isPaid: false
+                //     },
+                //     include: {
+                //         raffle: true
+                //     }
+                // },
                 payments: true
             }
         });
@@ -50,10 +50,10 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                 return total + transaction.totalAmount;
             }, 0);
             // 2. Raffle tickets debt
-            const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
-                const ticketPrice = ticket.raffle.ticketPrice;
-                return total + Math.max(0, ticketPrice);
-            }, 0);
+            // const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
+            //     const ticketPrice = ticket.raffle.ticketPrice;
+            //     return total + Math.max(0, ticketPrice);
+            // }, 0);
             // 3. Monthly service debt
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
@@ -79,12 +79,13 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
             }, 0);
 
             // Calculate total debt for the client
-            const clientTotalDebt = transactionDebt + raffleDebt + monthlyServiceDebt - payments;
+            // const clientTotalDebt = transactionDebt + raffleDebt + monthlyServiceDebt - payments;
+            const clientTotalDebt = transactionDebt + monthlyServiceDebt - payments;
             return {
                 ...client,
                 totalDebt: clientTotalDebt,
                 transactionDebt: transactionDebt,
-                raffleDebt: raffleDebt,
+                // raffleDebt: raffleDebt,
                 monthlyServiceDebt: monthlyServiceDebt,
             };
         });
@@ -122,11 +123,11 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                         isActive: true
                     },
                 },
-                raffleTickets: {
-                    include: {
-                        raffle: true
-                    }
-                },
+                // raffleTickets: {
+                //     include: {
+                //         raffle: true
+                //     }
+                // },
                 payments: true
             }
         });
@@ -139,10 +140,10 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
             }, 0);
 
             // 2. Raffle tickets debt
-            const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
-                const ticketPrice = ticket.raffle.ticketPrice;
-                return total + Math.max(0, ticketPrice);
-            }, 0);
+            // const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
+            //     const ticketPrice = ticket.raffle.ticketPrice;
+            //     return total + Math.max(0, ticketPrice);
+            // }, 0);
 
             // 3. Monthly service debt
             const currentDate = new Date();
@@ -173,7 +174,8 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
 
             return {
                 totalTransactionDebt: summary.totalTransactionDebt + transactionDebt,
-                totalRaffleDebt: summary.totalRaffleDebt + raffleDebt, // Ignored as per the original code
+                // totalRaffleDebt: summary.totalRaffleDebt + raffleDebt, // Ignored as per the original code
+                totalRaffleDebt: summary.totalRaffleDebt, // Ignored as per the original code
                 totalMonthlyServiceDebt: summary.totalMonthlyServiceDebt + monthlyServiceDebt,
                 grandTotalDebt: summary.grandTotalDebt + clientTotalDebt
             };

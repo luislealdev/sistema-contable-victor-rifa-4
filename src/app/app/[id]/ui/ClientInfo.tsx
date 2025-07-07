@@ -1,6 +1,6 @@
 'use client'
 
-import { Client, Payment, Raffle, RaffleTicket, Section, Transaction } from "@prisma/client"
+import { Client, Payment, Section, Transaction } from "@prisma/client"
 import { FC, useState } from "react"
 import TransactionForm from "@/components/forms/TransactionForm"
 import PaymentForm from "@/components/forms/PaymentForm"
@@ -12,16 +12,16 @@ import { deletePayment } from "@/actions/payment/delete-payment"
 //     payments: Payment[];
 // };
 
-type RaffleTicketWithRaffle = RaffleTicket & {
-    raffle: Raffle;
-    // payments: RaffleTicketPayment[];  // Cambié a RaffleTicketPayment
-};
+// type RaffleTicketWithRaffle = RaffleTicket & {
+//     raffle: Raffle;
+//     // payments: RaffleTicketPayment[];  // Cambié a RaffleTicketPayment
+// };
 
 interface Props {
     client: (Client & {
         section: Section | null;
         transactions: Transaction[];
-        raffleTickets: RaffleTicketWithRaffle[];
+        // raffleTickets: RaffleTicketWithRaffle[];
         payments: Payment[];
     }) | null;
 }
@@ -58,16 +58,17 @@ export const ClientInfo: FC<Props> = ({ client }) => {
 
     const transactionDebt = totalTransactions - totalPayments;
 
-    const totalRaffleValue = client.raffleTickets.reduce((total: number, ticket) => {
-        return total + ticket.raffle.ticketPrice;
-    }, 0);
+    // const totalRaffleValue = client.raffleTickets.reduce((total: number, ticket) => {
+    //     return total + ticket.raffle.ticketPrice;
+    // }, 0);
 
     // Para rifas, asumiré que por ahora no hay pagos específicos de rifas
     // Si implementas pagos de rifas después, aquí calcularías los pagos de rifas
-    const totalRafflePayments = 0; // client.raffleTickets.reduce...
-    const raffleDebt = totalRaffleValue - totalRafflePayments;
+    // const totalRafflePayments = 0; // client.raffleTickets.reduce...
+    // const raffleDebt = totalRaffleValue - totalRafflePayments;
 
-    const totalDebt = transactionDebt + raffleDebt;
+    // const totalDebt = transactionDebt + raffleDebt;
+    const totalDebt = transactionDebt;
 
     // Funciones para manejar el formulario de transacciones
     const handleNewTransaction = () => {
@@ -292,7 +293,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                     </div>
 
                     {/* Rifas - Compacto */}
-                    {totalRaffleValue > 0 && (
+                    {/* {totalRaffleValue > 0 && (
                         <div className="mb-4">
                             <h3 className="text-sm font-medium text-gray-700 mb-2">Rifas</h3>
                             <div className="grid grid-cols-3 gap-2 text-xs">
@@ -312,7 +313,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                                 </div>
                             </div>
                         </div>
-                    )}
+                    )} */}
 
                     {/* Total General */}
                     <div className="bg-red-50 p-3 rounded-lg border border-red-200">
@@ -668,63 +669,7 @@ export const ClientInfo: FC<Props> = ({ client }) => {
             </div>
 
             {/* Boletos de Rifas */}
-            <div className="bg-white rounded-lg shadow-md p-4">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                    Boletos de Rifas ({client.raffleTickets.length})
-                </h2>
-                {client.raffleTickets.length === 0 ? (
-                    <p className="text-gray-500">No hay boletos de rifas registrados</p>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {client.raffleTickets.map((ticket) => {
-                            // const totalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                            // const remaining = ticket.raffle.ticketPrice - totalPaid;
-                            const remaining = ticket.raffle.ticketPrice;
 
-                            return (
-                                <div key={ticket.id} className="border rounded-lg p-3 hover:shadow-md transition-shadow">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h3 className="font-semibold text-gray-800 text-sm truncate flex-1 mr-2">
-                                            {ticket.raffle.title}
-                                        </h3>
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${ticket.isPaid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                            }`}>
-                                            {ticket.isPaid ? 'Pagado' : 'Pendiente'}
-                                        </span>
-                                    </div>
-                                    <div className="space-y-1 text-xs text-gray-600">
-                                        <div className="flex justify-between">
-                                            <span>Número:</span>
-                                            <span className="font-bold text-lg text-blue-600">#{ticket.number}</span>
-                                        </div>
-                                        <div className="text-xs text-gray-700 truncate" title={ticket.raffle.prize}>
-                                            Premio: {ticket.raffle.prize}
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Sorteo:</span>
-                                            <span>{formatDate(ticket.raffle.drawDate)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Precio:</span>
-                                            <span className="font-medium">{formatMoney(ticket.raffle.ticketPrice)}</span>
-                                        </div>
-                                        {/* <div className="flex justify-between">
-                                            <span>Pagado:</span>
-                                            <span className="text-green-600 font-medium">{formatMoney(totalPaid)}</span>
-                                        </div> */}
-                                        {remaining > 0 && (
-                                            <div className="flex justify-between">
-                                                <span>Restante:</span>
-                                                <span className="text-red-600 font-bold">{formatMoney(remaining)}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
         </div>
     );
 }
