@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createUpdateSection } from '@/actions/section/create-update-section';
+import { deleteSection } from '@/actions/section/delete-section';
 import { Section } from '@prisma/client';
 
 interface SectionFormProps {
@@ -22,6 +23,7 @@ export default function SectionForm({ section, onSuccess, onCancel }: SectionFor
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
+    const [deleting, setDeleting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,6 +51,31 @@ export default function SectionForm({ section, onSuccess, onCancel }: SectionFor
             ...prev,
             [name]: value
         }));
+    };
+
+    const handleDelete = async () => {
+        if (!section?.id) return;
+
+        if (!confirm(`¿Estás seguro de que quieres eliminar la sección "${section.name}"? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        setDeleting(true);
+        setError('');
+
+        try {
+            const result = await deleteSection(section.id);
+
+            if (result.ok) {
+                onSuccess?.();
+            } else {
+                setError(result.message || 'Error al eliminar la sección');
+            }
+        } catch {
+            setError('Error inesperado al eliminar la sección');
+        } finally {
+            setDeleting(false);
+        }
     };
 
     return (
@@ -83,11 +110,30 @@ export default function SectionForm({ section, onSuccess, onCancel }: SectionFor
 
                 {/* Action Buttons */}
                 <div className="flex space-x-3 pt-4">
+                    {/* Botón eliminar (solo cuando se está editando) */}
+                    {section?.id && (
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            disabled={loading || deleting}
+                            className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            {deleting ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Eliminando...
+                                </div>
+                            ) : (
+                                'Eliminar'
+                            )}
+                        </button>
+                    )}
+                    
                     {onCancel && (
                         <button
                             type="button"
                             onClick={onCancel}
-                            disabled={loading}
+                            disabled={loading || deleting}
                             className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
                         >
                             Cancelar
@@ -95,7 +141,7 @@ export default function SectionForm({ section, onSuccess, onCancel }: SectionFor
                     )}
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || deleting}
                         className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                         {loading ? (

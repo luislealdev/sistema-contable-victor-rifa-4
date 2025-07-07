@@ -2,7 +2,7 @@ export const sendWhatsApp = async (phone: string, message: string) => {
 
     // Limpiar el número (remover espacios, guiones, paréntesis)
     const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
-    
+
     // Verificar si ya tiene código de país y formatear
     let formattedPhone = '';
     if (cleanPhone.startsWith('1') && cleanPhone.length === 11) {
@@ -19,9 +19,9 @@ export const sendWhatsApp = async (phone: string, message: string) => {
         formattedPhone = cleanPhone;
     }
 
-    const sendTo = formattedPhone; 
+    const sendTo = formattedPhone;
 
-     await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendText', {
+    await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendText', {
 
         method: 'POST',
         headers: {
@@ -34,7 +34,35 @@ export const sendWhatsApp = async (phone: string, message: string) => {
             chatId: `${sendTo}@c.us`,
             text: message,
             session: "default",
+            file: {
+                mimetype: "image/png",
+                url: "https://sistema-contable-three.vercel.app/pagos.png",
+                filename: "pagos.png"
+            },
         })
     });
+
+    const resp = await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendImage', {
+
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Api-Key': process.env.WAHA_API_KEY || '', //
+        },
+
+        body: JSON.stringify({
+            chatId: `${sendTo}@c.us`,
+            caption: "Recuerda que puedes pagar transferirme.",
+            session: "default",
+            file: {
+                mimetype: "image/jpeg",
+                url: "https://github.com/devlikeapro/waha/raw/core/examples/dev.likeapro.jpg",
+                filename: "filename.jpeg"
+            },
+        })
+    });
+
+    console.log(resp);
+    
 
 }  

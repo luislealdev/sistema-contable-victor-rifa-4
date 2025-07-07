@@ -53,6 +53,7 @@ export const ClientsTable: FC<Props> = ({
     const [showForm, setShowForm] = useState(false)
     const [showSectionForm, setShowSectionForm] = useState(false)
     const [editingClient, setEditingClient] = useState<Client | null>(null)
+    const [editingSection, setEditingSection] = useState<Section | null>(null)
     // const [filterSection, setFilterSection] = useState(sectionId?.toString() || '')
     const [searchTerm, setSearchTerm] = useState(search || '')
     const [loading, setLoading] = useState(false)
@@ -96,11 +97,23 @@ export const ClientsTable: FC<Props> = ({
 
     const handleSectionFormSuccess = () => {
         setShowSectionForm(false)
+        setEditingSection(null)
         window.location.reload() // Refresh the page to show new section
     }
 
     const handleSectionFormCancel = () => {
         setShowSectionForm(false)
+        setEditingSection(null)
+    }
+
+    const handleEditSection = (section: Section) => {
+        setEditingSection(section)
+        setShowSectionForm(true)
+    }
+
+    const handleNewSection = () => {
+        setEditingSection(null)
+        setShowSectionForm(true)
     }
 
     // Genera colores consistentes para las secciones
@@ -161,7 +174,7 @@ export const ClientsTable: FC<Props> = ({
         return (
             <div className="container mx-auto p-6">
                 <SectionForm
-                    section={null}
+                    section={editingSection}
                     onSuccess={handleSectionFormSuccess}
                     onCancel={handleSectionFormCancel}
                 />
@@ -207,7 +220,7 @@ export const ClientsTable: FC<Props> = ({
                         </button> */}
 
                         <button
-                            onClick={() => setShowSectionForm(true)}
+                            onClick={handleNewSection}
                             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
                         >
                             Nueva Sección
@@ -294,19 +307,36 @@ export const ClientsTable: FC<Props> = ({
 
                         {/* Secciones existentes */}
                         {sections.map((section) => (
-                            <button
+                            <div
                                 key={section.id}
-                                onClick={() => handleSectionFilter(section.id)}
-                                className={`p-3 rounded-lg border-2 transition-all duration-200 ${sectionId === section.id
+                                className={`relative p-3 rounded-lg border-2 transition-all duration-200 group ${sectionId === section.id
                                     ? `${getSectionColor(section.id)} shadow-md transform scale-105`
                                     : `${getSectionColor(section.id)} opacity-70 hover:opacity-100 hover:transform hover:scale-105`
                                     }`}
                             >
-                                <div className="text-center">
+                                {/* Botón principal de la sección */}
+                                <button
+                                    onClick={() => handleSectionFilter(section.id)}
+                                    className="w-full text-center"
+                                >
                                     <div className="font-semibold text-xs truncate" title={section.name}>{section.name}</div>
                                     <div className="text-xs mt-1">{getClientsCountBySection(section.id)}</div>
-                                </div>
-                            </button>
+                                </button>
+                                
+                                {/* Botón de editar (siempre visible) */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditSection(section);
+                                    }}
+                                    className="absolute top-1 right-1 bg-white rounded-full p-1.5 shadow-md hover:bg-gray-50 border border-gray-200 transition-colors"
+                                    title="Editar sección"
+                                >
+                                    <svg className="w-3 h-3 text-gray-500 hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                </button>
+                            </div>
                         ))}
                         {/* Link to raffles with image and bottom text */}
                         <Link
