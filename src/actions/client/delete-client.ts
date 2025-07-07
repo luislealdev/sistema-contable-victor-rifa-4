@@ -16,15 +16,15 @@ export async function deleteClient(clientId: number) {
             }
         });
 
-        const raffleTicketsNotPayed = await prisma.raffleTicket.findFirst({
-            where: {
-                clientId: clientId,
-                isPaid: false
-            }
-        });
+        // const raffleTicketsNotPayed = await prisma.raffleTicket.findFirst({
+        //     where: {
+        //         clientId: clientId,
+        //         isPaid: false
+        //     }
+        // });
 
         // If client has pending debt, prevent deletion
-        if (transactions || raffleTicketsNotPayed) {
+        if (transactions) {
             return {
                 ok: false,
                 message: "No se puede eliminar el cliente porque tiene deudas pendientes"
@@ -43,11 +43,11 @@ export async function deleteClient(clientId: number) {
             });
 
             // Delete raffle tickets
-            await tx.raffleTicket.deleteMany({
-                where: {
-                    clientId: clientId
-                }
-            });
+            // await tx.raffleTicket.deleteMany({
+            //     where: {
+            //         clientId: clientId
+            //     }
+            // });
 
             // Delete transactions
             await tx.transaction.deleteMany({

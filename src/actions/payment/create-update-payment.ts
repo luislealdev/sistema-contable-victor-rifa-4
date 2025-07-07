@@ -70,26 +70,27 @@ export async function createOrUpdatePayment(payment: unknown) {
             _sum: { totalAmount: true }
         });
 
-        const raffleTicketsDebt = await prisma.raffleTicket.findMany({
-            where: { clientId: parsedPayment.data.clientId },
-            include: {
-                raffle: {
-                    select: { ticketPrice: true }
-                }
-            }
-        });
+        // const raffleTicketsDebt = await prisma.raffleTicket.findMany({
+        //     where: { clientId: parsedPayment.data.clientId },
+        //     include: {
+        //         raffle: {
+        //             select: { ticketPrice: true }
+        //         }
+        //     }
+        // });
 
         // Calculate total raffle debt
-        const totalRaffleDebt = raffleTicketsDebt.reduce((total, ticket) => {
-            return total + ticket.raffle.ticketPrice;
-        }, 0);
+        // const totalRaffleDebt = raffleTicketsDebt.reduce((total, ticket) => {
+        //     return total + ticket.raffle.ticketPrice;
+        // }, 0);
 
         const payments = await prisma.payment.aggregate({
             where: { clientId: parsedPayment.data.clientId },
             _sum: { amount: true }
         });
 
-        const rest = (transactionDebt._sum.totalAmount || 0) + totalRaffleDebt - (payments._sum.amount || 0);
+        // const rest = (transactionDebt._sum.totalAmount || 0) + totalRaffleDebt - (payments._sum.amount || 0);
+        const rest = (transactionDebt._sum.totalAmount || 0) - (payments._sum.amount || 0);
 
         if (client?.phone) {
             // Send WhatsApp message to the client
