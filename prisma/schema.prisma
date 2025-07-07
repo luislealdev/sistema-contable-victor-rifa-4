@@ -95,18 +95,18 @@ model RaffleTicket {
     raffle   Raffle @relation(fields: [raffleId], references: [id])
     raffleId Int
 
-    payments RaffleTicketPayment[]
+    // payments RaffleTicketPayment[]
 
     createdAt DateTime @default(now())
 
     @@unique([raffleId, number]) // Un número por rifa, sin duplicados
 }
 
-model RaffleTicketPayment {
-    id     Int      @id @default(autoincrement())
-    amount Float
-    date   DateTime @default(now())
+// model RaffleTicketPayment {
+//     id     Int      @id @default(autoincrement())
+//     amount Float
+//     date   DateTime @default(now())
 
-    ticket   RaffleTicket @relation(fields: [ticketId], references: [id])
-    ticketId Int
-}
+//     ticket   RaffleTicket @relation(fields: [ticketId], references: [id])
+//     ticketId Int
+// }

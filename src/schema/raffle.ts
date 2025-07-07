@@ -14,13 +14,13 @@ export const raffleTicketSchema = z.object({
     number: z.number().int().min(1, "Ticket number must be at least 1"),
     raffleId: z.number().int().optional(),
     clientId: z.number().int().optional(),
-    totalPaid: z.number().min(0, "Total paid must be a positive number"),
-    isPaid: z.boolean().default(false),
+    // totalPaid: z.number().min(0, "Total paid must be a positive number"),
+    // isPaid: z.boolean().default(false),
 });
 
-export const raffleTicketPayment = z.object({
-    id: z.number().int().optional(),
-    amount: z.number().min(0, "Amount must be a positive number"),
-    date: z.date().default(() => new Date()),
-    ticketId: z.number().int().optional()
-});
+// export const raffleTicketPayment = z.object({
+//     id: z.number().int().optional(),
+//     amount: z.number().min(0, "Amount must be a positive number"),
+//     date: z.date().default(() => new Date()),
+//     ticketId: z.number().int().optional()
+// });
