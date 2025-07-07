@@ -26,6 +26,52 @@ export const createUpdateRaffleTicket = async (ticket: unknown) => {
             },
         });
 
+        // Si el ticket está marcado como pagado y tiene un totalPaid > 0,
+        // asegurar que los pagos coincidan con el totalPaid
+        if (parsedTicket.data.isPaid && parsedTicket.data.totalPaid > 0) {
+            const existingPayments = await prisma.raffleTicketPayment.findMany({
+                where: { ticketId: savedTicket.id }
+            });
+
+            const totalExistingPayments = existingPayments.reduce((sum, payment) => sum + payment.amount, 0);
+            
+            // Si los pagos existentes no coinciden con el total pagado
+            if (totalExistingPayments !== parsedTicket.data.totalPaid) {
+                if (totalExistingPayments < parsedTicket.data.totalPaid) {
+                    // Crear un pago para la diferencia
+                    await prisma.raffleTicketPayment.create({
+                        data: {
+                            ticketId: savedTicket.id,
+                            amount: parsedTicket.data.totalPaid - totalExistingPayments,
+                            date: new Date()
+                        }
+                    });
+                } else if (totalExistingPayments > parsedTicket.data.totalPaid) {
+                    // Si hay más pagos de los esperados, eliminar el exceso (empezando por los más recientes)
+                    let amountToRemove = totalExistingPayments - parsedTicket.data.totalPaid;
+                    const sortedPayments = existingPayments.sort((a, b) => b.date.getTime() - a.date.getTime());
+                    
+                    for (const payment of sortedPayments) {
+                        if (amountToRemove <= 0) break;
+                        
+                        if (payment.amount <= amountToRemove) {
+                            await prisma.raffleTicketPayment.delete({
+                                where: { id: payment.id }
+                            });
+                            amountToRemove -= payment.amount;
+                        } else {
+                            // Actualizar el pago parcialmente
+                            await prisma.raffleTicketPayment.update({
+                                where: { id: payment.id },
+                                data: { amount: payment.amount - amountToRemove }
+                            });
+                            amountToRemove = 0;
+                        }
+                    }
+                }
+            }
+        }
+
         revalidatePath('/app/rifas');
         revalidatePath(`/app/rifas/${savedTicket.raffleId}`);
 

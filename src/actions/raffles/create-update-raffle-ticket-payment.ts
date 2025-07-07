@@ -18,15 +18,42 @@ export const createUpdateRaffleTicketPayment = async (payment: unknown) => {
                 id: parsedPayment.data.id || 0, // Use 0 for new payments
             },
             create: {
-                ...parsedPayment.data,
+                amount: parsedPayment.data.amount,
+                date: parsedPayment.data.date,
+                ticketId: parsedPayment.data.ticketId,
             },
             update: {
-                ...parsedPayment.data,
+                amount: parsedPayment.data.amount,
+                date: parsedPayment.data.date,
             },
         });
 
+        // Actualizar el totalPaid del ticket - obtener los pagos actualizados
+        const updatedTicket = await prisma.raffleTicket.findUnique({
+            where: { id: parsedPayment.data.ticketId },
+            include: { payments: true }
+        });
+
+        if (updatedTicket) {
+            const totalPaid = updatedTicket.payments.reduce((sum, payment) => sum + payment.amount, 0);
+            const ticketPrice = await prisma.raffle.findUnique({
+                where: { id: updatedTicket.raffleId },
+                select: { ticketPrice: true }
+            });
+
+            await prisma.raffleTicket.update({
+                where: { id: updatedTicket.id },
+                data: {
+                    totalPaid: totalPaid,
+                    isPaid: ticketPrice ? totalPaid >= ticketPrice.ticketPrice : false
+                }
+            });
+        }
+
         revalidatePath('/app/rifas');
-        revalidatePath(`/app/rifas/${savedPayment.ticketId}`);
+        if (updatedTicket) {
+            revalidatePath(`/app/rifas/${updatedTicket.raffleId}`);
+        }
 
         return {
             ok: true,
