@@ -86,8 +86,8 @@ model Raffle {
 model RaffleTicket {
     id        Int     @id @default(autoincrement())
     number    Int
-    totalPaid Float   @default(0.0)
-    isPaid    Boolean @default(false)
+    // totalPaid Float   @default(0.0)
+    // isPaid    Boolean @default(false)
 
     client   Client @relation(fields: [clientId], references: [id])
     clientId Int
