@@ -65,11 +65,11 @@ export async function createOrUpdateTransaction(transaction: unknown) {
 
         if (client?.phone) {
             // Send WhatsApp message to the client
-            const message = `Hola ${client.name}, se ha agregado una nueva transacción a tu cuenta. ` +
+            const message = `Hola ${client.name}, se ha agregado una nueva transacción a tu cuenta.\n` +
                 `Detalles:\n` +
-                `Monto Total: ${parsedTransaction.data.totalAmount}\n` +
-                `Descripción: ${parsedTransaction.data.description || 'Sin descripción'}\n` +
-                `Monto Restante: ${rest}\n` +
+                `Monto: ${parsedTransaction.data.totalAmount}\n` +
+                `Descripción: ${parsedTransaction.data.description || 'Sin descripción'}\n\n` +
+                `Monto Total Restante: ${rest}\n` +
                 `Gracias por tu preferencia. Si tienes alguna duda contáctame “TORITO”`;
 
             sendWhatsApp(client.phone, message);
