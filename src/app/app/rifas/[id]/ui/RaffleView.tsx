@@ -85,9 +85,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     const handleDeleteTicket = async (ticket: RaffleTicket) => {
         if (window.confirm(`¿Estás seguro de que quieres eliminar el ticket #${ticket.number}?`)) {
             const result = await deleteRaffleTicket(ticket.id);
-            if (result.ok) {
-                window.location.reload();
-            } else {
+            if (!result.ok) {
                 alert(result.message);
             }
         }
@@ -98,10 +96,6 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
         setShowPaymentForm(false);
         setSelectedTicket(null);
         setSelectedPayment(null);
-        // Recargar después de un breve delay para que el modal se cierre primero
-        setTimeout(() => {
-            window.location.reload();
-        }, 300);
     };
 
     // Calcular estadísticas basadas en pagos reales
@@ -161,14 +155,6 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                 <span className="text-gray-600">Vendidos:</span>
                                 <span className="font-semibold text-blue-600">{totalSold}</span>
                             </div>
-                            {/* <div className="flex justify-between">
-                                <span className="text-gray-600">Pagados:</span>
-                                <span className="font-semibold text-green-600">{totalPaid}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Pendientes:</span>
-                                <span className="font-semibold text-yellow-600">{totalPending}</span>
-                            </div> */}
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Disponibles:</span>
                                 <span className="font-semibold text-gray-600">{totalAvailable}</span>
@@ -194,34 +180,39 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
             {/* Lista de números */}
             <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">Números de la Rifa</h2>
-                    <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                        <button
-                            onClick={handleCreateTicket}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                        >
-                            + Nuevo Ticket
-                        </button>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-                            <span className="text-sm text-gray-600">Pagado</span>
+                    <div className="flex flex-col items-center gap-4 mt-2 sm:mt-0">
+                        <div className="flex justify-between items-center w-full sm:w-auto gap-4">
+                            <h2 className="text-xl font-bold text-gray-800">Números de la Rifa</h2>
+                            <button
+                                onClick={handleCreateTicket}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                            >
+                                + Nuevo Ticket
+                            </button>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
-                            <span className="text-sm text-gray-600">Pendiente</span>
+                        <div className="flex flex-wrap gap-4 justify-center">
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+                                <span className="text-sm text-gray-600">Pagado</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
+                                <span className="text-sm text-gray-600">Pendiente</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
+                                <span className="text-sm text-gray-600">Disponible</span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
-                            <span className="text-sm text-gray-600">Disponible</span>
-                        </div>
+
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="grid grid-cols-2">
                     {numbers.map(number => {
                         const ticket = occupiedNumbers.get(number);
                         const isOccupied = !!ticket;
-                        
+
                         // Calcular el total pagado real basado en todos los pagos
                         let realTotalPaid = 0;
                         let realIsPaid = false;
@@ -229,12 +220,12 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                             realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
                             realIsPaid = realTotalPaid >= raffle.ticketPrice;
                         }
-                        
+
                         return (
                             <div
                                 key={number}
                                 className={`
-                                    flex items-center justify-between p-3 rounded-lg border-2 transition-colors
+                                    text-xs flex items-center justify-between border-1 transition-colors
                                     ${isOccupied
                                         ? realIsPaid
                                             ? 'bg-green-50 border-green-200 text-green-800'
@@ -243,20 +234,17 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     }
                                 `}
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-current">
-                                        <span className="font-bold text-sm">{number}</span>
+                                <div className="flex items-center gap-2">
+                                    <div className="flex items-center justify-center bg-yellow-300">
+                                        <span className="font-bold text-xs">{number}</span>
                                     </div>
                                     <div className="flex-1">
                                         {isOccupied ? (
                                             <div>
                                                 <div className="font-semibold">{ticket.client}</div>
-                                                <div className="text-sm opacity-75">
-                                                    {formatMoney(realTotalPaid)} / {formatMoney(raffle.ticketPrice)}
-                                                </div>
                                             </div>
                                         ) : (
-                                            <div className="text-gray-500 italic">Disponible</div>
+                                            <div className="text-gray-500 italic text-xs">Disponible</div>
                                         )}
                                     </div>
                                 </div>
@@ -266,48 +254,48 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                         <div className="flex items-center gap-2">
                                             <div className="text-right mr-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-lg">
+                                                    <span className="text-xs">
                                                         {realIsPaid ? '✓' : '⏳'}
                                                     </span>
-                                                    <span className="font-semibold">
+                                                    {/* <span className="font-semibold">
                                                         {realIsPaid ? 'Pagado' : 'Pendiente'}
-                                                    </span>
+                                                    </span> */}
                                                 </div>
                                             </div>
                                             <button
                                                 onClick={() => handleEditTicket(ticket)}
-                                                className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors text-sm"
+                                                className="bg-blue-500 text-center rounded-md hover:bg-blue-600 transition-colors text-xm"
                                             >
-                                                Editar
+                                                ✏️
                                             </button>
                                             {!realIsPaid && (
                                                 <button
                                                     onClick={() => handleAddPayment(ticket)}
-                                                    className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition-colors text-sm"
+                                                    className="bg-green-500 text-center rounded-md hover:bg-green-600 transition-colors text-xm"
                                                 >
-                                                    + Pago
+                                                    💵
                                                 </button>
                                             )}
                                             <button
                                                 onClick={() => handleDeleteTicket(ticket)}
-                                                className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors text-sm"
+                                                className="bg-red-500 text-center rounded-md hover:bg-red-600 transition-colors text-xm"
                                             >
-                                                Eliminar
+                                                🗑️
                                             </button>
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2">
-                                            <div className="text-gray-400 mr-4">
+                                            {/* <div className="text-gray-400 mr-4">
                                                 {formatMoney(raffle.ticketPrice)}
-                                            </div>
+                                            </div> */}
                                             <button
                                                 onClick={() => {
                                                     setSelectedTicket({ number, raffleId: raffle.id, client: '', totalPaid: 0, isPaid: false } as RaffleTicket);
                                                     setShowTicketForm(true);
                                                 }}
-                                                className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors text-sm"
+                                                className="bg-blue-500 text-white rounded-md transition-colors text-xm"
                                             >
-                                                Asignar
+                                                ✏️
                                             </button>
                                         </div>
                                     )}

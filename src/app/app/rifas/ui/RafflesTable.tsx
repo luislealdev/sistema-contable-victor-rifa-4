@@ -4,7 +4,7 @@ import { Raffle } from '@prisma/client'
 import React, { FC, useState } from 'react'
 import RaffleForm from '@/components/forms/RaffleForm'
 import { deleteRaffle } from '@/actions/raffles/delete-raffle'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Props {
     raffles: Raffle[]
@@ -14,6 +14,7 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
     const [showRaffleForm, setShowRaffleForm] = useState(false);
     const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const router = useRouter();
 
     // Calcular potencial de recaudación
     const calculatePotentialRevenue = (ticketPrice: number, totalNumbers: number) => {
@@ -137,12 +138,16 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                     {/* Vista móvil */}
                     <div className="block md:hidden">
                         {raffles.map((raffle) => (
-                            <div key={raffle.id} className="border-b border-gray-200 p-4">
+                            <div
+                                key={raffle.id}
+                                className="border-b border-gray-200 p-4 cursor-pointer hover:bg-gray-50"
+                                onClick={() => router.push(`/app/rifas/${raffle.id}`)}
+                            >
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="flex-1">
-                                        <Link href={`/app/rifas/${raffle.id}`} className="cursor-pointer">
+                                        <div>
                                             <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600">{raffle.title}</h3>
-                                        </Link>
+                                        </div>
                                         <div className="flex items-center gap-2">
                                             <p className="text-sm text-gray-600">Sorteo: {formatDate(raffle.drawDate)}</p>
                                             {isRaffleExpired(raffle.drawDate) && (
@@ -154,7 +159,10 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                                     </div>
                                     <div className="flex space-x-2 ml-2">
                                         <button
-                                            onClick={() => handleEditRaffle(raffle)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEditRaffle(raffle);
+                                            }}
                                             className="text-blue-600 hover:text-blue-900 transition-colors p-1"
                                             disabled={isDeleting}
                                             title="Editar"
@@ -162,7 +170,10 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                                             ✏️
                                         </button>
                                         <button
-                                            onClick={() => handleDeleteRaffle(raffle.id, raffle.title)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteRaffle(raffle.id, raffle.title);
+                                            }}
                                             className="text-red-600 hover:text-red-900 transition-colors p-1"
                                             disabled={isDeleting}
                                             title="Eliminar"
@@ -223,11 +234,15 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {raffles.map((raffle) => (
-                                    <tr key={raffle.id} className="hover:bg-gray-50">
+                                    <tr
+                                        key={raffle.id}
+                                        className="hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => router.push(`/app/rifas/${raffle.id}`)}
+                                    >
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link href={`/app/rifas/${raffle.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                                            <div className="text-sm font-medium text-gray-900 hover:text-blue-600">
                                                 {raffle.title}
-                                            </Link>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
@@ -256,14 +271,20 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div className="flex justify-end space-x-2">
                                                 <button
-                                                    onClick={() => handleEditRaffle(raffle)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEditRaffle(raffle);
+                                                    }}
                                                     className="text-blue-600 hover:text-blue-900 transition-colors"
                                                     disabled={isDeleting}
                                                 >
                                                     Editar
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDeleteRaffle(raffle.id, raffle.title)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteRaffle(raffle.id, raffle.title);
+                                                    }}
                                                     className="text-red-600 hover:text-red-900 transition-colors"
                                                     disabled={isDeleting}
                                                 >
