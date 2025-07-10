@@ -19,6 +19,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState<RaffleTicket | null>(null);
     const [selectedPayment, setSelectedPayment] = useState<RaffleTicketPayment | null>(null);
+    const [showPotential, setShowPotential] = useState(false);
 
     if (!raffle) {
         return (
@@ -174,16 +175,16 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                 <span className="font-semibold text-green-600">{formatMoney(totalRevenue)}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-gray-600">Potencial:</span>
-                                <span className="font-semibold text-blue-600">{formatMoney(potentialRevenue)}</span>
+                                <span className="text-gray-600">Potencial: <span onClick={() => setShowPotential(!showPotential)}>{showPotential ? 'Ocultar' : 'Ver'}</span> </span>
+                                <span className="font-semibold text-blue-600">{showPotential && formatMoney(potentialRevenue)}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Lista de números */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            < div className="bg-white rounded-lg shadow-md p-6" >
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                     <div className="flex flex-col items-center gap-4 mt-2 sm:mt-0">
                         <div className="flex justify-between items-center w-full sm:w-auto gap-4">
@@ -324,53 +325,57 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </ div>
 
             {/* Modal para RaffleTicketForm */}
-            {showTicketForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-                        <div className="p-4">
-                            <RaffleTicketForm
-                                raffleTicket={selectedTicket}
-                                raffleId={raffle.id}
-                                raffleTitle={raffle.title}
-                                ticketPrice={raffle.ticketPrice}
-                                availableNumbers={availableNumbers}
-                                onSuccess={handleCloseModals}
-                                onCancel={handleCloseModals}
-                            />
+            {
+                showTicketForm && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                            <div className="p-4">
+                                <RaffleTicketForm
+                                    raffleTicket={selectedTicket}
+                                    raffleId={raffle.id}
+                                    raffleTitle={raffle.title}
+                                    ticketPrice={raffle.ticketPrice}
+                                    availableNumbers={availableNumbers}
+                                    onSuccess={handleCloseModals}
+                                    onCancel={handleCloseModals}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Modal para RaffleTicketPaymentForm */}
-            {showPaymentForm && selectedTicket && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-                        <div className="p-4">
-                            {(() => {
-                                // Obtener el ticket completo con pagos del mapa
-                                const fullTicket = occupiedNumbers.get(selectedTicket.number);
-                                const realTotalPaid = fullTicket?.payments?.reduce((sum: number, payment: RaffleTicketPayment) => sum + payment.amount, 0) || 0;
-                                return (
-                                    <RaffleTicketPaymentForm
-                                        payment={selectedPayment}
-                                        ticketId={selectedTicket.id}
-                                        ticketNumber={selectedTicket.number}
-                                        clientName={selectedTicket.client}
-                                        ticketPrice={raffle.ticketPrice}
-                                        totalPaid={realTotalPaid}
-                                        onSuccess={handleCloseModals}
-                                        onCancel={handleCloseModals}
-                                    />
-                                );
-                            })()}
+            {
+                showPaymentForm && selectedTicket && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                            <div className="p-4">
+                                {(() => {
+                                    // Obtener el ticket completo con pagos del mapa
+                                    const fullTicket = occupiedNumbers.get(selectedTicket.number);
+                                    const realTotalPaid = fullTicket?.payments?.reduce((sum: number, payment: RaffleTicketPayment) => sum + payment.amount, 0) || 0;
+                                    return (
+                                        <RaffleTicketPaymentForm
+                                            payment={selectedPayment}
+                                            ticketId={selectedTicket.id}
+                                            ticketNumber={selectedTicket.number}
+                                            clientName={selectedTicket.client}
+                                            ticketPrice={raffle.ticketPrice}
+                                            totalPaid={realTotalPaid}
+                                            onSuccess={handleCloseModals}
+                                            onCancel={handleCloseModals}
+                                        />
+                                    );
+                                })()}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
