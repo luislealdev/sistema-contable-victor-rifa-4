@@ -19,7 +19,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState<RaffleTicket | null>(null);
     const [selectedPayment, setSelectedPayment] = useState<RaffleTicketPayment | null>(null);
-    const [showPotential, setShowPotential] = useState(false);
+    // const [showPotential, setShowPotential] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
     if (!raffle) {
@@ -124,11 +124,11 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
 
     // Calcular estadísticas basadas en pagos reales
     const totalSold = raffle.tickets.length;
-    const totalRevenue = raffle.tickets.reduce((sum, ticket) => {
-        const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
-        return sum + ticketPayments;
-    }, 0);
-    const potentialRevenue = raffle.ticketPrice * raffle.totalNumbers;
+    // const totalRevenue = raffle.tickets.reduce((sum, ticket) => {
+    //     const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
+    //     return sum + ticketPayments;
+    // }, 0);
+    // const potentialRevenue = raffle.ticketPrice * raffle.totalNumbers;
     const totalAvailable = raffle.totalNumbers - totalSold;
 
     return (
@@ -187,7 +187,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                 <span className="text-gray-600">Total números:</span>
                                 <span className="font-semibold">{raffle.totalNumbers}</span>
                             </div>
-                            <hr className="my-2" />
+                            {/* <hr className="my-2" />
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Recaudado:</span>
                                 <span className="font-semibold text-green-600">{formatMoney(totalRevenue)}</span>
@@ -195,7 +195,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Potencial: <span onClick={() => setShowPotential(!showPotential)}>{showPotential ? 'Ocultar' : 'Ver'}</span> </span>
                                 <span className="font-semibold text-blue-600">{showPotential && formatMoney(potentialRevenue)}</span>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
