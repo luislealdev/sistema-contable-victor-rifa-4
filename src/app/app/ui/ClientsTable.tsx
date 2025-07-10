@@ -236,41 +236,39 @@ export const ClientsTable: FC<Props> = ({
 
                 {/* Filtro de Búsqueda */}
                 <div className="flex flex-col md:flex-row gap-4 mb-6">
-                    <div className="flex-1">
+                    <div className="flex-1 flex gap-2">
                         <input
                             type="text"
                             placeholder="Buscar por nombre o teléfono..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     handleFilter()
                                 }
                             }}
                         />
-                    </div>
-                    <div className="flex gap-2">
                         <button
                             onClick={handleFilter}
-                            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors whitespace-nowrap"
                         >
                             Buscar
                         </button>
-                        {searchTerm && (
-                            <button
-                                onClick={() => {
-                                    setSearchTerm('')
-                                    const url = buildURL(1, sectionId?.toString(), '')
-                                    window.location.href = url
-                                }}
-                                className="px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-md hover:bg-red-200 transition-colors"
-                                title="Limpiar búsqueda"
-                            >
-                                ✕ Limpiar
-                            </button>
-                        )}
                     </div>
+                    {searchTerm && (
+                        <button
+                            onClick={() => {
+                                setSearchTerm('')
+                                const url = buildURL(1, sectionId?.toString(), '')
+                                window.location.href = url
+                            }}
+                            className="px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-md hover:bg-red-200 transition-colors whitespace-nowrap"
+                            title="Limpiar búsqueda"
+                        >
+                            ✕ Limpiar
+                        </button>
+                    )}
                 </div>
 
                 {/* Secciones con Colores */}
@@ -372,23 +370,23 @@ export const ClientsTable: FC<Props> = ({
                         }
                     </h2>
                 </div>
-                <div className="w-full">
-                    <table className="w-full">
+                <div className="w-full overflow-x-auto">
+                    <table className="w-full min-w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-2 sm:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Cliente
                                 </th>
-                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                                <th className="px-2 sm:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                                     Teléfono
                                 </th>
-                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-2 sm:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Sección
                                 </th>
-                                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-2 sm:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Deuda
                                 </th>
-                                <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-2 sm:px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Acciones
                                 </th>
                             </tr>
@@ -396,7 +394,7 @@ export const ClientsTable: FC<Props> = ({
                         <tbody className="bg-white divide-y divide-gray-200">
                             {clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-3 py-4 text-center text-gray-500">
+                                    <td colSpan={5} className="px-2 sm:px-3 py-4 text-center text-gray-500">
                                         No se encontraron clientes
                                     </td>
                                 </tr>
@@ -411,7 +409,7 @@ export const ClientsTable: FC<Props> = ({
                                         onClick={() => window.location.href = `/app/${client.id}`}
                                         title={`Click para ver detalles de ${client.name}`}
                                     >
-                                        <td className="px-3 py-4">
+                                        <td className="px-2 sm:px-3 py-3 sm:py-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="min-w-0 flex-1">
                                                     <div className="text-sm font-medium text-gray-900 truncate">
@@ -433,23 +431,23 @@ export const ClientsTable: FC<Props> = ({
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-3 py-4 text-sm text-gray-900 hidden md:table-cell">
+                                        <td className="px-2 sm:px-3 py-3 sm:py-4 text-sm text-gray-900 hidden md:table-cell">
                                             {client.phone}
                                         </td>
-                                        <td className="px-3 py-4">
+                                        <td className="px-2 sm:px-3 py-3 sm:py-4">
                                             <div className={`text-xs ${client.sectionId
                                                 ? getSectionColor(client.sectionId)
                                                 : 'bg-gray-50 text-gray-500 border-gray-200'
-                                                } rounded-md px-2 py-1 inline-flex items-center space-x-1 max-w-full`}>
+                                                } rounded-md px-1.5 sm:px-2 py-1 inline-flex items-center space-x-1 max-w-full`}>
                                                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${client.sectionId
                                                     ? getSectionColor(client.sectionId).split(' ')[1] // text color converted to bg
                                                     : 'bg-gray-400'
                                                     } border-white border`}></div>
-                                                <span className="font-medium truncate">{getSectionName(client.sectionId)}</span>
+                                                <span className="font-medium truncate text-xs">{getSectionName(client.sectionId)}</span>
                                             </div>
                                         </td>
 
-                                        <td className="px-3 py-4">
+                                        <td className="px-2 sm:px-3 py-3 sm:py-4">
                                             <div className="text-right">
                                                 <span className={`text-sm font-medium ${client.totalDebt > 0
                                                     ? 'text-red-600'
@@ -457,28 +455,17 @@ export const ClientsTable: FC<Props> = ({
                                                     }`}>
                                                     ${client.totalDebt.toFixed(0)}
                                                 </span>
-                                                {/* {client.totalDebt > 0 && (
-                                                    <div className="text-xs text-gray-500">
-                                                        T: ${client.transactionDebt.toFixed(0)}
-                                                        {client.raffleDebt > 0 && (
-                                                            <> | R: ${client.raffleDebt.toFixed(0)}</>
-                                                        )}
-                                                        {client.monthlyServiceDebt > 0 && (
-                                                            <> | S: ${client.monthlyServiceDebt.toFixed(0)}</>
-                                                        )}
-                                                    </div>
-                                                )} */}
                                             </div>
                                         </td>
 
-                                        <td className="px-3 py-4 text-right">
+                                        <td className="px-2 sm:px-3 py-3 sm:py-4 text-right">
                                             <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
                                                 <Link
                                                     href={`/app/${client.id}`}
                                                     className="text-green-600 hover:text-green-900 transition-colors p-1"
                                                     title="Ver detalles"
                                                 >
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
@@ -581,14 +568,14 @@ export const ClientsTable: FC<Props> = ({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         {/* Deuda de Transacciones */}
                         <div className="bg-white rounded-lg p-3 border border-blue-200">
                             <div className="flex items-center space-x-2">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                 <h4 className="text-xs font-medium text-gray-700">Transacciones</h4>
                             </div>
-                            <p className="text-lg font-bold text-blue-600 mt-1">
+                            <p className="text-sm sm:text-lg font-bold text-blue-600 mt-1">
                                 ${debtSummary.totalTransactionDebt.toLocaleString()}
                             </p>
                         </div>
@@ -599,7 +586,7 @@ export const ClientsTable: FC<Props> = ({
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                                 <h4 className="text-xs font-medium text-gray-700">Rifas</h4>
                             </div>
-                            <p className="text-lg font-bold text-green-600 mt-1">
+                            <p className="text-sm sm:text-lg font-bold text-green-600 mt-1">
                                 ${debtSummary.totalRaffleDebt.toLocaleString()}
                             </p>
                         </div>
@@ -610,7 +597,7 @@ export const ClientsTable: FC<Props> = ({
                                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                                 <h4 className="text-xs font-medium text-gray-700">Servicios</h4>
                             </div>
-                            <p className="text-lg font-bold text-purple-600 mt-1">
+                            <p className="text-sm sm:text-lg font-bold text-purple-600 mt-1">
                                 ${debtSummary.totalMonthlyServiceDebt.toLocaleString()}
                             </p>
                         </div>
@@ -621,7 +608,7 @@ export const ClientsTable: FC<Props> = ({
                                 <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                                 <h4 className="text-xs font-bold text-gray-800">TOTAL</h4>
                             </div>
-                            <p className="text-lg font-bold text-red-600 mt-1">
+                            <p className="text-sm sm:text-lg font-bold text-red-600 mt-1">
                                 ${debtSummary.grandTotalDebt.toLocaleString()}
                             </p>
                         </div>
