@@ -65,6 +65,11 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     // Obtener números disponibles
     const availableNumbers = numbers.filter(num => !occupiedNumbers.has(num));
 
+    // Función para formatear número con cero inicial si es necesario
+    const formatNumber = (num: number): string => {
+        return num < 10 ? `0${num}` : num.toString();
+    };
+
     // Funciones para manejar los modales
     const handleCreateTicket = () => {
         setSelectedTicket(null);
@@ -236,7 +241,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                             >
                                 <div className="flex items-center gap-2">
                                     <div className="flex items-center justify-center bg-yellow-300">
-                                        <span className="font-bold text-xs">{number}</span>
+                                        <span className="font-bold text-xs">{formatNumber(number)}</span>
                                     </div>
                                     <div className="flex-1">
                                         {isOccupied ? (
