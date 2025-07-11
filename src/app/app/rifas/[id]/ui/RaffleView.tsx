@@ -4,7 +4,6 @@ import { FC, useState } from "react"
 import Link from "next/link"
 import RaffleTicketForm from "@/components/forms/RaffleTicket"
 import RaffleTicketPaymentForm from "@/components/forms/RaffleTicketPaymentForm"
-import { deleteRaffleTicket } from "@/actions/raffles/delete-raffle-ticket"
 
 interface Props {
     raffle: Raffle & {
@@ -74,17 +73,17 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     // Función para filtrar números basado en el término de búsqueda
     const filteredNumbers = numbers.filter(number => {
         if (!searchTerm.trim()) return true;
-        
+
         const ticket = occupiedNumbers.get(number);
         const numberStr = formatNumber(number);
         const searchLower = searchTerm.toLowerCase();
-        
+
         // Buscar por número
         if (numberStr.includes(searchLower)) return true;
-        
+
         // Buscar por nombre de cliente si existe
         if (ticket && ticket.client.toLowerCase().includes(searchLower)) return true;
-        
+
         return false;
     });
 
@@ -103,15 +102,6 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
         setSelectedTicket(ticket);
         setSelectedPayment(null);
         setShowPaymentForm(true);
-    };
-
-    const handleDeleteTicket = async (ticket: RaffleTicket) => {
-        if (window.confirm(`¿Estás seguro de que quieres eliminar el ticket #${ticket.number}?`)) {
-            const result = await deleteRaffleTicket(ticket.id);
-            if (!result.ok) {
-                alert(result.message);
-            }
-        }
     };
 
     const handleCloseModals = () => {
@@ -280,192 +270,180 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                             {/* Primera columna: números del 1 al 50 */}
                             <div className="">
                                 {filteredNumbers.slice(0, Math.ceil(filteredNumbers.length / 2)).map(number => {
-                            const ticket = occupiedNumbers.get(number);
-                            const isOccupied = !!ticket;
+                                    const ticket = occupiedNumbers.get(number);
+                                    const isOccupied = !!ticket;
 
-                            // Calcular el total pagado real basado en todos los pagos
-                            let realTotalPaid = 0;
-                            let realIsPaid = false;
-                            if (ticket && ticket.payments) {
-                                realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                realIsPaid = realTotalPaid >= raffle.ticketPrice;
-                            }
+                                    // Calcular el total pagado real basado en todos los pagos
+                                    let realTotalPaid = 0;
+                                    let realIsPaid = false;
+                                    if (ticket && ticket.payments) {
+                                        realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
+                                        realIsPaid = realTotalPaid >= raffle.ticketPrice;
+                                    }
 
-                            return (
-                                <div
-                                    key={number}
-                                    className={`
+                                    return (
+                                        <div
+                                            key={number}
+                                            className={`
                                         text-xs flex items-center justify-between transition-colors
                                         ${isOccupied
-                                            ? realIsPaid
-                                                ? 'bg-green-50 text-green-800'
-                                                : 'bg-yellow-50 text-yellow-800'
-                                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                        }
+                                                    ? realIsPaid
+                                                        ? 'bg-green-50 text-green-800'
+                                                        : 'bg-yellow-50 text-yellow-800'
+                                                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                                }
                                     `}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-center justify-center bg-yellow-300">
-                                            <span className="font-bold text-xs">{formatNumber(number)}</span>
-                                        </div>
-                                        <div className="flex-1">
-                                            {isOccupied ? (
-                                                <div>
-                                                    <div className="font-semibold">{ticket.client}</div>
-                                                </div>
-                                            ) : (
-                                                <div className="text-gray-500 italic text-xs">Disponible</div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center">
-                                        {isOccupied ? (
+                                        >
                                             <div className="flex items-center gap-2">
-                                                <div className="text-right mr-4">
+                                                <div className="flex items-center justify-center bg-yellow-300">
+                                                    <span className="font-bold text-xs">{formatNumber(number)}</span>
+                                                </div>
+                                                <div className="flex-1">
+                                                    {isOccupied ? (
+                                                        <div>
+                                                            <div className="font-semibold">{ticket.client}</div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-gray-500 italic text-xs">Disponible</div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center">
+                                                {isOccupied ? (
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs">
-                                                            {realIsPaid ? '✓' : '⏳'}
-                                                        </span>
+                                                        <div className="text-right mr-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs">
+                                                                    {ticket.totalPaid}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleEditTicket(ticket)}
+                                                            className="text-center text-xm"
+                                                        >
+                                                            ✏️
+                                                        </button>
+                                                        {!realIsPaid && (
+                                                            <button
+                                                                onClick={() => handleAddPayment(ticket)}
+                                                                className="text-center text-xm"
+                                                            >
+                                                                💵
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                </div>
-                                                <button
-                                                    onClick={() => handleEditTicket(ticket)}
-                                                    className="bg-blue-500 text-center rounded-md hover:bg-blue-600 transition-colors text-xm"
-                                                >
-                                                    ✏️
-                                                </button>
-                                                {!realIsPaid && (
-                                                    <button
-                                                        onClick={() => handleAddPayment(ticket)}
-                                                        className="bg-green-500 text-center rounded-md hover:bg-green-600 transition-colors text-xm"
-                                                    >
-                                                        💵
-                                                    </button>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedTicket({ number, raffleId: raffle.id, client: '', totalPaid: 0, isPaid: false } as RaffleTicket);
+                                                                setShowTicketForm(true);
+                                                            }}
+                                                            className=" text-white rounded-md transition-colors text-xm"
+                                                        >
+                                                            ✏️
+                                                        </button>
+                                                    </div>
                                                 )}
-                                                <button
-                                                    onClick={() => handleDeleteTicket(ticket)}
-                                                    className="bg-red-500 text-center rounded-md hover:bg-red-600 transition-colors text-xm"
-                                                >
-                                                    🗑️
-                                                </button>
                                             </div>
-                                        ) : (
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedTicket({ number, raffleId: raffle.id, client: '', totalPaid: 0, isPaid: false } as RaffleTicket);
-                                                        setShowTicketForm(true);
-                                                    }}
-                                                    className="bg-blue-500 text-white rounded-md transition-colors text-xm"
-                                                >
-                                                    ✏️
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
 
-                    {/* Segunda columna: números del 51 en adelante */}
-                    <div className="">
-                        {filteredNumbers.slice(Math.ceil(filteredNumbers.length / 2)).map(number => {
-                            const ticket = occupiedNumbers.get(number);
-                            const isOccupied = !!ticket;
+                            {/* Segunda columna: números del 51 en adelante */}
+                            <div className="">
+                                {filteredNumbers.slice(Math.ceil(filteredNumbers.length / 2)).map(number => {
+                                    const ticket = occupiedNumbers.get(number);
+                                    const isOccupied = !!ticket;
 
-                            // Calcular el total pagado real basado en todos los pagos
-                            let realTotalPaid = 0;
-                            let realIsPaid = false;
-                            if (ticket && ticket.payments) {
-                                realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                realIsPaid = realTotalPaid >= raffle.ticketPrice;
-                            }
+                                    // Calcular el total pagado real basado en todos los pagos
+                                    let realTotalPaid = 0;
+                                    let realIsPaid = false;
+                                    if (ticket && ticket.payments) {
+                                        realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
+                                        realIsPaid = realTotalPaid >= raffle.ticketPrice;
+                                    }
 
-                            return (
-                                <div
-                                    key={number}
-                                    className={`
+                                    return (
+                                        <div
+                                            key={number}
+                                            className={`
                                         text-xs flex items-center justify-between transition-colors
                                         ${isOccupied
-                                            ? realIsPaid
-                                                ? 'bg-green-50 border-green-200 text-green-800'
-                                                : 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                                            : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                                        }
+                                                    ? realIsPaid
+                                                        ? 'bg-green-50 border-green-200 text-green-800'
+                                                        : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                                                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                                                }
                                     `}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-center justify-center bg-yellow-300">
-                                            <span className="font-bold text-xs">{formatNumber(number)}</span>
-                                        </div>
-                                        <div className="flex-1">
-                                            {isOccupied ? (
-                                                <div>
-                                                    <div className="font-semibold">{ticket.client}</div>
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex items-center justify-center bg-yellow-300">
+                                                    <span className="font-bold text-xs">{formatNumber(number)}</span>
                                                 </div>
-                                            ) : (
-                                                <div className="text-gray-500 italic text-xs">Disponible</div>
-                                            )}
-                                        </div>
-                                    </div>
+                                                <div className="flex-1">
+                                                    {isOccupied ? (
+                                                        <div>
+                                                            <div className="font-semibold">{ticket.client}</div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-gray-500 italic text-xs">Disponible</div>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                                    <div className="flex items-center gap-2">
-                                        {isOccupied ? (
                                             <div className="flex items-center gap-2">
-                                                <div className="text-right mr-4">
+                                                {isOccupied ? (
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs">
-                                                            {realIsPaid ? '✓' : '⏳'}
-                                                        </span>
+                                                        <div className="text-right mr-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs">
+                                                                    {ticket.totalPaid}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleEditTicket(ticket)}
+                                                            className="text-center rounded-md hover:bg-blue-600 transition-colors text-xm"
+                                                        >
+                                                            ✏️
+                                                        </button>
+                                                        {!realIsPaid && (
+                                                            <button
+                                                                onClick={() => handleAddPayment(ticket)}
+                                                                className="text-center text-xm"
+                                                            >
+                                                                💵
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                </div>
-                                                <button
-                                                    onClick={() => handleEditTicket(ticket)}
-                                                    className="bg-blue-500 text-center rounded-md hover:bg-blue-600 transition-colors text-xm"
-                                                >
-                                                    ✏️
-                                                </button>
-                                                {!realIsPaid && (
-                                                    <button
-                                                        onClick={() => handleAddPayment(ticket)}
-                                                        className="bg-green-500 text-center rounded-md hover:bg-green-600 transition-colors text-xm"
-                                                    >
-                                                        💵
-                                                    </button>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedTicket({ number, raffleId: raffle.id, client: '', totalPaid: 0, isPaid: false } as RaffleTicket);
+                                                                setShowTicketForm(true);
+                                                            }}
+                                                            className="text-white rounded-md transition-colors text-xm"
+                                                        >
+                                                            ✏️
+                                                        </button>
+                                                    </div>
                                                 )}
-                                                <button
-                                                    onClick={() => handleDeleteTicket(ticket)}
-                                                    className="bg-red-500 text-center rounded-md hover:bg-red-600 transition-colors text-xm"
-                                                >
-                                                    🗑️
-                                                </button>
                                             </div>
-                                        ) : (
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedTicket({ number, raffleId: raffle.id, client: '', totalPaid: 0, isPaid: false } as RaffleTicket);
-                                                        setShowTicketForm(true);
-                                                    }}
-                                                    className="bg-blue-500 text-white rounded-md transition-colors text-xm"
-                                                >
-                                                    ✏️
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </>
                     )}
                 </div>
 
-                {/* Leyenda adicional */}
-                <div className="mt-6 bg-gray-50 rounded-lg p-4">
+                {/* Leyenda adicional                 */}
+                {/* <div className="mt-6 bg-gray-50 rounded-lg p-4">
                     <h3 className="text-sm font-semibold text-gray-800 mb-2">Leyenda</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
@@ -477,7 +455,8 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                             <span>Pendiente de pago</span>
                         </div>
                     </div>
-                </div>
+                </div> */}
+
             </ div>
 
             {/* Modal para RaffleTicketForm */}

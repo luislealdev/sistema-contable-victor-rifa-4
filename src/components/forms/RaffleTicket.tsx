@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createUpdateRaffleTicket } from '@/actions/raffles/create-update-raffle-ticket';
 import { RaffleTicket } from '@prisma/client';
+import { deleteRaffleTicket } from '@/actions/raffles';
 
 interface RaffleTicketFormProps {
     raffleTicket: RaffleTicket | null;
@@ -39,6 +40,15 @@ export default function RaffleTicketForm({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
+
+    const handleDeleteTicket = async (ticket: RaffleTicket) => {
+        if (window.confirm(`¿Estás seguro de que quieres eliminar el ticket #${ticket.number}?`)) {
+            const result = await deleteRaffleTicket(ticket.id);
+            if (!result.ok) {
+                alert(result.message);
+            }
+        }
+    };
 
     // Actualizar isPaid automáticamente cuando totalPaid cambie
     useEffect(() => {
@@ -100,9 +110,22 @@ export default function RaffleTicketForm({
 
     return (
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                {raffleTicket?.id ? 'Editar Ticket' : 'Nuevo Ticket'}
-            </h2>
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-800">
+                    {raffleTicket?.id ? 'Editar Ticket' : 'Nuevo Ticket'}
+                </h2>
+                {raffleTicket?.id && (
+                    <button 
+                        onClick={() => handleDeleteTicket(raffleTicket as RaffleTicket)} 
+                        className="flex items-center space-x-2 bg-red-50 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span className="text-sm font-medium">Eliminar</span>
+                    </button>
+                )}
+            </div>
 
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
                 <p className="text-sm text-blue-800">
@@ -219,8 +242,8 @@ export default function RaffleTicketForm({
 
                 {/* Payment Status Info */}
                 <div className={`p-3 rounded-md ${formData.isPaid
-                        ? 'bg-green-50 border border-green-200'
-                        : 'bg-yellow-50 border border-yellow-200'
+                    ? 'bg-green-50 border border-green-200'
+                    : 'bg-yellow-50 border border-yellow-200'
                     }`}>
                     <p className={`text-sm ${formData.isPaid ? 'text-green-800' : 'text-yellow-800'
                         }`}>
