@@ -19,7 +19,6 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState<RaffleTicket | null>(null);
     const [selectedPayment, setSelectedPayment] = useState<RaffleTicketPayment | null>(null);
-    // const [showPotential, setShowPotential] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
     if (!raffle) {
@@ -62,7 +61,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     });
 
     // Generar array de números del 1 al totalNumbers
-    const numbers = Array.from({ length: raffle.totalNumbers }, (_, i) => i + 1);
+    const numbers = Array.from({ length: raffle.totalNumbers }, (_, i) => i);
 
     // Obtener números disponibles
     const availableNumbers = numbers.filter(num => !occupiedNumbers.has(num));
