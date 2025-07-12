@@ -1,6 +1,7 @@
 'use server'
 
 import prisma from "@/lib/prisma"
+import { sendWhatsApp } from "@/utils/send-whatsapp"
 import { revalidatePath } from "next/cache"
 
 export const deleteTransaction = async (transactionId: number) => {
@@ -29,6 +30,34 @@ export const deleteTransaction = async (transactionId: number) => {
     await prisma.transaction.delete({
       where: { id: transactionId }
     })
+
+    // Get the client to send WhatsApp message
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
+      select: { phone: true, name: true }
+    });
+
+    if (client?.phone) {
+      // Total client debt calculation
+      const transactionDebt = await prisma.transaction.aggregate({
+        where: { clientId: clientId },
+        _sum: { totalAmount: true }
+      });
+
+      const payments = await prisma.payment.aggregate({
+        where: { clientId: clientId },
+        _sum: { amount: true }
+      });
+
+      const rest = (transactionDebt._sum.totalAmount || 0) - (payments._sum.amount || 0);
+
+      const message = `¡Hola ${client.name}! 😊\n\n` +
+        `Se ha registrado la eliminación de una transacción en tu cuenta. Aquí tienes los detalles:\n\n` +
+        `💰 *Deuda actual*: $${rest.toFixed(2)}\n\n` +
+        `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarme. *Torito* 📲.\n`;
+
+      sendWhatsApp(client.phone, message);
+    }
 
     revalidatePath('/app')
     revalidatePath(`/app/${clientId}`)

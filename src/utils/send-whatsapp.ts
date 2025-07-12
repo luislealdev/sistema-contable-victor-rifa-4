@@ -32,7 +32,7 @@ export const sendWhatsApp = async (phone: string, message: string) => {
 
         body: JSON.stringify({
             chatId: `${sendTo}@c.us`,
-            text: message,
+            text: `TORITO\n${message}`,
             session: "default",
             file: {
                 mimetype: "image/png",
@@ -63,6 +63,6 @@ export const sendWhatsApp = async (phone: string, message: string) => {
     });
 
     console.log(resp);
-    
+
 
 }  
