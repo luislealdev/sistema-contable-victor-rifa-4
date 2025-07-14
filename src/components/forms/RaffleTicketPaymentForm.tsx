@@ -8,7 +8,7 @@ interface RaffleTicketPaymentFormProps {
     payment: RaffleTicketPayment | null;
     ticketId: number;
     ticketNumber: number;
-    clientName: string;
+    // clientName: string;
     ticketPrice: number;
     totalPaid: number;
     onSuccess?: () => void;
@@ -24,7 +24,7 @@ export default function RaffleTicketPaymentForm({
     payment,
     ticketId,
     ticketNumber,
-    clientName,
+    // clientName,
     ticketPrice,
     totalPaid,
     onSuccess,
@@ -45,7 +45,6 @@ export default function RaffleTicketPaymentForm({
         setLoading(true);
         setError('');
         setSuccess('');
-
         try {
             const dataToSubmit = {
                 ...formData,
@@ -90,9 +89,9 @@ export default function RaffleTicketPaymentForm({
                 <p className="text-sm text-blue-800">
                     <span className="font-medium">Ticket #:</span> {ticketNumber}
                 </p>
-                <p className="text-sm text-blue-800">
+                {/* <p className="text-sm text-blue-800">
                     <span className="font-medium">Cliente:</span> {clientName}
-                </p>
+                </p> */}
                 <p className="text-sm text-blue-800">
                     <span className="font-medium">Precio del ticket:</span> ${ticketPrice.toFixed(2)}
                 </p>

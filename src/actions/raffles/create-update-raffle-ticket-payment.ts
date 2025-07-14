@@ -1,6 +1,7 @@
 'use server';
 import prisma from "@/lib/prisma";
 import { raffleTicketPayment } from "@/schema/raffle";
+import { sendWhatsApp } from "@/utils/send-whatsapp";
 import { revalidatePath } from "next/cache";
 
 export const createUpdateRaffleTicketPayment = async (payment: unknown) => {
@@ -35,7 +36,7 @@ export const createUpdateRaffleTicketPayment = async (payment: unknown) => {
         });
 
         if (updatedTicket) {
-            const totalPaid = updatedTicket.payments.reduce((sum, payment) => sum + payment.amount, 0);
+            const totalPaid = updatedTicket.totalPaid + savedPayment.amount;
             const ticketPrice = await prisma.raffle.findUnique({
                 where: { id: updatedTicket.raffleId },
                 select: { ticketPrice: true }
@@ -48,9 +49,32 @@ export const createUpdateRaffleTicketPayment = async (payment: unknown) => {
                     isPaid: ticketPrice ? totalPaid >= ticketPrice.ticketPrice : false
                 }
             });
+
+            // Send WhatsApp message to client
+            const client = await prisma.client.findUnique({
+                where: { id: updatedTicket?.clientId },
+                select: { phone: true, name: true }
+            });
+
+            if (client?.phone) {
+                const message = `¡Hola ${client.name}! 😊\n\n` +
+                    `Se ha registrado un nuevo pago para tu ticket de rifa. Aquí tienes los detalles:\n\n` +
+                    `🎟️ *Ticket #*: ${updatedTicket?.number}\n` +
+                    `💰 *Monto del pago*: $${savedPayment.amount.toFixed(2)}\n` +
+                    `💵 *Total pagado hasta ahora*: $${totalPaid.toFixed(2)}\n\n` +
+                    // Rest
+                    `*Restante: $${ticketPrice ? (ticketPrice.ticketPrice - totalPaid).toFixed(2) : '0.00'}*\n\n` +
+
+                    `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarme. *Torito* 📲.\n`;
+
+                await sendWhatsApp(client.phone, message);
+            }
         }
 
+
+
         revalidatePath('/app/rifas');
+
         if (updatedTicket) {
             revalidatePath(`/app/rifas/${updatedTicket.raffleId}`);
         }

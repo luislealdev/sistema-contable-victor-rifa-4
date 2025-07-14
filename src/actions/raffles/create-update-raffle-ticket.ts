@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { raffleTicketSchema } from "@/schema/raffle";
+import { sendWhatsApp } from "@/utils/send-whatsapp";
 import { revalidatePath } from "next/cache";
 
 export const createUpdateRaffleTicket = async (ticket: unknown) => {
@@ -34,7 +35,7 @@ export const createUpdateRaffleTicket = async (ticket: unknown) => {
             });
 
             const totalExistingPayments = existingPayments.reduce((sum, payment) => sum + payment.amount, 0);
-            
+
             // Si los pagos existentes no coinciden con el total pagado
             if (totalExistingPayments !== parsedTicket.data.totalPaid) {
                 if (totalExistingPayments < parsedTicket.data.totalPaid) {
@@ -50,10 +51,10 @@ export const createUpdateRaffleTicket = async (ticket: unknown) => {
                     // Si hay más pagos de los esperados, eliminar el exceso (empezando por los más recientes)
                     let amountToRemove = totalExistingPayments - parsedTicket.data.totalPaid;
                     const sortedPayments = existingPayments.sort((a, b) => b.date.getTime() - a.date.getTime());
-                    
+
                     for (const payment of sortedPayments) {
                         if (amountToRemove <= 0) break;
-                        
+
                         if (payment.amount <= amountToRemove) {
                             await prisma.raffleTicketPayment.delete({
                                 where: { id: payment.id }
@@ -70,6 +71,31 @@ export const createUpdateRaffleTicket = async (ticket: unknown) => {
                     }
                 }
             }
+        }
+
+        // Get client phone to send WhatsApp message
+        const client = await prisma.client.findUnique({
+            where: { id: savedTicket.clientId },
+            select: { phone: true, name: true }
+        });
+
+        if (client?.phone) {
+
+            // Get ticket price 
+            const raffle = await prisma.raffle.findUnique({
+                where: { id: savedTicket.raffleId },
+                select: { ticketPrice: true }
+            });
+
+            const message = `¡Hola ${client.name}! 😊\n\n` +
+                `Se ha registrado un nuevo ticket de rifa en tu cuenta. Aquí tienes los detalles:\n\n` +
+                `🎟️ *Ticket #*: ${savedTicket.number}\n` +
+                `💰 *Precio del ticket*: $${raffle!.ticketPrice.toFixed(2)}\n` +
+                `💵 *Total pagado*: $${savedTicket.totalPaid.toFixed(2)}\n\n` +
+                `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarme. *Torito* 📲.\n`;
+
+            // Aquí deberías implementar la función sendWhatsApp
+            sendWhatsApp(client.phone, message);
         }
 
         revalidatePath('/app/rifas');

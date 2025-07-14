@@ -4,7 +4,7 @@ import { FC } from "react";
 
 interface Props {
     number: number;
-    ticket?: RaffleTicket & { payments: RaffleTicketPayment[] };
+    ticket?: RaffleTicket & { payments: RaffleTicketPayment[], client: { id: number, name: string } };
     rafflePrice: number;
     onEditTicket: (ticket: RaffleTicket) => void;
     onAddPayment: (ticket: RaffleTicket) => void;
@@ -55,7 +55,7 @@ export const RaffleNumberItem: FC<Props> = ({
                 <div className="flex-1">
                     {isOccupied ? (
                         <div>
-                            <div className="font-semibold">{ticket.client}</div>
+                            <div className="font-semibold">{ticket.client.name}</div>
                         </div>
                     ) : (
                         <div className="text-gray-500 italic text-xs">Disponible</div>

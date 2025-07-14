@@ -13,7 +13,7 @@ export const raffleTicketSchema = z.object({
     id: z.number().int().optional(),
     number: z.number().int().min(1, "Ticket number must be at least 1"),
     raffleId: z.number().int(),
-    client: z.string().min(1, "Client name is required"),
+    clientId: z.number().int(),
     totalPaid: z.number().min(0, "Total paid must be a positive number").default(0),
     isPaid: z.boolean().default(false),
 });

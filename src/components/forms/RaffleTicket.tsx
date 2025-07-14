@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { createUpdateRaffleTicket } from '@/actions/raffles/create-update-raffle-ticket';
-import { RaffleTicket } from '@prisma/client';
+import { Client, RaffleTicket } from '@prisma/client';
 import { deleteRaffleTicket } from '@/actions/raffles';
+import { getPaginatedClients } from '@/actions/client';
 
 interface RaffleTicketFormProps {
     raffleTicket: RaffleTicket | null;
@@ -17,7 +18,7 @@ interface RaffleTicketFormProps {
 
 type RaffleTicketFormState = {
     number: number | '';
-    client: string;
+    clientId: number | '';
     totalPaid: number | '';
     isPaid: boolean;
 };
@@ -33,13 +34,38 @@ export default function RaffleTicketForm({
 }: RaffleTicketFormProps) {
     const [formData, setFormData] = useState<RaffleTicketFormState>({
         number: raffleTicket?.number || '',
-        client: raffleTicket?.client || '',
+        clientId: raffleTicket?.clientId || '',
         totalPaid: raffleTicket?.totalPaid || '',
         isPaid: raffleTicket?.isPaid || false
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
+    const [clientSearch, setClientSearch] = useState('');
+    const [clients, setClients] = useState<Client[]>([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [loadingClients, setLoadingClients] = useState(false);
+
+    // Initialize client search if editing existing ticket
+    useEffect(() => {
+        if (raffleTicket?.clientId) {
+            // If editing, we need to fetch the client info to display in the search field
+            const fetchClientInfo = async () => {
+                try {
+                    const result = await getPaginatedClients(1, undefined, '');
+                    if (result.ok) {
+                        const client = result.clients?.find(c => c.id === raffleTicket.clientId);
+                        if (client) {
+                            setClientSearch(`${client.name} - ${client.phone}`);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching client info:', error);
+                }
+            };
+            fetchClientInfo();
+        }
+    }, [raffleTicket?.clientId]);
 
     const handleDeleteTicket = async (ticket: RaffleTicket) => {
         if (window.confirm(`¿Estás seguro de que quieres eliminar el ticket #${ticket.number}?`)) {
@@ -49,6 +75,32 @@ export default function RaffleTicketForm({
             }
         }
     };
+
+    // Buscar clientes cuando el usuario escriba al menos 3 caracteres
+    useEffect(() => {
+        const searchClients = async () => {
+            if (clientSearch.length >= 3) {
+                setLoadingClients(true);
+                try {
+                    const result = await getPaginatedClients(1, undefined, clientSearch);
+                    if (result.ok) {
+                        setClients(result.clients || []);
+                        setShowDropdown(true);
+                    }
+                } catch (error) {
+                    console.error('Error searching clients:', error);
+                } finally {
+                    setLoadingClients(false);
+                }
+            } else {
+                setClients([]);
+                setShowDropdown(false);
+            }
+        };
+
+        const timeoutId = setTimeout(searchClients, 300); // Debounce
+        return () => clearTimeout(timeoutId);
+    }, [clientSearch]);
 
     // Actualizar isPaid automáticamente cuando totalPaid cambie
     useEffect(() => {
@@ -115,8 +167,8 @@ export default function RaffleTicketForm({
                     {raffleTicket?.id ? 'Editar Ticket' : 'Nuevo Ticket'}
                 </h2>
                 {raffleTicket?.id && (
-                    <button 
-                        onClick={() => handleDeleteTicket(raffleTicket as RaffleTicket)} 
+                    <button
+                        onClick={() => handleDeleteTicket(raffleTicket as RaffleTicket)}
                         className="flex items-center space-x-2 bg-red-50 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,7 +233,7 @@ export default function RaffleTicketForm({
                 </div>
 
                 {/* Client Field */}
-                <div>
+                <div className="relative">
                     <label htmlFor="client" className="block text-sm font-medium text-gray-700 mb-1">
                         Cliente <span className="text-red-500">*</span>
                     </label>
@@ -189,12 +241,75 @@ export default function RaffleTicketForm({
                         type="text"
                         id="client"
                         name="client"
-                        value={formData.client}
-                        onChange={handleInputChange}
+                        value={clientSearch}
+                        onChange={(e) => {
+                            setClientSearch(e.target.value);
+                            if (e.target.value.length < 3) {
+                                setFormData(prev => ({ ...prev, clientId: '' }));
+                            }
+                        }}
+                        onFocus={() => {
+                            if (clients.length > 0) {
+                                setShowDropdown(true);
+                            }
+                        }}
+                        onBlur={() => {
+                            // Delay hiding dropdown to allow click on option
+                            setTimeout(() => setShowDropdown(false), 200);
+                        }}
                         required
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Nombre del cliente"
+                        placeholder="Escribe al menos 3 letras para buscar..."
+                        autoComplete="off"
                     />
+
+                    {/* Loading indicator */}
+                    {loadingClients && (
+                        <div className="absolute right-3 top-9">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                        </div>
+                    )}
+
+                    {/* Dropdown with clients */}
+                    {showDropdown && clients.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                            {clients.map((client) => (
+                                <div
+                                    key={client.id}
+                                    className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                    onClick={() => {
+                                        setFormData(prev => ({ ...prev, clientId: client.id }));
+                                        setClientSearch(`${client.name} - ${client.phone}`);
+                                        setShowDropdown(false);
+                                    }}
+                                >
+                                    <div className="font-medium text-gray-900">{client.name}</div>
+                                    <div className="text-sm text-gray-500">{client.phone}</div>
+                                    {client.address && (
+                                        <div className="text-xs text-gray-400">{client.address}</div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* No results message */}
+                    {clientSearch.length >= 3 && !loadingClients && clients.length === 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                            <div className="px-3 py-2 text-gray-500 text-sm">
+                                No se encontraron clientes
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Selected client info */}
+                    {formData.clientId && (
+                        <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                            <div className="text-sm text-green-800">
+                                ✓ Cliente seleccionado (ID: {formData.clientId})
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Total Paid Field */}

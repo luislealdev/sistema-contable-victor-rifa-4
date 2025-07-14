@@ -5,7 +5,7 @@ import { RaffleNumberItem } from "./RaffleNumberItem";
 
 interface Props {
     filteredNumbers: number[];
-    occupiedNumbers: Map<number, RaffleTicket & { payments: RaffleTicketPayment[] }>;
+    occupiedNumbers: Map<number, RaffleTicket & { payments: RaffleTicketPayment[], client: { id: number, name: string } }>;
     rafflePrice: number;
     searchTerm: string;
     onEditTicket: (ticket: RaffleTicket) => void;

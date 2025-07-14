@@ -4,7 +4,7 @@ import { RaffleTicket, RaffleTicketPayment } from "@prisma/client";
 export const filterNumbers = (
     numbers: number[],
     searchTerm: string,
-    occupiedNumbers: Map<number, RaffleTicket & { payments: RaffleTicketPayment[] }>
+    occupiedNumbers: Map<number, RaffleTicket & { payments: RaffleTicketPayment[], client: { id: number, name: string } }>
 ): number[] => {
     if (!searchTerm.trim()) return numbers;
     
@@ -21,7 +21,7 @@ export const filterNumbers = (
         if (numberStr.includes(searchLower)) return true;
         
         // Buscar por nombre de cliente si existe
-        if (ticket && ticket.client.toLowerCase().includes(searchLower)) return true;
+        if (ticket && ticket.client.name.toLowerCase().includes(searchLower)) return true;
         
         return false;
     });

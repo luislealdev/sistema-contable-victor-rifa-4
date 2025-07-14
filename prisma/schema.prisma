@@ -34,6 +34,7 @@ model Client {
 
     transactions Transaction[]
     payments     Payment[]
+    RaffleTicket RaffleTicket[]
 }
 
 model Transaction {
@@ -88,7 +89,8 @@ model RaffleTicket {
     totalPaid Float   @default(0.0)
     isPaid    Boolean @default(false)
 
-    client String
+    client   Client @relation(fields: [clientId], references: [id])
+    clientId Int
 
     raffle   Raffle @relation(fields: [raffleId], references: [id])
     raffleId Int
