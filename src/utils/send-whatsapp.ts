@@ -33,13 +33,11 @@ export const sendWhatsApp = async (phone: string, message: string) => {
         body: JSON.stringify({
             chatId: `${sendTo}@c.us`,
             text: `🐂 *TORITO*\n\n${message}\n\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
                 `💳 *INFORMACIÓN PARA PAGOS*\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
                 `🏦 *BBVA BANCOMER*\n` +
                 `👤 Victor\n` +
-                `💳 *Cuenta Maestra:* 4152314332859928\n` +
-                `📱 *Pago en Línea:* 4152314332859910\n\n` +
+                `💳 *Transferencia 1:* 4152314332859928\n` +
+                `💳 *Transferencia 2:* 4152314332859910\n\n` +
                 `💡 *Recuerda enviar tu comprobante de pago*\n`,
             session: "default",
             file: {
