@@ -32,7 +32,15 @@ export const sendWhatsApp = async (phone: string, message: string) => {
 
         body: JSON.stringify({
             chatId: `${sendTo}@c.us`,
-            text: `TORITO\n${message}`,
+            text: `🐂 *TORITO*\n\n${message}\n\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `💳 *INFORMACIÓN PARA PAGOS*\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `🏦 *BBVA BANCOMER*\n` +
+                `👤 Victor\n` +
+                `💳 *Cuenta Maestra:* 4152314332859928\n` +
+                `📱 *Pago en Línea:* 4152314332859910\n\n` +
+                `💡 *Recuerda enviar tu comprobante de pago*\n`,
             session: "default",
             file: {
                 mimetype: "image/png",
@@ -42,27 +50,27 @@ export const sendWhatsApp = async (phone: string, message: string) => {
         })
     });
 
-    const resp = await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendImage', {
+    // const resp = await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendImage', {
 
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Api-Key': process.env.WAHA_API_KEY || '', //
-        },
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'X-Api-Key': process.env.WAHA_API_KEY || '', //
+    //     },
 
-        body: JSON.stringify({
-            chatId: `${sendTo}@c.us`,
-            caption: "Recuerda que puedes pagar transferirme.",
-            session: "default",
-            file: {
-                mimetype: "image/jpeg",
-                url: "https://github.com/devlikeapro/waha/raw/core/examples/dev.likeapro.jpg",
-                filename: "filename.jpeg"
-            },
-        })
-    });
+    //     body: JSON.stringify({
+    //         chatId: `${sendTo}@c.us`,
+    //         caption: "Recuerda que puedes pagar transferirme.",
+    //         session: "default",
+    //         file: {
+    //             mimetype: "image/jpeg",
+    //             url: "https://github.com/devlikeapro/waha/raw/core/examples/dev.likeapro.jpg",
+    //             filename: "filename.jpeg"
+    //         },
+    //     })
+    // });
 
-    console.log(resp);
+    // console.log(resp);
 
 
 }  
