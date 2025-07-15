@@ -89,8 +89,9 @@ model RaffleTicket {
     totalPaid Float   @default(0.0)
     isPaid    Boolean @default(false)
 
-    client   Client @relation(fields: [clientId], references: [id])
-    clientId Int
+    client      Client  @relation(fields: [clientId], references: [id])
+    clientId    Int
+    clientAlias String?
 
     raffle   Raffle @relation(fields: [raffleId], references: [id])
     raffleId Int

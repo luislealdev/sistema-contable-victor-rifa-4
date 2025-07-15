@@ -317,7 +317,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                     {isOccupied ? (
                                                         <div>
                                                             <div className="font-semibold text-8 text-black" title={ticket.client.name}>
-                                                                {truncateName(ticket.client.name)}
+                                                                {truncateName(ticket.clientAlias || ticket.client.name)}
                                                             </div>
                                                         </div>
                                                     ) : (
