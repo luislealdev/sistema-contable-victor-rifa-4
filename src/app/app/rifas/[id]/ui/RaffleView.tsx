@@ -206,7 +206,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
             </div >
 
             {/* Lista de números */}
-            < div className="bg-white rounded-lg shadow-md p-6" >
+            < div className="bg-white rounded-lg shadow-md" >
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                     <div className="flex flex-col items-center gap-4 mt-2 sm:mt-0">
                         <div className="flex justify-between items-center w-full sm:w-auto gap-4">
