@@ -80,7 +80,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     };
 
     // Función para truncar nombres largos
-    const truncateName = (name: string, maxLength: number = 4): string => {
+    const truncateName = (name: string, maxLength: number = 6 ): string => {
         if (name.length <= maxLength) return name;
         return name.substring(0, maxLength) + '..';
     };
@@ -269,7 +269,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4" style={{lineHeight: '1'}}>
                     {filteredNumbers.length === 0 ? (
                         <div className="col-span-2 text-center py-8">
                             <p className="text-gray-500 text-lg">No se encontraron números que coincidan con &ldquo;{searchTerm}&rdquo;</p>
@@ -316,7 +316,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                 <div className="flex-1">
                                                     {isOccupied ? (
                                                         <div>
-                                                            <div className="font-semibold" title={ticket.client.name}>
+                                                            <div className="font-semibold text-8 text-black" title={ticket.client.name}>
                                                                 {truncateName(ticket.client.name)}
                                                             </div>
                                                         </div>
@@ -328,14 +328,10 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
 
                                             <div className="flex items-center">
                                                 {isOccupied ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="text-right mr-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-8">
-                                                                    {ticket.totalPaid}
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-8 mr-1">
+                                                            {ticket.totalPaid}
+                                                        </span>
                                                         <button
                                                             onClick={() => handleEditTicket(ticket)}
                                                             className="text-center text-8"
@@ -403,7 +399,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                 <div className="flex-1">
                                                     {isOccupied ? (
                                                         <div>
-                                                            <div className="font-semibold" title={ticket.client.name}>
+                                                            <div className="font-semibold text-black" title={ticket.client.name}>
                                                                 {truncateName(ticket.client.name)}
                                                             </div>
                                                         </div>
@@ -413,19 +409,15 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center">
                                                 {isOccupied ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="text-right mr-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-8">
-                                                                    {ticket.totalPaid}
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-8 mr-1">
+                                                            {ticket.totalPaid}
+                                                        </span>
                                                         <button
                                                             onClick={() => handleEditTicket(ticket)}
-                                                            className="text-center rounded-md hover:bg-blue-600 transition-colors text-8"
+                                                            className="text-center text-8"
                                                         >
                                                             ✏️
                                                         </button>
