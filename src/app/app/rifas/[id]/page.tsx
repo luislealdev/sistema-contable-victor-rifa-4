@@ -21,9 +21,6 @@ export default async function RafflePage({ params }: {
         notFound();
     }
 
-    console.log("Raffle data:", raffle);
-    
-
     return (
         <RaffleView raffle={raffle} />
     )

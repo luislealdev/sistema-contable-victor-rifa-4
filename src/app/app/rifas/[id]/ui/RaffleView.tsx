@@ -142,7 +142,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
             <div className="mb-4">
                 <Link
                     href="/app/rifas"
-                    className="inline-flex items-center px-4 py-2 text-8 font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-4 py-2 text-13 font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                     ← Volver a Rifas
                 </Link>
@@ -155,23 +155,23 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                         <div className="flex items-center gap-3 mb-3">
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{raffle.title}</h1>
                             {isRaffleExpired() && (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-8 font-medium bg-red-100 text-red-800">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-13 font-medium bg-red-100 text-red-800">
                                     Terminada
                                 </span>
                             )}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
-                                <p className="text-8 text-gray-600">Fecha del sorteo</p>
+                                <p className="text-13 text-gray-600">Fecha del sorteo</p>
                                 <p className="text-lg font-semibold text-gray-800">{formatDate(raffle.drawDate)}</p>
                             </div>
                             <div>
-                                <p className="text-8 text-gray-600">Precio por boleto</p>
+                                <p className="text-13 text-gray-600">Precio por boleto</p>
                                 <p className="text-lg font-semibold text-green-600">{formatMoney(raffle.ticketPrice)}</p>
                             </div>
                         </div>
                         <div>
-                            <p className="text-8 text-gray-600 mb-2">Premio</p>
+                            <p className="text-13 text-gray-600 mb-2">Premio</p>
                             <p className="text-gray-800 bg-gray-50 p-3 rounded-md">{raffle.prize}</p>
                         </div>
                     </div>
@@ -222,15 +222,15 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                         <div className="flex flex-wrap gap-4 justify-center">
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-                                <span className="text-8 text-gray-600">Pagado</span>
+                                <span className="text-13 text-gray-600">Pagado</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
-                                <span className="text-8 text-gray-600">Pendiente</span>
+                                <span className="text-13 text-gray-600">Pendiente</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
-                                <span className="text-8 text-gray-600">Disponible</span>
+                                <span className="text-13 text-gray-600">Disponible</span>
                             </div>
                         </div>
 
@@ -242,7 +242,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     placeholder="Buscar por número o nombre de cliente..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-8"
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-13 "
                                 />
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -276,7 +276,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                             <p className="text-gray-500 text-lg">No se encontraron números que coincidan con &ldquo;{searchTerm}&rdquo;</p>
                             <button
                                 onClick={() => setSearchTerm('')}
-                                className="mt-2 text-blue-600 hover:text-blue-800 text-8 underline"
+                                className="mt-2 text-blue-600 hover:text-blue-800 text-13 underline"
                             >
                                 Limpiar búsqueda
                             </button>
@@ -301,7 +301,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                         <div
                                             key={number}
                                             className={`
-                                                border border-black text-8 flex items-center justify-between transition-colors
+                                                border border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
                                                         ? 'bg-green-50 text-green-800'
@@ -312,17 +312,17 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                         >
                                             <div className="flex items-center gap-2">
                                                 <div className="flex items-center justify-center bg-yellow-300">
-                                                    <span className="font-bold text-8">{formatNumber(number)}</span>
+                                                    <span className="font-bold text-13 ">{formatNumber(number)}</span>
                                                 </div>
                                                 <div className="flex-1">
                                                     {isOccupied ? (
                                                         <div>
-                                                            <div className="font-semibold text-8 text-black" title={ticket.client.name}>
+                                                            <div className="font-semibold text-13 text-black" title={ticket.client.name}>
                                                                 {ticket.clientAlias ? truncateName(ticket.clientAlias) : truncateName(ticket.client.name)}
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <div className="text-gray-500 italic text-8">Disponible</div>
+                                                        <div className="text-gray-500 italic text-13 ">Disponible</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -330,19 +330,19 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                             <div className="flex items-center">
                                                 {isOccupied ? (
                                                     <div className="flex items-center">
-                                                        <span className="text-8 mr-1">
+                                                        <span className="text-13 mr-1">
                                                             {ticket.totalPaid}
                                                         </span>
                                                         <button
                                                             onClick={() => handleEditTicket(ticket)}
-                                                            className="text-center text-8"
+                                                            className="text-center text-13 "
                                                         >
                                                             ✏️
                                                         </button>
                                                         {!realIsPaid && (
                                                             <button
                                                                 onClick={() => handleAddPayment(ticket)}
-                                                                className="text-center text-8"
+                                                                className="text-center text-13 "
                                                             >
                                                                 💵
                                                             </button>
@@ -355,7 +355,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                                 setSelectedTicket({ number, raffleId: raffle.id, totalPaid: 0, isPaid: false } as RaffleTicket);
                                                                 setShowTicketForm(true);
                                                             }}
-                                                            className=" text-white rounded-md transition-colors text-8"
+                                                            className=" text-white rounded-md transition-colors text-13 "
                                                         >
                                                             ✏️
                                                         </button>
@@ -384,7 +384,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     return (
                                         <div
                                             key={number}
-                                            className={`border border-black text-8 flex items-center justify-between transition-colors
+                                            className={`border border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
                                                         ? 'bg-green-50 border-green-200 text-green-800'
@@ -395,7 +395,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                         >
                                             <div className="flex items-center gap-2">
                                                 <div className="flex items-center justify-center bg-yellow-300">
-                                                    <span className="font-bold text-8">{formatNumber(number)}</span>
+                                                    <span className="font-bold text-13 ">{formatNumber(number)}</span>
                                                 </div>
                                                 <div className="flex-1">
                                                     {isOccupied ? (
@@ -405,7 +405,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <div className="text-gray-500 italic text-8">Disponible</div>
+                                                        <div className="text-gray-500 italic text-13 ">Disponible</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -413,19 +413,19 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                             <div className="flex items-center">
                                                 {isOccupied ? (
                                                     <div className="flex items-center">
-                                                        <span className="text-8 mr-1">
+                                                        <span className="text-13 mr-1">
                                                             {ticket.totalPaid}
                                                         </span>
                                                         <button
                                                             onClick={() => handleEditTicket(ticket)}
-                                                            className="text-center text-8"
+                                                            className="text-center text-13 "
                                                         >
                                                             ✏️
                                                         </button>
                                                         {!realIsPaid && (
                                                             <button
                                                                 onClick={() => handleAddPayment(ticket)}
-                                                                className="text-center text-8"
+                                                                className="text-center text-13 "
                                                             >
                                                                 💵
                                                             </button>
@@ -438,7 +438,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                                 setSelectedTicket({ number, raffleId: raffle.id, totalPaid: 0, isPaid: false } as RaffleTicket);
                                                                 setShowTicketForm(true);
                                                             }}
-                                                            className="text-white rounded-md transition-colors text-8"
+                                                            className="text-white rounded-md transition-colors text-13 "
                                                         >
                                                             ✏️
                                                         </button>
@@ -452,12 +452,12 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                         </>
                     )}
                 </div>
-                <p className="text-center text-8">RIFAS EL TORITO 100% GARANTÍA</p>
+                <p className="text-center text-13 ">RIFAS EL TORITO 100% GARANTÍA</p>
 
                 {/* Leyenda adicional                 */}
                 {/* <div className="mt-6 bg-gray-50 rounded-lg p-4">
-                    <h3 className="text-8 font-semibold text-gray-800 mb-2">Leyenda</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-8 text-gray-600">
+                    <h3 className="text-13 font-semibold text-gray-800 mb-2">Leyenda</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-13 text-gray-600">
                         <div className="flex items-center gap-2">
                             <span className="text-green-600">✓</span>
                             <span>Pagado completamente</span>
