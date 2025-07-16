@@ -12,6 +12,7 @@ interface Props {
             client: {
                 id: number
                 name: string
+                clientAlias?: string
             }
         })[]
     } | null
@@ -317,7 +318,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                     {isOccupied ? (
                                                         <div>
                                                             <div className="font-semibold text-8 text-black" title={ticket.client.name}>
-                                                                {truncateName(ticket.clientAlias || ticket.client.name)}
+                                                                {ticket.clientAlias ? truncateName(ticket.clientAlias) : truncateName(ticket.client.name)}
                                                             </div>
                                                         </div>
                                                     ) : (
@@ -400,7 +401,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                     {isOccupied ? (
                                                         <div>
                                                             <div className="font-semibold text-black" title={ticket.client.name}>
-                                                                {truncateName(ticket.client.name)}
+                                                                {ticket.clientAlias ? truncateName(ticket.clientAlias) : truncateName(ticket.client.name)}
                                                             </div>
                                                         </div>
                                                     ) : (
