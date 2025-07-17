@@ -11,7 +11,7 @@ interface TransactionFormProps {
         isActive: boolean;
         description?: string | null;
         totalAmount: number;
-        remaining: number;
+        // remaining: number;
         clientId: number;
     } | null;
     clientId: number;
@@ -23,7 +23,7 @@ type TransactionFormState = {
     type: TransactionType;
     description: string;
     totalAmount: number;
-    remaining: number;
+    // remaining: number;
     isActive: boolean;
     clientId: number;
 };
@@ -33,7 +33,7 @@ export default function TransactionForm({ transaction, clientId, onSuccess, onCa
         type: transaction?.type || TransactionType.SALE,
         description: transaction?.description || '',
         totalAmount: transaction?.totalAmount || 0,
-        remaining: transaction?.remaining || transaction?.totalAmount || 0,
+        // remaining: transaction?.remaining || transaction?.totalAmount || 0,
         isActive: transaction?.isActive ?? true,
         clientId: transaction?.clientId || clientId
     });
@@ -80,7 +80,7 @@ export default function TransactionForm({ transaction, clientId, onSuccess, onCa
             setFormData(prev => ({
                 ...prev,
                 totalAmount: newAmount,
-                remaining: newAmount
+                // remaining: newAmount
             }));
         }
     };
@@ -164,7 +164,7 @@ export default function TransactionForm({ transaction, clientId, onSuccess, onCa
                 </div>
 
                 {/* Remaining Amount (only show for existing transactions) */}
-                {transaction?.id && (
+                {/* {transaction?.id && (
                     <div>
                         <label htmlFor="remaining" className="block text-sm font-medium text-gray-700 mb-1">
                             Monto Restante
@@ -183,9 +183,9 @@ export default function TransactionForm({ transaction, clientId, onSuccess, onCa
                                 className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="0.00"
                             />
-                        </div>
+                        </div> 
                     </div>
-                )}
+                )} */}
 
                 {/* Active Status */}
                 <div className="flex items-center">

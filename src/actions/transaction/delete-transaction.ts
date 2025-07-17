@@ -9,7 +9,6 @@ export const deleteTransaction = async (transactionId: number) => {
     // Verificar que la transacción existe
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
-      include: { payments: true }
     })
 
     if (!transaction) {
@@ -20,11 +19,6 @@ export const deleteTransaction = async (transactionId: number) => {
     }
 
     const clientId = transaction.clientId
-
-    // Eliminar todos los pagos asociados primero
-    await prisma.payment.deleteMany({
-      where: { transactionId }
-    })
 
     // Eliminar la transacción
     await prisma.transaction.delete({

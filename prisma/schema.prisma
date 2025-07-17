@@ -43,13 +43,13 @@ model Transaction {
     isActive    Boolean         @default(true)
     description String?
     totalAmount Float
-    remaining   Float
+    // remaining   Float // Delete
     createdAt   DateTime        @default(now())
 
     client   Client @relation(fields: [clientId], references: [id])
     clientId Int
 
-    payments Payment[]
+    // payments Payment[]
 }
 
 model Payment {
@@ -57,8 +57,8 @@ model Payment {
     amount        Float
     date          DateTime     @default(now())
     description   String?
-    transaction   Transaction? @relation(fields: [transactionId], references: [id])
-    transactionId Int?
+    // transaction   Transaction? @relation(fields: [transactionId], references: [id])
+    // transactionId Int?
 
     client   Client @relation(fields: [clientId], references: [id])
     clientId Int

@@ -9,7 +9,7 @@ export const deletePayment = async (paymentId: number) => {
     // Verificar que el pago existe
     const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
-      include: { transaction: true }
+      // include: { transaction: true }
     })
 
     if (!payment) {

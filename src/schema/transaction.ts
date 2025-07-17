@@ -7,7 +7,7 @@ export const transactionSchema = z.object({
     isActive: z.boolean().default(true).optional(),
     description: z.string().optional(),
     totalAmount: z.number().min(0, "Total amount must be a positive number"),
-    remaining: z.number().optional(),
+    // remaining: z.number().optional(),
     clientId: z.number().int()
 });
 

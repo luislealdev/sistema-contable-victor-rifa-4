@@ -346,9 +346,9 @@ export const ClientInfo: FC<Props> = ({ client }) => {
                         <div className="block md:hidden space-y-3">
                             {client.transactions.map((transaction) => {
                                 // Calcular pagos relacionados con esta transacción específica
-                                const transactionPayments = client.payments.filter(p => p.transactionId === transaction.id);
-                                const totalPaidForTransaction = transactionPayments.reduce((sum, payment) => sum + payment.amount, 0);
-                                const remaining = transaction.totalAmount - totalPaidForTransaction;
+                                // const transactionPayments = client.payments.filter(p => p.transactionId === transaction.id);
+                                // const totalPaidForTransaction = transactionPayments.reduce((sum, payment) => sum + payment.amount, 0);
+                                const remaining = transaction.totalAmount;
                                 const isPaid = remaining <= 0;
 
                                 return (

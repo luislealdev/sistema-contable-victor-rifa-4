@@ -16,7 +16,7 @@ export async function createOrUpdatePayment(payment: unknown) {
 
     try {
         // Create or update payment
-        const savedPayment = await prisma.payment.upsert({
+        await prisma.payment.upsert({
             where: {
                 id: parsedPayment.data.id || 0, // Use 0 for new payments
             },
@@ -25,38 +25,38 @@ export async function createOrUpdatePayment(payment: unknown) {
                 date: parsedPayment.data.date,
                 description: parsedPayment.data.description,
                 clientId: parsedPayment.data.clientId,
-                transactionId: parsedPayment.data.transactionId,
+                // transactionId: parsedPayment.data.transactionId,
             },
             update: {
                 amount: parsedPayment.data.amount,
                 date: parsedPayment.data.date,
                 description: parsedPayment.data.description,
-                transactionId: parsedPayment.data.transactionId,
+                // transactionId: parsedPayment.data.transactionId,
             },
         });
 
         // If payment is linked to a transaction, update the remaining amount
-        if (savedPayment.transactionId) {
+        // if (savedPayment.transactionId) {
             // Calculate total payments for this transaction
-            const totalPaid = await prisma.payment.aggregate({
-                where: { transactionId: savedPayment.transactionId },
-                _sum: { amount: true }
-            });
+            // const totalPaid = await prisma.payment.aggregate({
+            //     where: { transactionId: savedPayment.transactionId },
+            //     _sum: { amount: true }
+            // });
 
             // Get the transaction to calculate remaining
-            const transaction = await prisma.transaction.findUnique({
-                where: { id: savedPayment.transactionId }
-            });
+            // const transaction = await prisma.transaction.findUnique({
+            //     where: { id: savedPayment.transactionId }
+            // });
 
-            if (transaction) {
-                const remaining = Math.max(0, transaction.totalAmount - (totalPaid._sum.amount || 0));
+            // if (transaction) {
+            //     const remaining = Math.max(0, transaction.totalAmount - (totalPaid._sum.amount || 0));
 
-                await prisma.transaction.update({
-                    where: { id: savedPayment.transactionId },
-                    data: { remaining }
-                });
-            }
-        }
+            //     await prisma.transaction.update({
+            //         where: { id: savedPayment.transactionId },
+            //         data: { remaining }
+            //     });
+            // }
+        // }
 
         // Get the client to send WhatsApp message
         const client = await prisma.client.findUnique({

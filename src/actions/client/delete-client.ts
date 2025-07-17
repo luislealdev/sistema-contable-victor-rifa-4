@@ -10,9 +10,9 @@ export async function deleteClient(clientId: number) {
         const transactions = await prisma.transaction.findFirst({
             where: {
                 clientId: clientId,
-                remaining: {
-                    gt: 0
-                }
+                // remaining: {
+                //     gt: 0
+                // }
             }
         });
 
@@ -27,20 +27,20 @@ export async function deleteClient(clientId: number) {
         if (transactions) {
             return {
                 ok: false,
-                message: "No se puede eliminar el cliente porque tiene deudas pendientes"
+                message: "No se puede eliminar el cliente porque tiene transacciones. Por favor, elimine las transacciones pendientes primero."
             };
         }
 
         // Delete related records in cascade
         await prisma.$transaction(async (tx) => {
             // Delete payments first (if they reference transactions)
-            await tx.payment.deleteMany({
-                where: {
-                    transaction: {
-                        clientId: clientId
-                    }
-                }
-            });
+            // await tx.payment.deleteMany({
+            //     where: {
+            //         transaction: {
+            //             clientId: clientId
+            //         }
+            //     }
+            // });
 
             // Delete raffle tickets
             // await tx.raffleTicket.deleteMany({

@@ -20,11 +20,11 @@ export async function createOrUpdateTransaction(transaction: unknown) {
                 id: parsedTransaction.data.id || 0, // Use 0 for new transactions
             },
             create: {
-                remaining: parsedTransaction.data.remaining || parsedTransaction.data.totalAmount,
+                // remaining: parsedTransaction.data.remaining || parsedTransaction.data.totalAmount,
                 ...parsedTransaction.data
             },
             update: {
-                remaining: parsedTransaction.data.remaining || parsedTransaction.data.totalAmount,
+                // remaining: parsedTransaction.data.remaining || parsedTransaction.data.totalAmount,
                 ...parsedTransaction.data,
             },
         });
