@@ -304,8 +304,8 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                 border border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
-                                                        ? 'bg-green-50 text-green-800'
-                                                        : 'bg-yellow-50 text-yellow-800'
+                                                        ? 'bg-yellow-300 text-yellow-800'
+                                                        : 'bg-green-300 text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
@@ -387,8 +387,8 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                             className={`border border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
-                                                        ? 'bg-green-50 border-green-200 text-green-800'
-                                                        : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                                                        ? 'bg-yellow-300 text-yellow-800'
+                                                        : 'bg-green-300 text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
