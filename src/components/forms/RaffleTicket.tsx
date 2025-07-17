@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { createUpdateRaffleTicket } from '@/actions/raffles/create-update-raffle-ticket';
-import { Client, RaffleTicket } from '@prisma/client';
+import { Client, RaffleTicket, Section } from '@prisma/client';
 import { deleteRaffleTicket } from '@/actions/raffles';
 import { getPaginatedClients } from '@/actions/client';
+import { getSections } from '@/actions/section/get-sections';
+import ClientForm from './ClientForm';
 
 interface RaffleTicketFormProps {
     raffleTicket: RaffleTicket | null;
@@ -47,6 +49,10 @@ export default function RaffleTicketForm({
     const [clients, setClients] = useState<Client[]>([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [loadingClients, setLoadingClients] = useState(false);
+    
+    // Estados para el modal de crear cliente
+    const [showCreateClientModal, setShowCreateClientModal] = useState(false);
+    const [sections, setSections] = useState<Section[]>([]);
 
     // Initialize client search if editing existing ticket
     useEffect(() => {
@@ -68,6 +74,21 @@ export default function RaffleTicketForm({
             fetchClientInfo();
         }
     }, [raffleTicket?.clientId]);
+
+    // Cargar secciones al montar el componente
+    useEffect(() => {
+        const loadSections = async () => {
+            try {
+                const result = await getSections();
+                if (result.ok && result.sections) {
+                    setSections(result.sections);
+                }
+            } catch (error) {
+                console.error('Error loading sections:', error);
+            }
+        };
+        loadSections();
+    }, []);
 
     const handleDeleteTicket = async (ticket: RaffleTicket) => {
         if (window.confirm(`¿Estás seguro de que quieres eliminar el ticket #${ticket.number}?`)) {
@@ -160,6 +181,23 @@ export default function RaffleTicketForm({
                     ? (value ? Number(value) : '')
                     : value
         }));
+    };
+
+    // Función para manejar la creación exitosa de un cliente
+    const handleClientCreated = async () => {
+        setShowCreateClientModal(false);
+        // Refrescar la búsqueda de clientes si hay un término de búsqueda
+        if (clientSearch.length >= 3) {
+            try {
+                const result = await getPaginatedClients(1, undefined, clientSearch);
+                if (result.ok) {
+                    setClients(result.clients || []);
+                    setShowDropdown(true);
+                }
+            } catch (error) {
+                console.error('Error refreshing clients:', error);
+            }
+        }
     };
 
     return (
@@ -301,6 +339,15 @@ export default function RaffleTicketForm({
                             <div className="px-3 py-2 text-gray-500 text-sm">
                                 No se encontraron clientes
                             </div>
+                            <div className="px-3 py-2 border-t border-gray-100">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCreateClientModal(true)}
+                                    className="w-full text-left px-2 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                >
+                                    + Crear nuevo cliente &ldquo;{clientSearch}&rdquo;
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -414,6 +461,22 @@ export default function RaffleTicketForm({
                     </button>
                 </div>
             </form>
+
+            {/* Modal para crear cliente */}
+            {showCreateClientModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-4">
+                            <ClientForm
+                                client={null}
+                                sections={sections}
+                                onSuccess={handleClientCreated}
+                                onCancel={() => setShowCreateClientModal(false)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
