@@ -31,14 +31,11 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                         isActive: true
                     },
                 },
-                // raffleTickets: {
-                //     where: {
-                //         isPaid: false
-                //     },
-                //     include: {
-                //         raffle: true
-                //     }
-                // },
+                RaffleTicket: {
+                    include: {
+                        raffle: true
+                    }
+                },
                 payments: true
             }
         });
@@ -50,10 +47,16 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                 return total + transaction.totalAmount;
             }, 0);
             // 2. Raffle tickets debt
-            // const raffleDebt = client.raffleTickets.reduce((total, ticket) => {
-            //     const ticketPrice = ticket.raffle.ticketPrice;
-            //     return total + Math.max(0, ticketPrice);
-            // }, 0);
+            const raffleDebt = client.RaffleTicket.reduce((total, ticket) => {
+                const ticketPrice = ticket.raffle.ticketPrice;
+                return total + Math.max(0, ticketPrice);
+            }, 0);
+
+            const raffleRemaining = client.RaffleTicket.reduce((total, ticket) => {
+                const ticketPrice = ticket.raffle.ticketPrice;
+                return total + Math.max(0, ticketPrice - ticket.totalPaid);
+            }, 0);
+
             // 3. Monthly service debt
             const currentDate = new Date();
             const currentMonth = currentDate.getMonth();
@@ -85,11 +88,11 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                 ...client,
                 totalDebt: clientTotalDebt,
                 transactionDebt: transactionDebt,
-                // raffleDebt: raffleDebt,
+                raffleDebt: raffleDebt,
+                raffleRemaining: raffleRemaining,
                 monthlyServiceDebt: monthlyServiceDebt,
             };
         });
-
 
         const totalClients = await prisma.client.count(
             {

@@ -19,7 +19,9 @@ interface Props {
         // raffleTickets: (RaffleTicket & {
         //     raffle: Raffle,
         // })[] | undefined
-        payments: Payment[]
+        payments: Payment[],
+        raffleDebt: number,
+        raffleRemaining: number,
     })[]
     sections: Section[]
     currentPage: number
@@ -59,7 +61,7 @@ export const ClientsTable: FC<Props> = ({
     const [searchTerm, setSearchTerm] = useState(search || '')
     // const [loading, setLoading] = useState(false)
     // const [hideMoneyData, setHideMoneyData] = useState(false)
-    
+
     // Estados para el modal de pagos
     const [showPaymentForm, setShowPaymentForm] = useState(false)
     const [selectedClientForPayment, setSelectedClientForPayment] = useState<(Client & {
@@ -420,6 +422,9 @@ export const ClientsTable: FC<Props> = ({
                                 <th className="px-2 sm:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Deuda
                                 </th>
+                                <th className="px-2 sm:px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Rifas
+                                </th>
                                 <th className="px-2 sm:px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Acciones
                                 </th>
@@ -491,6 +496,46 @@ export const ClientsTable: FC<Props> = ({
                                                 </span>
                                             </div>
                                         </td>
+
+                                        {
+                                            client.raffleDebt > 0 ? (
+                                                <td className="px-2 sm:px-3 py-3 sm:py-4">
+                                                    <div className="text-center">
+                                                        <div className="flex flex-col items-center space-y-1">
+                                                            <div className="flex items-center space-x-1">
+                                                                <span className="text-xs font-semibold text-green-600">
+                                                                    ${(client.raffleDebt - client.raffleRemaining).toFixed(0)}
+                                                                </span>
+                                                                <span className="text-xs text-gray-400">/</span>
+                                                                <span className="text-xs font-semibold text-gray-800">
+                                                                    ${client.raffleDebt.toFixed(0)}
+                                                                </span>
+                                                            </div>
+                                                            <div className="w-full bg-gray-200 rounded-full h-1.5 max-w-16">
+                                                                <div 
+                                                                    className="bg-green-500 h-1.5 rounded-full transition-all duration-300" 
+                                                                    style={{
+                                                                        width: `${((client.raffleDebt - client.raffleRemaining) / client.raffleDebt) * 100}%`
+                                                                    }}
+                                                                ></div>
+                                                            </div>
+                                                            {client.raffleRemaining > 0 && (
+                                                                <span className="text-xs text-red-500 font-medium">
+                                                                    Resta: ${client.raffleRemaining.toFixed(0)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            ) : (
+                                                <td className="px-2 sm:px-3 py-3 sm:py-4 text-center">
+                                                    <div className="flex flex-col items-center space-y-1">
+                                                        <span className="text-xs text-gray-400">🎫</span>
+                                                        <span className="text-xs text-gray-500">Sin Rifas</span>
+                                                    </div>
+                                                </td>
+                                            )
+                                        }
 
                                         <td className="px-2 sm:px-3 py-3 sm:py-4 text-right">
                                             <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
