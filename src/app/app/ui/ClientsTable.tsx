@@ -5,7 +5,8 @@ import React, { FC, useState } from 'react'
 import Link from 'next/link'
 import ClientForm from '@/components/forms/ClientForm'
 import SectionForm from '@/components/forms/SectionForm'
-import { deleteClient } from '@/actions/client/delete-client'
+import PaymentForm from '@/components/forms/PaymentForm'
+// import { deleteClient } from '@/actions/client/delete-client'
 import Image from 'next/image'
 
 interface Props {
@@ -56,28 +57,38 @@ export const ClientsTable: FC<Props> = ({
     const [editingSection, setEditingSection] = useState<Section | null>(null)
     // const [filterSection, setFilterSection] = useState(sectionId?.toString() || '')
     const [searchTerm, setSearchTerm] = useState(search || '')
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
     // const [hideMoneyData, setHideMoneyData] = useState(false)
+    
+    // Estados para el modal de pagos
+    const [showPaymentForm, setShowPaymentForm] = useState(false)
+    const [selectedClientForPayment, setSelectedClientForPayment] = useState<(Client & {
+        transactionDebt: number
+        monthlyServiceDebt: number
+        totalDebt: number
+        transactions: Transaction[] | undefined,
+        payments: Payment[]
+    }) | null>(null)
 
-    const handleDelete = async (clientId: number, clientName: string) => {
-        if (!confirm(`¿Estás seguro de que quieres eliminar a ${clientName}?`)) {
-            return
-        }
+    // const handleDelete = async (clientId: number, clientName: string) => {
+    //     if (!confirm(`¿Estás seguro de que quieres eliminar a ${clientName}?`)) {
+    //         return
+    //     }
 
-        setLoading(true)
-        try {
-            const result = await deleteClient(clientId)
-            if (result.ok) {
-                window.location.reload() // Refresh the page
-            } else {
-                alert(result.message)
-            }
-        } catch {
-            alert('Error al eliminar el cliente')
-        } finally {
-            setLoading(false)
-        }
-    }
+    //     setLoading(true)
+    //     try {
+    //         const result = await deleteClient(clientId)
+    //         if (result.ok) {
+    //             window.location.reload() // Refresh the page
+    //         } else {
+    //             alert(result.message)
+    //         }
+    //     } catch {
+    //         alert('Error al eliminar el cliente')
+    //     } finally {
+    //         setLoading(false)
+    //     }
+    // }
 
     const handleEdit = (client: Client) => {
         setEditingClient(client)
@@ -114,6 +125,29 @@ export const ClientsTable: FC<Props> = ({
     const handleNewSection = () => {
         setEditingSection(null)
         setShowSectionForm(true)
+    }
+
+    // Funciones para manejar pagos
+    const handleAddPayment = (client: Client & {
+        transactionDebt: number
+        monthlyServiceDebt: number
+        totalDebt: number
+        transactions: Transaction[] | undefined,
+        payments: Payment[]
+    }) => {
+        setSelectedClientForPayment(client)
+        setShowPaymentForm(true)
+    }
+
+    const handlePaymentSuccess = () => {
+        setShowPaymentForm(false)
+        setSelectedClientForPayment(null)
+        window.location.reload() // Refresh to update debt amounts
+    }
+
+    const handlePaymentCancel = () => {
+        setShowPaymentForm(false)
+        setSelectedClientForPayment(null)
     }
 
     // Genera colores consistentes para las secciones
@@ -320,7 +354,7 @@ export const ClientsTable: FC<Props> = ({
                                     <div className="font-semibold text-xs truncate" title={section.name}>{section.name}</div>
                                     <div className="text-xs mt-1">{getClientsCountBySection(section.id)}</div>
                                 </button>
-                                
+
                                 {/* Botón de editar (siempre visible) */}
                                 <button
                                     onClick={(e) => {
@@ -477,13 +511,20 @@ export const ClientsTable: FC<Props> = ({
                                                 >
                                                     ✏️
                                                 </button>
-                                                <button
+                                                {/* <button
                                                     onClick={() => handleDelete(client.id, client.name)}
                                                     disabled={loading}
                                                     className="text-red-600 hover:text-red-900 transition-colors disabled:opacity-50 p-1 text-xs"
                                                     title="Eliminar"
                                                 >
                                                     🗑️
+                                                </button> */}
+                                                <button
+                                                    onClick={() => handleAddPayment(client)}
+                                                    className="text-blue-600 hover:text-blue-900 transition-colors p-1 text-xs"
+                                                    title="Agregar Pago"
+                                                >
+                                                    💵
                                                 </button>
                                             </div>
                                         </td>
@@ -645,6 +686,61 @@ export const ClientsTable: FC<Props> = ({
                                     ></div>
                                 </>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal para ClientForm */}
+            {showForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-4">
+                            <ClientForm
+                                client={editingClient}
+                                sections={sections}
+                                onSuccess={handleFormSuccess}
+                                onCancel={handleFormCancel}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal para SectionForm */}
+            {showSectionForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-4">
+                            <SectionForm
+                                section={editingSection}
+                                onSuccess={handleSectionFormSuccess}
+                                onCancel={handleSectionFormCancel}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal para PaymentForm */}
+            {showPaymentForm && selectedClientForPayment && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-4">
+                            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                <p className="text-sm text-blue-800">
+                                    <span className="font-medium">Cliente:</span> {selectedClientForPayment.name}
+                                </p>
+                                <p className="text-sm text-blue-800">
+                                    <span className="font-medium">Deuda Total:</span> ${selectedClientForPayment.totalDebt.toFixed(2)}
+                                </p>
+                            </div>
+                            <PaymentForm
+                                payment={null}
+                                clientId={selectedClientForPayment.id}
+                                onSuccess={handlePaymentSuccess}
+                                onCancel={handlePaymentCancel}
+                            />
                         </div>
                     </div>
                 </div>
