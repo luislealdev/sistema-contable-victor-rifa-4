@@ -6,6 +6,7 @@ import Link from 'next/link'
 import ClientForm from '@/components/forms/ClientForm'
 import SectionForm from '@/components/forms/SectionForm'
 import PaymentForm from '@/components/forms/PaymentForm'
+import TransactionForm from '@/components/forms/TransactionForm'
 // import { deleteClient } from '@/actions/client/delete-client'
 import Image from 'next/image'
 
@@ -72,6 +73,10 @@ export const ClientsTable: FC<Props> = ({
         payments: Payment[]
     }) | null>(null)
 
+    // Estados para el modal de transacciones
+    const [showTransactionForm, setShowTransactionForm] = useState(false)
+    const [selectedClientForTransaction, setSelectedClientForTransaction] = useState<number | null>(null)
+
     // const handleDelete = async (clientId: number, clientName: string) => {
     //     if (!confirm(`¿Estás seguro de que quieres eliminar a ${clientName}?`)) {
     //         return
@@ -95,6 +100,22 @@ export const ClientsTable: FC<Props> = ({
     const handleEdit = (client: Client) => {
         setEditingClient(client)
         setShowForm(true)
+    }
+
+    const handleAddTransaction = (clientId: number) => {
+        setSelectedClientForTransaction(clientId)
+        setShowTransactionForm(true)
+    }
+
+    const handleTransactionSuccess = () => {
+        setShowTransactionForm(false)
+        setSelectedClientForTransaction(null)
+        window.location.reload() // Refresh to update debt amounts
+    }
+
+    const handleTransactionCancel = () => {
+        setShowTransactionForm(false)
+        setSelectedClientForTransaction(null)
     }
 
     const handleFormSuccess = () => {
@@ -512,8 +533,8 @@ export const ClientsTable: FC<Props> = ({
                                                                 </span>
                                                             </div>
                                                             <div className="w-full bg-gray-200 rounded-full h-1.5 max-w-16">
-                                                                <div 
-                                                                    className="bg-green-500 h-1.5 rounded-full transition-all duration-300" 
+                                                                <div
+                                                                    className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
                                                                     style={{
                                                                         width: `${((client.raffleDebt - client.raffleRemaining) / client.raffleDebt) * 100}%`
                                                                     }}
@@ -539,16 +560,13 @@ export const ClientsTable: FC<Props> = ({
 
                                         <td className="px-2 sm:px-3 py-3 sm:py-4 text-right">
                                             <div className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
-                                                <Link
-                                                    href={`/app/${client.id}`}
+                                                <button
+                                                    onClick={() => handleAddTransaction(client.id)}
                                                     className="text-green-600 hover:text-green-900 transition-colors p-1"
                                                     title="Ver detalles"
                                                 >
-                                                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
-                                                </Link>
+                                                    ➕
+                                                </button>
                                                 <button
                                                     onClick={() => handleEdit(client)}
                                                     className="text-blue-600 hover:text-blue-900 transition-colors p-1 text-xs"
@@ -557,12 +575,11 @@ export const ClientsTable: FC<Props> = ({
                                                     ✏️
                                                 </button>
                                                 {/* <button
-                                                    onClick={() => handleDelete(client.id, client.name)}
-                                                    disabled={loading}
-                                                    className="text-red-600 hover:text-red-900 transition-colors disabled:opacity-50 p-1 text-xs"
-                                                    title="Eliminar"
+                                                    onClick={() => handleAddTransaction(client.id)}
+                                                    className="text-purple-600 hover:text-purple-900 transition-colors p-1 text-xs"
+                                                    title="Nueva Transacción"
                                                 >
-                                                    🗑️
+                                                    📋
                                                 </button> */}
                                                 <button
                                                     onClick={() => handleAddPayment(client)}
@@ -785,6 +802,30 @@ export const ClientsTable: FC<Props> = ({
                                 clientId={selectedClientForPayment.id}
                                 onSuccess={handlePaymentSuccess}
                                 onCancel={handlePaymentCancel}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal para TransactionForm */}
+            {showTransactionForm && selectedClientForTransaction && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-4">
+                            <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-md">
+                                <p className="text-sm text-purple-800">
+                                    <span className="font-medium">Cliente:</span> {clients.find(c => c.id === selectedClientForTransaction)?.name}
+                                </p>
+                                <p className="text-sm text-purple-800">
+                                    <span className="font-medium">Creando nueva transacción</span>
+                                </p>
+                            </div>
+                            <TransactionForm
+                                transaction={null}
+                                clientId={selectedClientForTransaction}
+                                onSuccess={handleTransactionSuccess}
+                                onCancel={handleTransactionCancel}
                             />
                         </div>
                     </div>
