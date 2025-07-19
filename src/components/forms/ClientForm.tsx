@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createOrUpdateClient } from '@/actions/client/create-update-client';
 import { Client, Section } from '@prisma/client';
 import { deleteClient } from '@/actions/client';
+import { clearClient } from '@/actions/client/clear-client';
 
 interface ClientFormProps {
     client: Client | null;
@@ -69,6 +70,25 @@ export default function ClientForm({ client, sections, onSuccess, onCancel }: Cl
         }
     }
 
+    const handleClearClient = async () => {
+        if (confirm(`¿Estás seguro de que quieres limpiar todas las transacciones y pagos de ${client!.name}? Esta acción pondrá su deuda en $0 y no se puede deshacer.`)) {
+            try {
+                setLoading(true);
+                const result = await clearClient(client!.id);
+
+                if (result.ok) {
+                    onSuccess?.();
+                } else {
+                    setError(result.message || 'Error al limpiar el cliente');
+                }
+            } catch {
+                setError('Error inesperado al limpiar el cliente');
+            } finally {
+                setLoading(false);
+            }
+        }
+    }
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -84,15 +104,28 @@ export default function ClientForm({ client, sections, onSuccess, onCancel }: Cl
                     {client?.id ? 'Editar Cliente' : 'Nuevo Cliente'}
                 </h2>
                 {client?.id && (
-                    <button
-                        onClick={handleDeleteClient}
-                        className="flex items-center space-x-2 bg-red-50 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        <span className="text-sm font-medium">Eliminar</span>
-                    </button>
+                    <div className="flex space-x-2">
+                        <button
+                            onClick={handleClearClient}
+                            disabled={loading}
+                            className="flex items-center space-x-2 bg-yellow-50 text-yellow-600 px-3 py-2 rounded-lg hover:bg-yellow-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <span className="text-sm font-medium">Limpiar</span>
+                        </button>
+                        <button
+                            onClick={handleDeleteClient}
+                            disabled={loading}
+                            className="flex items-center space-x-2 bg-red-50 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span className="text-sm font-medium">Eliminar</span>
+                        </button>
+                    </div>
                 )}
             </div>
 
