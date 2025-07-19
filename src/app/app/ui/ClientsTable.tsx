@@ -23,6 +23,7 @@ interface Props {
         payments: Payment[],
         raffleDebt: number,
         raffleRemaining: number,
+        raffleId: number | null
     })[]
     sections: Section[]
     currentPage: number
@@ -521,7 +522,11 @@ export const ClientsTable: FC<Props> = ({
                                         {
                                             client.raffleDebt > 0 ? (
                                                 <td className="px-2 sm:px-3 py-3 sm:py-4">
-                                                    <div className="text-center">
+                                                    <Link 
+                                                        href={`/app/rifas/${client.raffleId}`} 
+                                                        className="text-center"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
                                                         <div className="flex flex-col items-center space-y-1">
                                                             <div className="flex items-center space-x-1">
                                                                 <span className="text-xs font-semibold text-green-600">
@@ -546,13 +551,13 @@ export const ClientsTable: FC<Props> = ({
                                                                 </span>
                                                             )}
                                                         </div>
-                                                    </div>
+                                                    </Link>
                                                 </td>
                                             ) : (
                                                 <td className="px-2 sm:px-3 py-3 sm:py-4 text-center">
                                                     <div className="flex flex-col items-center space-y-1" onClick={(e) => e.stopPropagation()}>
-                                                        <Link 
-                                                            href='/app/rifas' 
+                                                        <Link
+                                                            href='/app/rifas'
                                                             className="flex flex-col items-center space-y-1 hover:bg-purple-50 rounded-md px-2 py-1 transition-colors"
                                                         >
                                                             <span className="text-xs text-gray-400">🎫</span>

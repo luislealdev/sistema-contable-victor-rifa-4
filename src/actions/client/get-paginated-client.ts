@@ -89,6 +89,7 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                 totalDebt: clientTotalDebt,
                 transactionDebt: transactionDebt,
                 raffleDebt: raffleDebt,
+                raffleId: client.RaffleTicket.length > 0 ? client.RaffleTicket[0].raffle.id : null,
                 raffleRemaining: raffleRemaining,
                 monthlyServiceDebt: monthlyServiceDebt,
             };
