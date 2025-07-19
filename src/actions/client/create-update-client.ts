@@ -28,6 +28,7 @@ export async function createOrUpdateClient(client: unknown) {
         });
 
         revalidatePath('/app');
+        revalidatePath('/rifas/');
 
         return {
             ok: true,
