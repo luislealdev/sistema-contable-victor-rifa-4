@@ -550,9 +550,14 @@ export const ClientsTable: FC<Props> = ({
                                                 </td>
                                             ) : (
                                                 <td className="px-2 sm:px-3 py-3 sm:py-4 text-center">
-                                                    <div className="flex flex-col items-center space-y-1">
-                                                        <span className="text-xs text-gray-400">🎫</span>
-                                                        <span className="text-xs text-gray-500">Sin Rifas</span>
+                                                    <div className="flex flex-col items-center space-y-1" onClick={(e) => e.stopPropagation()}>
+                                                        <Link 
+                                                            href='/app/rifas' 
+                                                            className="flex flex-col items-center space-y-1 hover:bg-purple-50 rounded-md px-2 py-1 transition-colors"
+                                                        >
+                                                            <span className="text-xs text-gray-400">🎫</span>
+                                                            <span className="text-xs text-purple-600 hover:text-purple-800 font-medium">Sin Rifas</span>
+                                                        </Link>
                                                     </div>
                                                 </td>
                                             )
