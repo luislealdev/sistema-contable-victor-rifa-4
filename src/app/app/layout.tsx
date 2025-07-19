@@ -29,9 +29,9 @@ export default async function AppLayout({
                         <Image
                             src="/logo.png"
                             alt="Logo"
-                            width={100}
+                            width={200}
                             height={100}
-                            className="h-30 w-30"
+                            className="h-30 w-50"
                         />
                     </div>
                 </div>
