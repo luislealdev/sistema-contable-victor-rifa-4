@@ -23,7 +23,7 @@ export async function getPaginatedClients(page: number = 1, sectionId?: number, 
                 })
             },
             orderBy: {
-                // name: 'asc',
+                name: 'asc',
             },
             include: {
                 transactions: {
