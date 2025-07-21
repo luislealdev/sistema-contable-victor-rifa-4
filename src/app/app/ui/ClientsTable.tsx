@@ -64,6 +64,10 @@ export const ClientsTable: FC<Props> = ({
     // const [loading, setLoading] = useState(false)
     // const [hideMoneyData, setHideMoneyData] = useState(false)
 
+    // Estados para ordenamiento
+    const [sortBy, setSortBy] = useState<'id' | 'name' | 'debt' | null>(null)
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+
     // Estados para el modal de pagos
     const [showPaymentForm, setShowPaymentForm] = useState(false)
     const [selectedClientForPayment, setSelectedClientForPayment] = useState<(Client & {
@@ -228,6 +232,37 @@ export const ClientsTable: FC<Props> = ({
         return section?.name || 'Sección desconocida'
     }
 
+    // Función para ordenar los clientes
+    const sortedClients = React.useMemo(() => {
+        if (!sortBy) return clients
+
+        return [...clients].sort((a, b) => {
+            let aValue: string | number
+            let bValue: string | number
+
+            switch (sortBy) {
+                case 'id':
+                    aValue = a.id
+                    bValue = b.id
+                    break
+                case 'name':
+                    aValue = a.name.toLowerCase()
+                    bValue = b.name.toLowerCase()
+                    break
+                case 'debt':
+                    aValue = a.totalDebt
+                    bValue = b.totalDebt
+                    break
+                default:
+                    return 0
+            }
+
+            if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
+            if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
+            return 0
+        })
+    }, [clients, sortBy, sortOrder])
+
     if (showSectionForm) {
         return (
             <div className="container mx-auto p-6">
@@ -314,6 +349,42 @@ export const ClientsTable: FC<Props> = ({
                             Buscar
                         </button>
                     </div>
+                    
+                    {/* Select de ordenamiento */}
+                    <div className="flex gap-2 items-center">
+                        <label htmlFor="sortSelect" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                            Ordenar por:
+                        </label>
+                        <select
+                            id="sortSelect"
+                            value={sortBy ? `${sortBy}-${sortOrder}` : ''}
+                            onChange={(e) => {
+                                if (e.target.value === '') {
+                                    setSortBy(null)
+                                } else {
+                                    const [field, order] = e.target.value.split('-') as ['id' | 'name' | 'debt', 'asc' | 'desc']
+                                    setSortBy(field)
+                                    setSortOrder(order)
+                                }
+                            }}
+                            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        >
+                            <option value="">Sin ordenar</option>
+                            <optgroup label="Por ID">
+                                <option value="id-asc">ID: Menor a Mayor</option>
+                                <option value="id-desc">ID: Mayor a Menor</option>
+                            </optgroup>
+                            <optgroup label="Por Nombre">
+                                <option value="name-asc">Nombre: A-Z</option>
+                                <option value="name-desc">Nombre: Z-A</option>
+                            </optgroup>
+                            <optgroup label="Por Deuda">
+                                <option value="debt-asc">Deuda: Menor a Mayor</option>
+                                <option value="debt-desc">Deuda: Mayor a Menor</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
                     {searchTerm && (
                         <button
                             onClick={() => {
@@ -453,14 +524,14 @@ export const ClientsTable: FC<Props> = ({
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {clients.length === 0 ? (
+                            {sortedClients.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-2 sm:px-3 py-4 text-center text-gray-500">
                                         No se encontraron clientes
                                     </td>
                                 </tr>
                             ) : (
-                                clients.map((client) => (
+                                sortedClients.map((client) => (
                                     <tr
                                         key={client.id}
                                         className={`hover:bg-gray-50 border-l-4 cursor-pointer transition-colors group ${client.sectionId
@@ -473,8 +544,13 @@ export const ClientsTable: FC<Props> = ({
                                         <td className="px-2 sm:px-3 py-3 sm:py-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="text-sm font-medium text-gray-900 truncate">
-                                                        {client.name}
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+                                                            #{client.id}
+                                                        </span>
+                                                        <div className="text-sm font-medium text-gray-900 truncate">
+                                                            {client.name}
+                                                        </div>
                                                     </div>
                                                     <div className="md:hidden text-xs text-gray-500 truncate">
                                                         {client.phone}
