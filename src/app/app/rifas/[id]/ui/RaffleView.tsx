@@ -128,13 +128,27 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     };
 
     // Calcular estadísticas basadas en pagos reales
-    const totalSold = raffle.tickets.length;
-    // const totalRevenue = raffle.tickets.reduce((sum, ticket) => {
-    //     const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
-    //     return sum + ticketPayments;
-    // }, 0);
-    // const potentialRevenue = raffle.ticketPrice * raffle.totalNumbers;
-    const totalAvailable = raffle.totalNumbers - totalSold;
+    const totalSold = raffle.tickets.length; // Boletos vendidos (asignados a clientes)
+    const totalAvailable = raffle.totalNumbers - totalSold; // Boletos disponibles (sin vender)
+    
+    // Calcular montos reales
+    const totalRecaudado = raffle.tickets.reduce((sum, ticket) => {
+        const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
+        return sum + ticketPayments;
+    }, 0);
+    
+    // Calcular restante por recaudar (boletos vendidos pero no pagados completamente)
+    const restantePorRecaudar = raffle.tickets.reduce((sum, ticket) => {
+        const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
+        const pendiente = raffle.ticketPrice - ticketPayments;
+        return sum + (pendiente > 0 ? pendiente : 0);
+    }, 0);
+    
+    // Calcular restante de venta (boletos no vendidos × precio)
+    const restanteDeVenta = totalAvailable * raffle.ticketPrice;
+    
+    // Calcular potencial total
+    const potencialTotal = raffle.ticketPrice * raffle.totalNumbers;
 
     return (
         <div className="container mx-auto p-4 md:p-6">
@@ -180,6 +194,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                     <div className="bg-gray-50 rounded-lg p-4 min-w-64">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">Estadísticas</h3>
                         <div className="space-y-2">
+                            {/* Boletos */}
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Vendidos:</span>
                                 <span className="font-semibold text-blue-600">{totalSold}</span>
@@ -192,15 +207,29 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                 <span className="text-gray-600">Total números:</span>
                                 <span className="font-semibold">{raffle.totalNumbers}</span>
                             </div>
-                            {/* <hr className="my-2" />
+                            
+                            <hr className="my-2" />
+                            
+                            {/* Montos */}
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Recaudado:</span>
-                                <span className="font-semibold text-green-600">{formatMoney(totalRevenue)}</span>
+                                <span className="font-semibold text-green-600">{formatMoney(totalRecaudado)}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-gray-600">Potencial: <span onClick={() => setShowPotential(!showPotential)}>{showPotential ? 'Ocultar' : 'Ver'}</span> </span>
-                                <span className="font-semibold text-blue-600">{showPotential && formatMoney(potentialRevenue)}</span>
-                            </div> */}
+                                <span className="text-gray-600">Por recaudar:</span>
+                                <span className="font-semibold text-orange-600">{formatMoney(restantePorRecaudar)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">Restante venta:</span>
+                                <span className="font-semibold text-red-600">{formatMoney(restanteDeVenta)}</span>
+                            </div>
+                            
+                            <hr className="my-2" />
+                            
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">Potencial total:</span>
+                                <span className="font-semibold text-purple-600">{formatMoney(potencialTotal)}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
