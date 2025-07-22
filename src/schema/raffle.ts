@@ -11,7 +11,7 @@ export const raffleSchema = z.object({
 
 export const raffleTicketSchema = z.object({
     id: z.number().int().optional(),
-    number: z.number().int().min(1, "Ticket number must be at least 1"),
+    number: z.number().int().min(0, "Ticket number must be at least 0"),
     raffleId: z.number().int(),
     clientId: z.number().int(),
     clientAlias: z.string().optional(),
