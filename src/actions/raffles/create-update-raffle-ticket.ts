@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { raffleTicketSchema } from "@/schema/raffle";
+import { formatDate } from "@/utils/formatDate";
 import { sendWhatsApp } from "@/utils/send-whatsapp";
 import { revalidatePath } from "next/cache";
 
@@ -84,15 +85,20 @@ export const createUpdateRaffleTicket = async (ticket: unknown) => {
             // Get ticket price 
             const raffle = await prisma.raffle.findUnique({
                 where: { id: savedTicket.raffleId },
-                select: { ticketPrice: true }
+                select: { ticketPrice: true, prize: true, drawDate: true }
             });
 
-            const message = `¡Hola ${client.name}! 😊\n\n` +
+            const message = `¡Hola ${client.name}! 🎉\n\n` +
                 `Se ha registrado un nuevo ticket de rifa en tu cuenta. Aquí tienes los detalles:\n\n` +
-                `🎟️ *Ticket #*: ${savedTicket.number}\n` +
+                `🎟️ *Número de ticket*: ${savedTicket.number.toString().padStart(2, '0')}\n` +
                 `💰 *Precio del ticket*: $${raffle!.ticketPrice.toFixed(2)}\n` +
-                `💵 *Total pagado*: $${savedTicket.totalPaid.toFixed(2)}\n\n` +
-                `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarme. *Torito* 📲.\n`;
+                `💵 *Total pagado*: $${savedTicket.totalPaid.toFixed(2)}\n` +
+                // `${savedTicket.totalPaid >= raffle!.ticketPrice ? '✅ *Estado*: PAGADO COMPLETO' : '⏳ *Estado*: PAGO PENDIENTE'}\n\n` +
+                `🎁 *Premio*: ${raffle!.prize}\n` +
+                `📅 *Fecha del sorteo*: ${formatDate(raffle!.drawDate)}\n\n` +
+                `¡Buena suerte! 🍀 Gracias por tu participación.\n\n` +
+                `Si tienes alguna pregunta, no dudes en contactarme.\n` +
+                `*El Torito* 📲`;
 
             // Aquí deberías implementar la función sendWhatsApp
             sendWhatsApp(client.phone, message);

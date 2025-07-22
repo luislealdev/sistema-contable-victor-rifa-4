@@ -1,6 +1,7 @@
 'use server';
 import prisma from "@/lib/prisma";
 import { raffleTicketPayment } from "@/schema/raffle";
+import { formatDate } from "@/utils/formatDate";
 import { sendWhatsApp } from "@/utils/send-whatsapp";
 import { revalidatePath } from "next/cache";
 
@@ -56,6 +57,11 @@ export const createUpdateRaffleTicketPayment = async (payment: unknown) => {
                 select: { phone: true, name: true }
             });
 
+            const raffle = await prisma.raffle.findUnique({
+                where: { id: updatedTicket?.raffleId },
+                select: { prize: true, drawDate: true }
+            });
+
             if (client?.phone) {
                 const message = `¡Hola ${client.name}! 😊\n\n` +
                     `Se ha registrado un nuevo pago para tu ticket de rifa. Aquí tienes los detalles:\n\n` +
@@ -64,8 +70,11 @@ export const createUpdateRaffleTicketPayment = async (payment: unknown) => {
                     `💵 *Total pagado hasta ahora*: $${totalPaid.toFixed(2)}\n\n` +
                     // Rest
                     `*Restante: $${ticketPrice ? (ticketPrice.ticketPrice - totalPaid).toFixed(2) : '0.00'}*\n\n` +
-
-                    `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarme. *Torito* 📲.\n`;
+                    `🎁 *Premio*: ${raffle!.prize}\n` +
+                    `📅 *Fecha del sorteo*: ${formatDate(raffle!.drawDate)}\n\n` +
+                    `¡Buena suerte! 🍀 Gracias por tu participación.\n\n` +
+                    `Si tienes alguna pregunta, no dudes en contactarme.\n` +
+                    `*El Torito* 📲`;
 
                 await sendWhatsApp(client.phone, message);
             }
