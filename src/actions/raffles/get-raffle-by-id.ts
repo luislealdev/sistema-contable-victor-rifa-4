@@ -22,8 +22,12 @@ export async function getRaffleById(raffleId: number) {
                             }
                         }
                     }
+                },
+                PreRaffle: {
+                    orderBy: {
+                        drawDate: 'asc'
+                    }
                 }
-
             }
         });
 

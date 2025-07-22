@@ -22,6 +22,9 @@ export async function getPaginatedRaffles(page: number = 1, search?: string) {
             orderBy: {
                 createdAt: 'desc',
             },
+            include: {
+                PreRaffle: true
+            }
         });
 
         return {

@@ -25,3 +25,11 @@ export const raffleTicketPayment = z.object({
     date: z.date().default(() => new Date()),
     ticketId: z.number().int()
 });
+
+export const preRaffleSchema = z.object({
+    id: z.number().int().optional(),
+    raffleId: z.number().int(),
+    title: z.string().min(1, "Title is required"),
+    drawDate: z.date().default(() => new Date()),
+    prize: z.string().min(1, "Prize is required"),
+});

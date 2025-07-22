@@ -1,9 +1,11 @@
 'use client';
-import { Raffle, RaffleTicket, RaffleTicketPayment } from "@prisma/client"
+import { Raffle, RaffleTicket, RaffleTicketPayment, PreRaffle } from "@prisma/client"
 import { FC, useState } from "react"
 import Link from "next/link"
 import RaffleTicketForm from "@/components/forms/RaffleTicket"
 import RaffleTicketPaymentForm from "@/components/forms/RaffleTicketPaymentForm"
+import PreRaffleForm from "@/components/forms/PreRaffleForm"
+import PreRafflesTable from "@/components/raffle/PreRafflesTable"
 
 interface Props {
     raffle: Raffle & {
@@ -14,15 +16,18 @@ interface Props {
                 name: string
                 clientAlias?: string
             }
-        })[]
+        })[],
+        PreRaffle: PreRaffle[]
     } | null
 }
 
 export const RaffleView: FC<Props> = ({ raffle }) => {
     const [showTicketForm, setShowTicketForm] = useState(false);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
+    const [showPreRaffleForm, setShowPreRaffleForm] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState<RaffleTicket | null>(null);
     const [selectedPayment, setSelectedPayment] = useState<RaffleTicketPayment | null>(null);
+    const [selectedPreRaffle, setSelectedPreRaffle] = useState<PreRaffle | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     if (!raffle) {
@@ -123,8 +128,10 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     const handleCloseModals = () => {
         setShowTicketForm(false);
         setShowPaymentForm(false);
+        setShowPreRaffleForm(false);
         setSelectedTicket(null);
         setSelectedPayment(null);
+        setSelectedPreRaffle(null);
     };
 
     // Calcular estadísticas basadas en pagos reales
@@ -234,6 +241,31 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                     </div>
                 </div>
             </div >
+
+            {/* Sección de Pre-Rifas */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-800">Pre-Rifas</h2>
+                    <button
+                        onClick={() => {
+                            setSelectedPreRaffle(null);
+                            setShowPreRaffleForm(true);
+                        }}
+                        className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+                    >
+                        + Nueva Pre-Rifa
+                    </button>
+                </div>
+                
+                <PreRafflesTable
+                    preRaffles={raffle.PreRaffle}
+                    onEdit={(preRaffle) => {
+                        setSelectedPreRaffle(preRaffle);
+                        setShowPreRaffleForm(true);
+                    }}
+                    onRefresh={() => window.location.reload()}
+                />
+            </div>
 
             {/* Lista de números */}
             < div className="bg-white rounded-lg shadow-md" >
@@ -549,6 +581,22 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                     </div>
                 )
             }
+
+            {/* Modal para PreRaffleForm */}
+            {showPreRaffleForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-4">
+                            <PreRaffleForm
+                                raffleId={raffle.id}
+                                preRaffle={selectedPreRaffle}
+                                onSuccess={handleCloseModals}
+                                onCancel={handleCloseModals}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 }
