@@ -133,14 +133,14 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     
     // Calcular montos reales
     const totalRecaudado = raffle.tickets.reduce((sum, ticket) => {
-        const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
-        return sum + ticketPayments;
+        // const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
+        return sum + ticket.totalPaid;
     }, 0);
     
     // Calcular restante por recaudar (boletos vendidos pero no pagados completamente)
     const restantePorRecaudar = raffle.tickets.reduce((sum, ticket) => {
-        const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
-        const pendiente = raffle.ticketPrice - ticketPayments;
+        // const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
+        const pendiente = raffle.ticketPrice - ticket.totalPaid;
         return sum + (pendiente > 0 ? pendiente : 0);
     }, 0);
     
