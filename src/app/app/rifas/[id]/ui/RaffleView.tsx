@@ -366,7 +366,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                         ${isOccupied
                                                     ? realIsPaid
                                                         ? 'bg-yellow-300  text-yellow-800'
-                                                        : 'bg-green-300 text-black-800'
+                                                        : ' text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
@@ -449,7 +449,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                         ${isOccupied
                                                     ? realIsPaid
                                                         ? 'bg-yellow-300 text-yellow-800'
-                                                        : 'bg-green-300 text-black-800'
+                                                        : ' text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
