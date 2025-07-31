@@ -365,14 +365,14 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                 border border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
-                                                        ? 'bg-yellow-200  text-yellow-800'
+                                                        ? 'bg-yellow-300  text-yellow-800'
                                                         : 'bg-green-300 text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
                                         >
                                             <div className="flex items-center gap-2">
-                                                <div className="flex items-center justify-center bg-yellow-200 ">
+                                                <div className="flex items-center justify-center bg-yellow-300 ">
                                                     <span className="font-bold text-13 ">{formatNumber(number)}</span>
                                                 </div>
                                                 <div className="flex-1">
@@ -448,14 +448,14 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                             className={`border border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
-                                                        ? 'bg-yellow-200 text-yellow-800'
+                                                        ? 'bg-yellow-300 text-yellow-800'
                                                         : 'bg-green-300 text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
                                         >
                                             <div className="flex items-center gap-2">
-                                                <div className="flex items-center justify-center bg-yellow-200 ">
+                                                <div className="flex items-center justify-center bg-yellow-300 ">
                                                     <span className="font-bold text-13 ">{formatNumber(number)}</span>
                                                 </div>
                                                 <div className="flex-1">
