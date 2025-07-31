@@ -355,7 +355,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     let realIsPaid = false;
                                     if (ticket && ticket.payments) {
                                         realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                        realIsPaid = realTotalPaid >= raffle.ticketPrice;
+                                        realIsPaid = realTotalPaid >= raffle.ticketPrice || ticket.totalPaid >= raffle.ticketPrice;
                                     }
 
                                     return (
@@ -439,7 +439,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     let realIsPaid = false;
                                     if (ticket && ticket.payments) {
                                         realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                        realIsPaid = realTotalPaid >= raffle.ticketPrice;
+                                        realIsPaid = realTotalPaid >= raffle.ticketPrice || ticket.totalPaid >= raffle.ticketPrice;
                                     }
 
                                     return (
