@@ -96,7 +96,7 @@ export async function createOrUpdatePayment(payment: unknown) {
             // Send WhatsApp message to the client
             const message = `¡Hola ${client.name}! 😊\n\n` +
                 `Tu pago de $${parsedPayment.data.amount.toFixed(2)} se ha ${parsedPayment.data.id ? 'actualizado' : 'registrado'} correctamente. 🎉\n\n` +
-                `💰 *Deuda total*: $${rest.toFixed(2)}\n\n` +
+                `💰 *Deuda restante*: $${rest.toFixed(2)}\n\n` +
                 `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarme. *Torito* 📲.\n`;
             sendWhatsApp(client.phone, message);
         }
