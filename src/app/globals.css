@@ -29,6 +29,10 @@ body {
   font-size: 13px !important
 }
 
+.text-12{
+  font-size: 12px !important
+}
+
 .bg-yellow-300{
   background-color: #ffff00 !important;
 }
