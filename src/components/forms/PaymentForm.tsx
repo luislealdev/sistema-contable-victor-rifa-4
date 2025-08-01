@@ -129,33 +129,6 @@ export default function PaymentForm({ payment, clientId, onSuccess, onCancel }: 
                     />
                 </div>
 
-                {/* Transaction */}
-                {/* <div>
-                    <label htmlFor="transactionId" className="block text-sm font-medium text-gray-700 mb-1">
-                        Transacción (Opcional)
-                    </label>
-                    <select
-                        id="transactionId"
-                        name="transactionId"
-                        value={formData.transactionId || ''}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                        <option value="">Seleccione una transacción (opcional)</option>
-                        {availableTransactions.map((transaction) => (
-                            <option key={transaction.id} value={transaction.id}>
-                                {transaction.type === 'SALE' ? 'Venta' :
-                                 transaction.type === 'LOAN' ? 'Préstamo' : 'Servicio'} - 
-                                ${transaction.totalAmount.toFixed(2)} (Restante: ${transaction.remaining.toFixed(2)})
-                                {transaction.description && ` - ${transaction.description}`}
-                            </option>
-                        ))}
-                    </select>
-                    <p className="mt-1 text-xs text-gray-500">
-                        Si selecciona una transacción, el pago se aplicará automáticamente a la deuda pendiente.
-                    </p>
-                </div> */}
-
                 {/* Description */}
                 <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">

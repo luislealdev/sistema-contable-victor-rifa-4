@@ -71,7 +71,7 @@ export const deletePayment = async (paymentId: number) => {
 
       const message = `¡Hola ${client.name}! 😊\n\n` +
         `Se ha registrado la eliminación de un pago en tu cuenta. Aquí tienes los detalles:\n\n` +
-        `💰 *Deuda actual*: $${rest.toFixed(2)}\n\n` +
+        `💰 *Deuda restante*: $${rest.toFixed(2)}\n\n` +
         `Gracias por tu preferencia. Si tienes alguna pregunta, no dudes en contactarme. *Torito* 📲.\n`;
 
       sendWhatsApp(client.phone, message);

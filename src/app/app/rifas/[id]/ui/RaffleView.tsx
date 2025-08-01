@@ -86,7 +86,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     };
 
     // Función para truncar nombres largos
-    const truncateName = (name: string, maxLength: number = 12 ): string => {
+    const truncateName = (name: string, maxLength: number = 12): string => {
         if (name.length <= maxLength) return name;
         return name.substring(0, maxLength) + '..';
     };
@@ -137,23 +137,23 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
     // Calcular estadísticas basadas en pagos reales
     const totalSold = raffle.tickets.length; // Boletos vendidos (asignados a clientes)
     const totalAvailable = raffle.totalNumbers - totalSold; // Boletos disponibles (sin vender)
-    
+
     // Calcular montos reales
     const totalRecaudado = raffle.tickets.reduce((sum, ticket) => {
         // const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
         return sum + ticket.totalPaid;
     }, 0);
-    
+
     // Calcular restante por recaudar (boletos vendidos pero no pagados completamente)
     const restantePorRecaudar = raffle.tickets.reduce((sum, ticket) => {
         // const ticketPayments = ticket.payments?.reduce((paymentSum, payment) => paymentSum + payment.amount, 0) || 0;
         const pendiente = raffle.ticketPrice - ticket.totalPaid;
         return sum + (pendiente > 0 ? pendiente : 0);
     }, 0);
-    
+
     // Calcular restante de venta (boletos no vendidos × precio)
     const restanteDeVenta = totalAvailable * raffle.ticketPrice;
-    
+
     // Calcular potencial total
     const potencialTotal = raffle.ticketPrice * raffle.totalNumbers;
 
@@ -214,9 +214,9 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                 <span className="text-gray-600">Total números:</span>
                                 <span className="font-semibold">{raffle.totalNumbers}</span>
                             </div>
-                            
+
                             <hr className="my-2" />
-                            
+
                             {/* Montos */}
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Recaudado:</span>
@@ -230,9 +230,9 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                 <span className="text-gray-600">Restante venta:</span>
                                 <span className="font-semibold text-red-600">{formatMoney(restanteDeVenta)}</span>
                             </div>
-                            
+
                             <hr className="my-2" />
-                            
+
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Potencial total:</span>
                                 <span className="font-semibold text-purple-600">{formatMoney(potencialTotal)}</span>
@@ -256,7 +256,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                         + Nueva Pre-Rifa
                     </button>
                 </div>
-                
+
                 <PreRafflesTable
                     preRaffles={raffle.PreRaffle}
                     onEdit={(preRaffle) => {
@@ -331,7 +331,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4" style={{lineHeight: '1'}}>
+                <div className="grid grid-cols-2 gap-4" style={{ lineHeight: '1' }}>
                     {filteredNumbers.length === 0 ? (
                         <div className="col-span-2 text-center py-8">
                             <p className="text-gray-500 text-lg">No se encontraron números que coincidan con &ldquo;{searchTerm}&rdquo;</p>
@@ -362,7 +362,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                         <div
                                             key={number}
                                             className={`
-                                                border border-black text-13 flex items-center justify-between transition-colors
+                                                border-2 border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
                                                         ? 'bg-yellow-300  text-yellow-800'
@@ -445,7 +445,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     return (
                                         <div
                                             key={number}
-                                            className={`border border-black text-13 flex items-center justify-between transition-colors
+                                            className={`border-2 border-black text-13 flex items-center justify-between transition-colors
                                         ${isOccupied
                                                     ? realIsPaid
                                                         ? 'bg-yellow-300 text-yellow-800'
