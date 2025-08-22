@@ -13,13 +13,9 @@ import Image from 'next/image'
 interface Props {
     clients: (Client & {
         transactionDebt: number
-        // raffleDebt: number
         monthlyServiceDebt: number
         totalDebt: number
         transactions: Transaction[] | undefined,
-        // raffleTickets: (RaffleTicket & {
-        //     raffle: Raffle,
-        // })[] | undefined
         payments: Payment[],
         raffleDebt: number,
         raffleRemaining: number,
@@ -39,7 +35,6 @@ interface Props {
     }
     sectionId?: number
     search?: string
-    // hideMoneyData?: boolean
 }
 
 export const ClientsTable: FC<Props> = ({
@@ -77,6 +72,9 @@ export const ClientsTable: FC<Props> = ({
     // Estados para el modal de transacciones
     const [showTransactionForm, setShowTransactionForm] = useState(false)
     const [selectedClientForTransaction, setSelectedClientForTransaction] = useState<number | null>(null)
+
+    // Estados para el modal de atrasos
+    const [showDelayedModal, setShowDelayedModal] = useState(false)
 
     // const handleDelete = async (clientId: number, clientName: string) => {
     //     if (!confirm(`¿Estás seguro de que quieres eliminar a ${clientName}?`)) {
@@ -172,6 +170,42 @@ export const ClientsTable: FC<Props> = ({
     const handlePaymentCancel = () => {
         setShowPaymentForm(false)
         setSelectedClientForPayment(null)
+    }
+
+    // Funciones para manejar el modal de atrasos
+    const handleShowDelayedClients = () => {
+        setShowDelayedModal(true)
+    }
+
+    const handleDelayedModalClose = () => {
+        setShowDelayedModal(false)
+    }
+
+    // Función para calcular clientes con atrasos
+    const getDelayedClients = () => {
+        const currentDate = new Date()
+        
+        return clients
+            .filter(client => client.totalDebt > 0) // Solo clientes con deuda
+            .map(client => {
+                // Encontrar el último pago del cliente
+                const lastPayment = client.payments.length > 0 
+                    ? client.payments.reduce((latest, payment) => 
+                        new Date(payment.date) > new Date(latest.date) ? payment : latest
+                    ) 
+                    : null
+
+                const daysSinceLastPayment = lastPayment 
+                    ? Math.floor((currentDate.getTime() - new Date(lastPayment.date).getTime()) / (1000 * 60 * 60 * 24))
+                    : Math.floor((currentDate.getTime() - new Date(client.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+
+                return {
+                    ...client,
+                    lastPayment,
+                    daysSinceLastPayment
+                }
+            })
+            .sort((a, b) => b.daysSinceLastPayment - a.daysSinceLastPayment) // Ordenar por más días sin pagar
     }
 
     // Genera colores consistentes para las secciones
@@ -282,6 +316,12 @@ export const ClientsTable: FC<Props> = ({
                             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
                         >
                             Nueva Sección
+                        </button>
+                        <button
+                            onClick={handleShowDelayedClients}
+                            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+                        >
+                            Atrasos
                         </button>
                         <button
                             onClick={() => setShowForm(true)}
@@ -843,6 +883,154 @@ export const ClientsTable: FC<Props> = ({
                                 onSuccess={handleTransactionSuccess}
                                 onCancel={handleTransactionCancel}
                             />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal para Clientes con Atrasos */}
+            {showDelayedModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-6">
+                            {/* Header del modal */}
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-bold text-red-600">
+                                    🚨 Clientes con Atrasos
+                                </h2>
+                                <button
+                                    onClick={handleDelayedModalClose}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Contenido del modal */}
+                            <div className="space-y-4">
+                                {getDelayedClients().length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <div className="text-6xl mb-4">🎉</div>
+                                        <h3 className="text-xl font-semibold text-green-600 mb-2">
+                                            ¡Excelente!
+                                        </h3>
+                                        <p className="text-gray-600">
+                                            No hay clientes con deudas pendientes
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                                            <p className="text-sm text-red-800">
+                                                <span className="font-medium">Total de clientes con atrasos:</span> {getDelayedClients().length}
+                                            </p>
+                                        </div>
+
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full min-w-full">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Cliente
+                                                        </th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Deuda Total
+                                                        </th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Último Pago
+                                                        </th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Días Sin Pagar
+                                                        </th>
+                                                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Acciones
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {getDelayedClients().map((client) => (
+                                                        <tr key={client.id} className="hover:bg-gray-50">
+                                                            <td className="px-4 py-4">
+                                                                <div className="flex items-center">
+                                                                    <div>
+                                                                        <div className="text-sm font-medium text-gray-900">
+                                                                            {client.name}
+                                                                        </div>
+                                                                        <div className="text-sm text-gray-500">
+                                                                            {client.phone}
+                                                                        </div>
+                                                                        <div className={`text-xs ${client.sectionId
+                                                                            ? getSectionColor(client.sectionId)
+                                                                            : 'bg-gray-50 text-gray-500 border-gray-200'
+                                                                        } rounded-md px-2 py-1 inline-flex items-center mt-1`}>
+                                                                            {getSectionName(client.sectionId)}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-4 py-4">
+                                                                <div className="text-sm font-bold text-red-600">
+                                                                    ${client.totalDebt.toFixed(0)}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-4 py-4">
+                                                                <div className="text-sm text-gray-900">
+                                                                    {client.lastPayment 
+                                                                        ? new Date(client.lastPayment.date).toLocaleDateString('es-ES')
+                                                                        : 'Sin pagos'
+                                                                    }
+                                                                </div>
+                                                                {client.lastPayment && (
+                                                                    <div className="text-xs text-gray-500">
+                                                                        ${client.lastPayment.amount.toFixed(0)}
+                                                                    </div>
+                                                                )}
+                                                            </td>
+                                                            <td className="px-4 py-4">
+                                                                <div className={`text-sm font-bold ${
+                                                                    client.daysSinceLastPayment > 60 
+                                                                        ? 'text-red-600' 
+                                                                        : client.daysSinceLastPayment > 30 
+                                                                        ? 'text-orange-600' 
+                                                                        : 'text-yellow-600'
+                                                                }`}>
+                                                                    {client.daysSinceLastPayment} días
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-4 py-4 text-right">
+                                                                <div className="flex justify-end space-x-2">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            handleDelayedModalClose()
+                                                                            window.location.href = `/app/${client.id}`
+                                                                        }}
+                                                                        className="text-blue-600 hover:text-blue-900 transition-colors text-xs bg-blue-100 px-2 py-1 rounded"
+                                                                        title="Ver detalles"
+                                                                    >
+                                                                        Ver
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            handleDelayedModalClose()
+                                                                            handleAddPayment(client)
+                                                                        }}
+                                                                        className="text-green-600 hover:text-green-900 transition-colors text-xs bg-green-100 px-2 py-1 rounded"
+                                                                        title="Agregar pago"
+                                                                    >
+                                                                        Pago
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
