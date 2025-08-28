@@ -21,7 +21,8 @@ export const sendWhatsApp = async (phone: string, message: string) => {
 
     const sendTo = formattedPhone;
 
-    await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendText', {
+    // await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendText', {
+    await fetch('https://luislealsoftware-whatsapp-api.creativa2020.com.mx/api/sendText', {
 
         method: 'POST',
         headers: {
@@ -39,7 +40,7 @@ export const sendWhatsApp = async (phone: string, message: string) => {
                 `💳 *Transf/Dep 1:* 4152314332859928\n` +
                 `💳 *Transf/Dep 2:* 4152314332859910\n\n` +
                 `💡 *Recuerda enviar tu comprobante de pago*\n`,
-            session: "default",
+            session: "victor",
             file: {
                 mimetype: "image/png",
                 url: "https://sistema-contable-three.vercel.app/pagos.png",
