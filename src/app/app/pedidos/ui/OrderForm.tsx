@@ -10,12 +10,13 @@ interface Props {
     onRefresh: () => void;
 }
 
-export const OrderForm: React.FC<Props> = ({ order, onClose }) => {
+export const OrderForm: React.FC<Props> = ({ order, onClose, onRefresh }) => {
     const [formData, setFormData] = useState({
         id: order?.id || undefined,
         client: order?.client || '',
         gender: order?.gender || '',
-        product: order?.product || ''
+        product: order?.product || '',
+        number: order?.number || ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,7 +27,7 @@ export const OrderForm: React.FC<Props> = ({ order, onClose }) => {
         try {
             const result = await createUpdateOrder(formData);
             if (result.ok) {
-                // onRefresh();
+                onRefresh();
                 onClose();
             } else {
                 alert(result.message);
@@ -41,7 +42,7 @@ export const OrderForm: React.FC<Props> = ({ order, onClose }) => {
     return (
         <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4">
-                {order ? 'Editar Orden' : 'Nueva Orden'}
+                {order ? `Editar Orden - Línea ${order.id}` : 'Nueva Orden'}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,10 +70,10 @@ export const OrderForm: React.FC<Props> = ({ order, onClose }) => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="">Seleccionar género</option>
-                        <option value="hombre">Hombre</option>
-                        <option value="mujer">Mujer</option>
-                        <option value="niño">Niño</option>
-                        <option value="niña">Niña</option>
+                        <option value="hombre">Hombre (H)</option>
+                        <option value="mujer">Mujer (M)</option>
+                        <option value="niño">Niño (N)</option>
+                        <option value="niña">Niña (N)</option>
                     </select>
                 </div>
 
@@ -86,6 +87,19 @@ export const OrderForm: React.FC<Props> = ({ order, onClose }) => {
                         onChange={(e) => setFormData({ ...formData, product: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         maxLength={100}
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Número/Talla
+                    </label>
+                    <input
+                        type="number"
+                        value={formData.number}
+                        onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ej: 6, 8, 10..."
                     />
                 </div>
 

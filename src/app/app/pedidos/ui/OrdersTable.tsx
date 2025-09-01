@@ -7,10 +7,9 @@ import { OrderForm } from './OrderForm';
 
 interface Props {
     orders: Order[];
-    onRefresh: () => void;
 }
 
-export const OrdersTable: React.FC<Props> = ({ orders, onRefresh }) => {
+export const OrdersTable: React.FC<Props> = ({ orders }) => {
     const [showOrderForm, setShowOrderForm] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -59,7 +58,7 @@ export const OrdersTable: React.FC<Props> = ({ orders, onRefresh }) => {
     });
 
     const handleCreateOrder = (id: number) => {
-        setSelectedOrder({ id, client: '', gender: null, product: null });
+        setSelectedOrder({ id, client: '', gender: null, product: null, number: null });
         setShowOrderForm(true);
     };
 
@@ -70,12 +69,7 @@ export const OrdersTable: React.FC<Props> = ({ orders, onRefresh }) => {
 
     const handleDeleteOrder = async (id: number) => {
         if (confirm('¿Estás seguro de que quieres eliminar esta orden?')) {
-            const result = await deleteOrder(id);
-            if (result.ok) {
-                // onRefresh();
-            } else {
-                alert(result.message);
-            }
+            await deleteOrder(id);
         }
     };
 
@@ -138,10 +132,23 @@ export const OrdersTable: React.FC<Props> = ({ orders, onRefresh }) => {
                 </div>
             </div>
 
-            {/* Grid de números en dos columnas */}
-            <div className="ga" style={{ lineHeight: '1' }}>
+            {/* Header de la tabla */}
+            <div className="px-4 mb-2">
+                <div className="grid grid-cols-7 gap-1 text-xs font-bold text-gray-700 border-b border-gray-300 pb-1">
+                    <div className="text-center">Línea</div>
+                    <div className="truncate">Nombre</div>
+                    <div className="truncate">Producto</div>
+                    <div className="text-center">H</div>
+                    <div className="text-center">M</div>
+                    <div className="text-center">N</div>
+                    <div className="text-center">N</div>
+                </div>
+            </div>
+
+            {/* Grid de números como tabla */}
+            <div className="px-4" style={{ lineHeight: '1' }}>
                 {filteredNumbers.length === 0 ? (
-                    <div className="col-span-2 text-center py-8">
+                    <div className="text-center py-8">
                         <p className="text-gray-500 text-lg">No se encontraron números que coincidan con &ldquo;{searchTerm}&rdquo;</p>
                         <button
                             onClick={() => setSearchTerm('')}
@@ -151,157 +158,93 @@ export const OrdersTable: React.FC<Props> = ({ orders, onRefresh }) => {
                         </button>
                     </div>
                 ) : (
-                    <>
-                        {/* Primera columna: números del 1 al 38 */}
-                        <div className="">
-                            {filteredNumbers.slice(0, Math.ceil(filteredNumbers.length / 2)).map(number => {
-                                const order = ordersMap.get(number);
-                                const isOccupied = !!order;
+                    <div className="">
+                        {filteredNumbers.map(number => {
+                            const order = ordersMap.get(number);
+                            const isOccupied = !!order;
 
-                                return (
-                                    <div
-                                        key={number}
-                                        onClick={() => isOccupied ? handleEditOrder(order) : handleCreateOrder(number)}
-                                        className={`
-                                            border-1 border-black text-xs flex items-center justify-between transition-colors cursor-pointer  
-                                            ${isOccupied
-                                                ? 'bg-green-100 hover:bg-green-200'
-                                                : 'bg-gray-50 hover:bg-gray-100'
-                                            }
-                                        `}
-                                    >
-                                        <div className="flex items-center ga flex-1 min-w-0">
-                                            <div className="flex items-center justify-center bg-yellow-300 w-6 rounded text-xs font-bold">
-                                                {formatNumber(number)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                {isOccupied ? (
-                                                    <div className="space-y-0.5">
-                                                        <div className="text-xs font-medium truncate">
-                                                            {truncateText(order.client, 8)}
-                                                        </div>
-                                                        <div className="flex ga text-xs">
-                                                            <span className="text-gray-600 truncate">
-                                                                {order.gender || 'N/A'}
-                                                            </span>
-                                                            <span className="text-gray-400">|</span>
-                                                            <span className="text-gray-600 truncate">
-                                                                {truncateText(order.product || 'N/A', 6)}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-xs text-gray-500">
-                                                        Disponible
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center ml-1">
-                                            {isOccupied ? (
-                                                <div className="flex items-center ga">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteOrder(order.id);
-                                                        }}
-                                                        className="text-red-500 hover:text-red-700 p-0.5"
-                                                        title="Eliminar"
-                                                    >
-                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="text-green-500">
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                    </svg>
-                                                </div>
-                                            )}
-                                        </div>
+                            return (
+                                <div
+                                    key={number}
+                                    className={`
+                                        border border-black text-xs transition-colors cursor-pointer grid grid-cols-7 gap-1 items-center p-1 relative
+                                        ${isOccupied
+                                            ? 'bg-green-100 hover:bg-green-200'
+                                            : 'bg-gray-50 hover:bg-gray-100'
+                                        }
+                                    `}
+                                    onClick={() => isOccupied ? handleEditOrder(order) : handleCreateOrder(number)}
+                                >
+                                    {/* Columna Línea */}
+                                    <div className="text-center font-bold">
+                                        {formatNumber(number)}
                                     </div>
-                                );
-                            })}
-                        </div>
 
-                        {/* Segunda columna: números del 39 al 75 */}
-                        <div className="">
-                            {filteredNumbers.slice(Math.ceil(filteredNumbers.length / 2)).map(number => {
-                                const order = ordersMap.get(number);
-                                const isOccupied = !!order;
-
-                                return (
-                                    <div
-                                        key={number}
-                                        onClick={() => isOccupied ? handleEditOrder(order) : handleCreateOrder(number)}
-                                        className={`
-                                            border-1 border-black text-xs flex items-center justify-between transition-colors cursor-pointer  
-                                            ${isOccupied
-                                                ? 'bg-green-100 hover:bg-green-200'
-                                                : 'bg-gray-50 hover:bg-gray-100'
-                                            }
-                                        `}
-                                    >
-                                        <div className="flex items-center ga flex-1 min-w-0">
-                                            <div className="flex items-center justify-center bg-yellow-300 w-6  rounded text-xs font-bold">
-                                                {formatNumber(number)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                {isOccupied ? (
-                                                    <div className="">
-                                                        <div className="text-xs font-medium truncate">
-                                                            {truncateText(order.client, 8)}
-                                                        </div>
-                                                        <div className="flex ga text-xs">
-                                                            <span className="text-gray-600 truncate">
-                                                                {order.gender || 'N/A'}
-                                                            </span>
-                                                            <span className="text-gray-400">|</span>
-                                                            <span className="text-gray-600 truncate">
-                                                                {truncateText(order.product || 'N/A', 6)}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-xs text-gray-500">
-                                                        Disponible
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center ml-1">
-                                            {isOccupied ? (
-                                                <div className="flex items-center ga">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteOrder(order.id);
-                                                        }}
-                                                        className="text-red-500 hover:text-red-700 p-0.5"
-                                                        title="Eliminar"
-                                                    >
-                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="text-green-500">
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                    </svg>
-                                                </div>
-                                            )}
-                                        </div>
+                                    {/* Columna Nombre */}
+                                    <div className="truncate font-medium">
+                                        {isOccupied ? truncateText(order.client, 10) : '-'}
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </>
+
+                                    {/* Columna Producto */}
+                                    <div className="truncate">
+                                        {isOccupied ? truncateText(order.product || '-', 10) : '-'}
+                                    </div>
+
+                                    {/* Columna Hombre */}
+                                    <div className="text-center">
+                                        {isOccupied && order.gender === 'hombre' ? (
+                                            <span className="bg-blue-200 px-1 rounded font-bold">
+                                                {order.number || '-'}
+                                            </span>
+                                        ) : '-'}
+                                    </div>
+
+                                    {/* Columna Dama */}
+                                    <div className="text-center">
+                                        {isOccupied && order.gender === 'mujer' ? (
+                                            <span className="bg-pink-200 px-1 rounded font-bold">
+                                                {order.number || '-'}
+                                            </span>
+                                        ) : '-'}
+                                    </div>
+
+                                    {/* Columna Niño */}
+                                    <div className="text-center">
+                                        {isOccupied && order.gender === 'niño' ? (
+                                            <span className="bg-green-200 px-1 rounded font-bold">
+                                                {order.number || '-'}
+                                            </span>
+                                        ) : '-'}
+                                    </div>
+
+                                    {/* Columna Niña */}
+                                    <div className="text-center relative">
+                                        {isOccupied && order.gender === 'niña' ? (
+                                            <span className="bg-purple-200 px-1 rounded font-bold">
+                                                {order.number || '-'}
+                                            </span>
+                                        ) : '-'}
+
+                                        {/* Botón eliminar en la última columna */}
+                                        {isOccupied && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteOrder(order.id);
+                                                }}
+                                                className="absolute right-0 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700 opacity-60 hover:opacity-100 transition-opacity"
+                                                title="Eliminar"
+                                            >
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
             </div>
 
@@ -314,7 +257,7 @@ export const OrdersTable: React.FC<Props> = ({ orders, onRefresh }) => {
                         order={selectedOrder}
                         onClose={handleCloseModal}
                         onRefresh={() => {
-                            onRefresh();
+                            // onRefresh();
                             handleCloseModal();
                         }}
                     />

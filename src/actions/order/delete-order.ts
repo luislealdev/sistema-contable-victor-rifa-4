@@ -10,6 +10,7 @@ export const deleteOrder = async (id: number) => {
         });
 
         revalidatePath('/app/pedidos');
+
         return {
             ok: true,
             message: 'Orden eliminada correctamente'
