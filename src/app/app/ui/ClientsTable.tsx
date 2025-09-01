@@ -184,18 +184,18 @@ export const ClientsTable: FC<Props> = ({
     // Función para calcular clientes con atrasos
     const getDelayedClients = () => {
         const currentDate = new Date()
-        
+
         return clients
             .filter(client => client.totalDebt > 0) // Solo clientes con deuda
             .map(client => {
                 // Encontrar el último pago del cliente
-                const lastPayment = client.payments.length > 0 
-                    ? client.payments.reduce((latest, payment) => 
+                const lastPayment = client.payments.length > 0
+                    ? client.payments.reduce((latest, payment) =>
                         new Date(payment.date) > new Date(latest.date) ? payment : latest
-                    ) 
+                    )
                     : null
 
-                const daysSinceLastPayment = lastPayment 
+                const daysSinceLastPayment = lastPayment
                     ? Math.floor((currentDate.getTime() - new Date(lastPayment.date).getTime()) / (1000 * 60 * 60 * 24))
                     : Math.floor((currentDate.getTime() - new Date(client.createdAt).getTime()) / (1000 * 60 * 60 * 24))
 
@@ -452,6 +452,19 @@ export const ClientsTable: FC<Props> = ({
                             />
                             <div className="text-xs font-semibold">Rifas</div>
                         </Link>
+                        <Link
+                            href="/app/pedidos"
+                            className="p-3 rounded-lg border-2 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200 transition-colors flex flex-col items-center justify-center"
+                        >
+                            <Image
+                                width={32}
+                                height={32}
+                                src="/logo.png"
+                                alt="Pedidos"
+                                className="w-8 h-8 mb-1"
+                            />
+                            <div className="text-xs font-semibold">Pedidos</div>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -568,8 +581,8 @@ export const ClientsTable: FC<Props> = ({
                                         {
                                             client.raffleDebt > 0 ? (
                                                 <td className="px-2 sm:px-3 py-3 sm:py-4">
-                                                    <Link 
-                                                        href={`/app/rifas/${client.raffleId}`} 
+                                                    <Link
+                                                        href={`/app/rifas/${client.raffleId}`}
                                                         className="text-center"
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
@@ -964,7 +977,7 @@ export const ClientsTable: FC<Props> = ({
                                                                         <div className={`text-xs ${client.sectionId
                                                                             ? getSectionColor(client.sectionId)
                                                                             : 'bg-gray-50 text-gray-500 border-gray-200'
-                                                                        } rounded-md px-2 py-1 inline-flex items-center mt-1`}>
+                                                                            } rounded-md px-2 py-1 inline-flex items-center mt-1`}>
                                                                             {getSectionName(client.sectionId)}
                                                                         </div>
                                                                     </div>
@@ -977,7 +990,7 @@ export const ClientsTable: FC<Props> = ({
                                                             </td>
                                                             <td className="px-4 py-4">
                                                                 <div className="text-sm text-gray-900">
-                                                                    {client.lastPayment 
+                                                                    {client.lastPayment
                                                                         ? new Date(client.lastPayment.date).toLocaleDateString('es-ES')
                                                                         : 'Sin pagos'
                                                                     }
@@ -989,13 +1002,12 @@ export const ClientsTable: FC<Props> = ({
                                                                 )}
                                                             </td>
                                                             <td className="px-4 py-4">
-                                                                <div className={`text-sm font-bold ${
-                                                                    client.daysSinceLastPayment > 60 
-                                                                        ? 'text-red-600' 
-                                                                        : client.daysSinceLastPayment > 30 
-                                                                        ? 'text-orange-600' 
+                                                                <div className={`text-sm font-bold ${client.daysSinceLastPayment > 60
+                                                                    ? 'text-red-600'
+                                                                    : client.daysSinceLastPayment > 30
+                                                                        ? 'text-orange-600'
                                                                         : 'text-yellow-600'
-                                                                }`}>
+                                                                    }`}>
                                                                     {client.daysSinceLastPayment} días
                                                                 </div>
                                                             </td>
