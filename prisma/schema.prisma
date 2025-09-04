@@ -124,9 +124,10 @@ model PreRaffle {
 }
 
 model Order {
-    id      Int     @id @default(autoincrement())
-    client  String
-    gender  String?
-    number  String?
-    product String?
+    id             Int     @id @default(autoincrement())
+    client         String
+    gender         String?
+    number         String?
+    product        String?
+    specifications String?
 }

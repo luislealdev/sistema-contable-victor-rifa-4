@@ -58,7 +58,7 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
     });
 
     const handleCreateOrder = (id: number) => {
-        setSelectedOrder({ id, client: '', gender: null, product: null, number: null });
+        setSelectedOrder({ id, client: '', gender: null, product: null, number: null, specifications: null });
         setShowOrderForm(true);
     };
 
