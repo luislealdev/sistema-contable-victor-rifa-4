@@ -29,10 +29,10 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
     };
 
     // Función para truncar texto largo
-    const truncateText = (text: string, maxLength: number = 8): string => {
-        if (text.length <= maxLength) return text;
-        return text.substring(0, maxLength) + '..';
-    };
+    // const truncateText = (text: string, maxLength: number = 8): string => {
+    //     if (text.length <= maxLength) return text;
+    //     return text.substring(0, maxLength) + '..';
+    // };
 
     // Función para filtrar números basado en el término de búsqueda
     const filteredNumbers = numbers.filter(number => {
@@ -134,14 +134,14 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
 
             {/* Header de la tabla */}
             <div className="px-4 mb-2">
-                <div className="grid grid-cols-7 gap-1 text-xs font-bold text-gray-700 border-b border-gray-300 pb-1">
-                    <div className="text-center">Línea</div>
-                    <div className="truncate">Nombre</div>
-                    <div className="truncate">Producto</div>
-                    <div className="text-center">H</div>
-                    <div className="text-center">M</div>
-                    <div className="text-center">N</div>
-                    <div className="text-center">N</div>
+                <div className="grid grid-cols-24 gap-1 text-xs font-bold text-gray-700 border-b border-gray-300 pb-1">
+                    <div className="text-center col-span-2">#</div>
+                    <div className="truncate col-span-8">Nombre</div>
+                    <div className="truncate col-span-8">Producto</div>
+                    <div className="text-center col-span-1.5 text-[10px]">H</div>
+                    <div className="text-center col-span-1.5 text-[10px]">M</div>
+                    <div className="text-center col-span-1.5 text-[10px]">N</div>
+                    <div className="text-center col-span-1.5 text-[10px]">N</div>
                 </div>
             </div>
 
@@ -167,7 +167,7 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                 <div
                                     key={number}
                                     className={`
-                                        border border-black text-xs transition-colors cursor-pointer grid grid-cols-7 gap-1 items-center p-1 relative
+                                        border border-black text-xs transition-colors cursor-pointer grid grid-cols-24 gap-1 items-center p-1 relative
                                         ${isOccupied
                                             ? 'bg-green-100 hover:bg-green-200'
                                             : 'bg-gray-50 hover:bg-gray-100'
@@ -176,71 +176,71 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                     onClick={() => isOccupied ? handleEditOrder(order) : handleCreateOrder(number)}
                                 >
                                     {/* Columna Línea */}
-                                    <div className="text-center font-bold">
+                                    <div className="text-center font-bold col-span-2">
                                         {formatNumber(number)}
                                     </div>
 
                                     {/* Columna Nombre */}
-                                    <div className="truncate font-medium">
-                                        {isOccupied ? truncateText(order.client, 10) : '-'}
+                                    <div className="font-medium col-span-8 truncate">
+                                        {isOccupied ? order.client : '-'}
                                     </div>
 
                                     {/* Columna Producto */}
-                                    <div className="truncate">
-                                        {isOccupied ? truncateText(order.product || '-', 10) : '-'}
+                                    <div className="col-span-8 truncate">
+                                        {isOccupied ? order.product || '-' : '-'}
                                     </div>
 
                                     {/* Columna Hombre */}
-                                    <div className="text-center">
+                                    <div className="text-center col-span-1.5">
                                         {isOccupied && order.gender === 'hombre' ? (
-                                            <span className="bg-blue-200 px-1 rounded font-bold">
+                                            <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
                                                 {order.number || '-'}
                                             </span>
-                                        ) : '-'}
+                                        ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Dama */}
-                                    <div className="text-center">
+                                    <div className="text-center col-span-1.5">
                                         {isOccupied && order.gender === 'mujer' ? (
-                                            <span className="bg-pink-200 px-1 rounded font-bold">
+                                            <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
                                                 {order.number || '-'}
                                             </span>
-                                        ) : '-'}
+                                        ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Niño */}
-                                    <div className="text-center">
+                                    <div className="text-center col-span-1.5">
                                         {isOccupied && order.gender === 'niño' ? (
-                                            <span className="bg-green-200 px-1 rounded font-bold">
+                                            <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
                                                 {order.number || '-'}
                                             </span>
-                                        ) : '-'}
+                                        ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Niña */}
-                                    <div className="text-center relative">
+                                    <div className="text-center col-span-1.5">
                                         {isOccupied && order.gender === 'niña' ? (
-                                            <span className="bg-purple-200 px-1 rounded font-bold">
+                                            <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
                                                 {order.number || '-'}
                                             </span>
-                                        ) : '-'}
-
-                                        {/* Botón eliminar en la última columna */}
-                                        {isOccupied && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteOrder(order.id);
-                                                }}
-                                                className="absolute right-0 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700 opacity-60 hover:opacity-100 transition-opacity"
-                                                title="Eliminar"
-                                            >
-                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        )}
+                                        ) : <span className="text-[10px]">-</span>}
                                     </div>
+                                    
+                                    {/* Botón eliminar */}
+                                    {isOccupied && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteOrder(order.id);
+                                            }}
+                                            className="absolute right-1 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700 opacity-60 hover:opacity-100 transition-opacity"
+                                            title="Eliminar"
+                                        >
+                                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
                             );
                         })}

@@ -41,11 +41,11 @@ export const sendWhatsApp = async (phone: string, message: string) => {
                 `💳 *Transf/Dep 2:* 4152314332859910\n\n` +
                 `💡 *Recuerda enviar tu comprobante de pago*\n`,
             session: "victor",
-            file: {
-                mimetype: "image/png",
-                url: "https://sistema-contable-three.vercel.app/pagos.png",
-                filename: "pagos.png"
-            },
+            // file: {
+            //     mimetype: "image/png",
+            //     url: "https://sistema-contable-three.vercel.app/pagos.png",
+            //     filename: "pagos.png"
+            // },
         })
     });
 
