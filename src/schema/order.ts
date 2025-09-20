@@ -13,7 +13,7 @@ export const orderSchema = z.object({
     id: z.number().min(1).optional(),
     client: z.string().min(2).max(100),
     gender: z.enum(["hombre", "mujer", "niño", "niña"]).optional(), // Mantener para compatibilidad
-    product: z.string().min(2).max(100).optional(),
+    product: z.string().optional(),
     number: z.string().optional(), // Mantener para compatibilidad
     specifications: z.string().max(500).optional(),
     totalAmount: z.number().default(0).optional(),
