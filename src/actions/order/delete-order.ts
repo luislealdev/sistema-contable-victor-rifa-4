@@ -5,6 +5,11 @@ import { revalidatePath } from "next/cache";
 
 export const deleteOrder = async (id: number) => {
     try {
+
+        await prisma.orderItem.deleteMany({
+            where: { orderId: id }
+        });
+        
         await prisma.order.delete({
             where: { id }
         });

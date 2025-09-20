@@ -1,21 +1,23 @@
 'use client';
 
 import { deleteOrder } from '@/actions/order/delete-order';
-import { Order } from '@prisma/client';
+import { Order, OrderItem } from '@prisma/client';
 import React, { useState } from 'react';
 import { OrderForm } from './OrderForm';
 
 interface Props {
-    orders: Order[];
+    orders: (Order & {
+        OrderItem?: OrderItem[];
+    })[];
 }
 
 export const OrdersTable: React.FC<Props> = ({ orders }) => {
     const [showOrderForm, setShowOrderForm] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<(Order & { OrderItem?: OrderItem[] }) | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     // Crear mapa de órdenes por ID
-    const ordersMap = new Map<number, Order>();
+    const ordersMap = new Map<number, Order & { OrderItem?: OrderItem[] }>();
     orders.forEach(order => {
         ordersMap.set(order.id, order);
     });
@@ -58,7 +60,16 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
     });
 
     const handleCreateOrder = (id: number) => {
-        setSelectedOrder({ id, client: '', gender: null, product: null, number: null, specifications: null });
+        setSelectedOrder({ 
+            id, 
+            client: '', 
+            gender: null, 
+            product: null, 
+            number: null, 
+            specifications: null, 
+            totalAmount: null,
+            OrderItem: []
+        });
         setShowOrderForm(true);
     };
 
@@ -192,37 +203,81 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
 
                                     {/* Columna Hombre */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied && order.gender === 'hombre' ? (
-                                            <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
-                                                {order.number || '-'}
-                                            </span>
+                                        {isOccupied ? (
+                                            <>
+                                                {/* Mostrar desde OrderItem si existe */}
+                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'hombre') ? (
+                                                    <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.OrderItem.find(item => item.gender === 'hombre')?.number || '-'}
+                                                    </span>
+                                                ) : 
+                                                /* Compatibilidad con formato antiguo */
+                                                order.gender === 'hombre' ? (
+                                                    <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.number || '-'}
+                                                    </span>
+                                                ) : <span className="text-[10px]">-</span>}
+                                            </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Dama */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied && order.gender === 'mujer' ? (
-                                            <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
-                                                {order.number || '-'}
-                                            </span>
+                                        {isOccupied ? (
+                                            <>
+                                                {/* Mostrar desde OrderItem si existe */}
+                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'mujer') ? (
+                                                    <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.OrderItem.find(item => item.gender === 'mujer')?.number || '-'}
+                                                    </span>
+                                                ) : 
+                                                /* Compatibilidad con formato antiguo */
+                                                order.gender === 'mujer' ? (
+                                                    <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.number || '-'}
+                                                    </span>
+                                                ) : <span className="text-[10px]">-</span>}
+                                            </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Niño */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied && order.gender === 'niño' ? (
-                                            <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
-                                                {order.number || '-'}
-                                            </span>
+                                        {isOccupied ? (
+                                            <>
+                                                {/* Mostrar desde OrderItem si existe */}
+                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'niño') ? (
+                                                    <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.OrderItem.find(item => item.gender === 'niño')?.number || '-'}
+                                                    </span>
+                                                ) : 
+                                                /* Compatibilidad con formato antiguo */
+                                                order.gender === 'niño' ? (
+                                                    <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.number || '-'}
+                                                    </span>
+                                                ) : <span className="text-[10px]">-</span>}
+                                            </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Niña */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied && order.gender === 'niña' ? (
-                                            <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
-                                                {order.number || '-'}
-                                            </span>
+                                        {isOccupied ? (
+                                            <>
+                                                {/* Mostrar desde OrderItem si existe */}
+                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'niña') ? (
+                                                    <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.OrderItem.find(item => item.gender === 'niña')?.number || '-'}
+                                                    </span>
+                                                ) : 
+                                                /* Compatibilidad con formato antiguo */
+                                                order.gender === 'niña' ? (
+                                                    <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
+                                                        {order.number || '-'}
+                                                    </span>
+                                                ) : <span className="text-[10px]">-</span>}
+                                            </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
                                     

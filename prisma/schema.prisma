@@ -124,10 +124,20 @@ model PreRaffle {
 }
 
 model Order {
-    id             Int     @id @default(autoincrement())
+    id             Int         @id @default(autoincrement())
     client         String
     gender         String?
     number         String?
     product        String?
     specifications String?
+    totalAmount    Float?
+    OrderItem      OrderItem[]
+}
+
+model OrderItem {
+    id      Int     @id @default(autoincrement())
+    gender  String?
+    number  String?
+    order   Order   @relation(fields: [orderId], references: [id])
+    orderId Int
 }
