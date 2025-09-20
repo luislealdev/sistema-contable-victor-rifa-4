@@ -16,7 +16,6 @@ export const orderSchema = z.object({
     product: z.string().min(2).max(100).optional(),
     number: z.string().optional(), // Mantener para compatibilidad
     specifications: z.string().max(500).optional(),
-    totalAmount: z.number().default(0),
-    // Nuevos campos para OrderItems - usando el nombre que espera el modelo de Prisma
+    totalAmount: z.number().default(0).optional(),
     OrderItem: z.array(orderItemSchema).optional()
 });

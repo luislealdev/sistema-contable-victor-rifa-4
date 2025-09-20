@@ -60,13 +60,13 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
     });
 
     const handleCreateOrder = (id: number) => {
-        setSelectedOrder({ 
-            id, 
-            client: '', 
-            gender: null, 
-            product: null, 
-            number: null, 
-            specifications: null, 
+        setSelectedOrder({
+            id,
+            client: '',
+            gender: null,
+            product: null,
+            number: null,
+            specifications: null,
             totalAmount: null,
             OrderItem: []
         });
@@ -147,8 +147,9 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
             <div className="px-4 mb-2">
                 <div className="grid grid-cols-24 gap-1 text-xs font-bold text-gray-700 border-b border-gray-300 pb-1">
                     <div className="text-center col-span-2">#</div>
-                    <div className="truncate col-span-8">Nombre</div>
-                    <div className="truncate col-span-8">Producto</div>
+                    <div className="truncate col-span-6">Nombre</div>
+                    <div className="truncate col-span-6">Producto</div>
+                    <div className="text-center col-span-4 text-[10px]">$</div>
                     <div className="text-center col-span-1.5 text-[10px]">H</div>
                     <div className="text-center col-span-1.5 text-[10px]">M</div>
                     <div className="text-center col-span-1.5 text-[10px]">N</div>
@@ -192,13 +193,16 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                     </div>
 
                                     {/* Columna Nombre */}
-                                    <div className="font-medium col-span-8 truncate">
+                                    <div className="font-medium col-span-6 truncate text-[10px]">
                                         {isOccupied ? order.client : '-'}
                                     </div>
 
                                     {/* Columna Producto */}
-                                    <div className="col-span-8 truncate">
+                                    <div className="col-span-6 truncate text-[10px]">
                                         {isOccupied ? order.product || '-' : '-'}
+                                    </div>
+                                    <div className="col-span-4 text-center text-[10px]">
+                                        {isOccupied ? (order.totalAmount !== null ? `$${order.totalAmount.toFixed(2)}` : '$0.00') : '-'}
                                     </div>
 
                                     {/* Columna Hombre */}
@@ -210,13 +214,13 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                                     <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
                                                         {order.OrderItem.find(item => item.gender === 'hombre')?.number || '-'}
                                                     </span>
-                                                ) : 
-                                                /* Compatibilidad con formato antiguo */
-                                                order.gender === 'hombre' ? (
-                                                    <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.number || '-'}
-                                                    </span>
-                                                ) : <span className="text-[10px]">-</span>}
+                                                ) :
+                                                    /* Compatibilidad con formato antiguo */
+                                                    order.gender === 'hombre' ? (
+                                                        <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
+                                                            {order.number || '-'}
+                                                        </span>
+                                                    ) : <span className="text-[10px]">-</span>}
                                             </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
@@ -230,13 +234,13 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                                     <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
                                                         {order.OrderItem.find(item => item.gender === 'mujer')?.number || '-'}
                                                     </span>
-                                                ) : 
-                                                /* Compatibilidad con formato antiguo */
-                                                order.gender === 'mujer' ? (
-                                                    <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.number || '-'}
-                                                    </span>
-                                                ) : <span className="text-[10px]">-</span>}
+                                                ) :
+                                                    /* Compatibilidad con formato antiguo */
+                                                    order.gender === 'mujer' ? (
+                                                        <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
+                                                            {order.number || '-'}
+                                                        </span>
+                                                    ) : <span className="text-[10px]">-</span>}
                                             </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
@@ -250,13 +254,13 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                                     <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
                                                         {order.OrderItem.find(item => item.gender === 'niño')?.number || '-'}
                                                     </span>
-                                                ) : 
-                                                /* Compatibilidad con formato antiguo */
-                                                order.gender === 'niño' ? (
-                                                    <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.number || '-'}
-                                                    </span>
-                                                ) : <span className="text-[10px]">-</span>}
+                                                ) :
+                                                    /* Compatibilidad con formato antiguo */
+                                                    order.gender === 'niño' ? (
+                                                        <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
+                                                            {order.number || '-'}
+                                                        </span>
+                                                    ) : <span className="text-[10px]">-</span>}
                                             </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
@@ -270,17 +274,17 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                                     <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
                                                         {order.OrderItem.find(item => item.gender === 'niña')?.number || '-'}
                                                     </span>
-                                                ) : 
-                                                /* Compatibilidad con formato antiguo */
-                                                order.gender === 'niña' ? (
-                                                    <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.number || '-'}
-                                                    </span>
-                                                ) : <span className="text-[10px]">-</span>}
+                                                ) :
+                                                    /* Compatibilidad con formato antiguo */
+                                                    order.gender === 'niña' ? (
+                                                        <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
+                                                            {order.number || '-'}
+                                                        </span>
+                                                    ) : <span className="text-[10px]">-</span>}
                                             </>
                                         ) : <span className="text-[10px]">-</span>}
                                     </div>
-                                    
+
                                     {/* Botón eliminar */}
                                     {isOccupied && (
                                         <button

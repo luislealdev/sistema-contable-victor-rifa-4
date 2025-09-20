@@ -17,8 +17,9 @@ export const OrderForm: React.FC<Props> = ({ order, onClose, onRefresh }) => {
         product: order?.product || '',
         specifications: order?.specifications || '',
         // Mantener estos campos para compatibilidad
-        gender: order?.gender || '',
-        number: order?.number || '',
+        gender: order?.gender || undefined,
+        number: order?.number || undefined,
+        totalAmount: order?.totalAmount || 0,
         // Nuevo array de items por género, usando el nombre que espera el modelo de Prisma
         OrderItem: [] as {
             id?: number;
@@ -59,10 +60,10 @@ export const OrderForm: React.FC<Props> = ({ order, onClose, onRefresh }) => {
         e.preventDefault();
 
         // Validar que al menos exista un item
-        if (formData.OrderItem.length === 0) {
-            alert('Debe agregar al menos una talla');
-            return;
-        }
+        // if (formData.OrderItem.length === 0) {
+        //     alert('Debe agregar al menos una talla');
+        //     return;
+        // }
 
         // Validar que todos los géneros estén seleccionados
         if (formData.OrderItem.some(item => !item.gender)) {
@@ -209,8 +210,8 @@ export const OrderForm: React.FC<Props> = ({ order, onClose, onRefresh }) => {
 
                     {/* Campo legado de género y número para compatibilidad */}
                     <div className="hidden">
-                        <input type="hidden" value={formData.gender} />
-                        <input type="hidden" value={formData.number} />
+                        <input type="hidden" value={formData.gender || ''} />
+                        <input type="hidden" value={formData.number || ''} />
                     </div>
                 </div>
 
@@ -225,6 +226,20 @@ export const OrderForm: React.FC<Props> = ({ order, onClose, onRefresh }) => {
                         maxLength={500}
                         rows={3}
                     ></textarea>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Monto Total
+                    </label>
+                    <input
+                        type="number"
+                        value={formData.totalAmount}
+                        onChange={(e) => setFormData({ ...formData, totalAmount: parseFloat(e.target.value)})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        min="0"
+                        step="0.01"
+                    />
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-4">
