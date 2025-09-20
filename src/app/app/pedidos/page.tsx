@@ -14,7 +14,7 @@ const OrdersPage = async () => {
                 </p>
             </div>
 
-            <OrdersTable orders={orders} />
+            <OrdersTable orders={orders || []} />
         </div>
     );
 };
