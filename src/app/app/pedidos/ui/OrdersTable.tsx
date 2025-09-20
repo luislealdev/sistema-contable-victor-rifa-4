@@ -15,6 +15,8 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
     const [showOrderForm, setShowOrderForm] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<(Order & { OrderItem?: OrderItem[] }) | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [showSelectionMode, setShowSelectionMode] = useState(false);
 
     // Crear mapa de órdenes por ID
     const ordersMap = new Map<number, Order & { OrderItem?: OrderItem[] }>();
@@ -88,6 +90,43 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
         setShowOrderForm(false);
         setSelectedOrder(null);
     };
+    
+    // Función para manejar la selección de una orden
+    const handleSelectOrder = (id: number, e: React.SyntheticEvent) => {
+        e.stopPropagation();
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(orderId => orderId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+    
+    // Función para calcular el total de todas las órdenes
+    const calculateTotal = () => {
+        return orders.reduce((sum, order) => {
+            return sum + (order.totalAmount || 0);
+        }, 0);
+    };
+    
+    // Función para calcular el total de órdenes seleccionadas
+    const calculateSelectedTotal = () => {
+        return orders
+            .filter(order => selectedIds.includes(order.id))
+            .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+    };
+    
+    // Función para limpiar selecciones
+    const clearSelections = () => {
+        setSelectedIds([]);
+    };
+    
+    // Función para alternar modo de selección
+    const toggleSelectionMode = () => {
+        setShowSelectionMode(!showSelectionMode);
+        if (showSelectionMode) {
+            clearSelections();
+        }
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-md">
@@ -106,6 +145,51 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                             <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
                             <span className="text-gray-600">Disponible ({75 - orders.length})</span>
                         </div>
+                    </div>
+                    
+                    {/* Información de totales */}
+                    <div className="w-full px-4 py-2 bg-blue-50 rounded-md mt-2 border border-blue-100">
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                            <div className="flex flex-col">
+                                <span className="text-sm font-medium">Total general:</span>
+                                <span className="text-lg font-bold text-blue-700">${calculateTotal().toFixed(2)}</span>
+                            </div>
+                            
+                            <div className="flex items-center">
+                                <button 
+                                    onClick={toggleSelectionMode}
+                                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                                        showSelectionMode 
+                                            ? 'bg-red-500 hover:bg-red-600 text-white' 
+                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    }`}
+                                >
+                                    {showSelectionMode ? 'Cancelar selección' : 'Seleccionar órdenes'}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {showSelectionMode && (
+                            <div className="mt-2 border-t border-blue-200 pt-2">
+                                <div className="flex flex-col sm:flex-row sm:justify-between items-center">
+                                    <div>
+                                        <span className="text-xs">Órdenes seleccionadas: {selectedIds.length}</span>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium">Subtotal seleccionado:</span>
+                                            <span className="text-lg font-bold text-green-700">${calculateSelectedTotal().toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button 
+                                        onClick={clearSelections}
+                                        className="mt-2 sm:mt-0 px-3 py-1 rounded-md text-xs bg-gray-200 hover:bg-gray-300 transition-colors"
+                                        disabled={selectedIds.length === 0}
+                                    >
+                                        Limpiar selección
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Campo de búsqueda */}
@@ -181,14 +265,37 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                     className={`
                                         border border-black text-xs transition-colors cursor-pointer grid grid-cols-24 gap-1 items-center p-1 relative
                                         ${isOccupied
-                                            ? 'bg-green-100 hover:bg-green-200'
+                                            ? selectedIds.includes(number)
+                                                ? 'bg-blue-200 hover:bg-blue-300'
+                                                : 'bg-green-100 hover:bg-green-200'
                                             : 'bg-gray-50 hover:bg-gray-100'
                                         }
                                     `}
-                                    onClick={() => isOccupied ? handleEditOrder(order) : handleCreateOrder(number)}
+                                    onClick={(e) => {
+                                        if (showSelectionMode && isOccupied) {
+                                            handleSelectOrder(number, e);
+                                        } else {
+                                            if (isOccupied) {
+                                                handleEditOrder(order);
+                                            } else {
+                                                handleCreateOrder(number);
+                                            }
+                                        }
+                                    }}
                                 >
                                     {/* Columna Línea */}
-                                    <div className="text-center font-bold col-span-2">
+                                    <div className="text-center font-bold col-span-2 flex items-center justify-center gap-1">
+                                        {showSelectionMode && isOccupied && (
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.includes(number)}
+                                                onChange={(e) => {
+                                                    e.stopPropagation();
+                                                    handleSelectOrder(number, e);
+                                                }}
+                                                className="w-3 h-3"
+                                            />
+                                        )}
                                         {formatNumber(number)}
                                     </div>
 
