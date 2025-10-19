@@ -10,7 +10,7 @@ export const orderItemSchema = z.object({
 
 // Esquema para Order con compatibilidad con datos antiguos y nuevos
 export const orderSchema = z.object({
-    id: z.number().min(1).optional(),
+    id: z.number().min(0).optional(), // 0 indica nueva orden, >0 para actualización
     client: z.string().min(2).max(100),
     gender: z.enum(["hombre", "mujer", "niño", "niña"]).optional(), // Mantener para compatibilidad
     product: z.string().optional(),

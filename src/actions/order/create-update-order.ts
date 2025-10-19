@@ -4,6 +4,25 @@ import prisma from "@/lib/prisma";
 import { orderSchema } from "@/schema/order";
 import { revalidatePath } from "next/cache";
 
+// Función para encontrar un ID disponible
+const findAvailableId = async (): Promise<number> => {
+    // Obtener todos los IDs existentes ordenados
+    const existingOrders = await prisma.order.findMany({
+        select: { id: true },
+        orderBy: { id: 'asc' }
+    });
+    
+    const existingIds = existingOrders.map(order => order.id);
+    
+    // Buscar el primer ID disponible (empezando desde 1)
+    let newId = 1;
+    while (existingIds.includes(newId)) {
+        newId++;
+    }
+    
+    return newId;
+};
+
 export const createUpdateOrder = async (order: unknown) => {
     const parsedOrder = orderSchema.safeParse(order);
     if (!parsedOrder.success) {
@@ -14,18 +33,49 @@ export const createUpdateOrder = async (order: unknown) => {
         }
     }
 
+    console.log(parsedOrder);
+    
+
     try {
         const { OrderItem, ...orderData } = parsedOrder.data;
         
-        // Crear o actualizar la orden
-        const savedOrder = await prisma.order.upsert({
-            where: { id: orderData.id || 0 },
-            update: orderData,
-            create: orderData,
-            include: {
-                OrderItem: true
-            }
-        });
+        // Determinar si es creación o actualización
+        const isUpdate = orderData.id && orderData.id > 0;
+        
+        let savedOrder;
+        
+        if (isUpdate) {
+            // Actualización: usar el ID existente
+            savedOrder = await prisma.order.update({
+                where: { id: orderData.id },
+                data: {
+                    client: orderData.client,
+                    gender: orderData.gender,
+                    product: orderData.product,
+                    number: orderData.number,
+                    specifications: orderData.specifications,
+                    totalAmount: orderData.totalAmount
+                },
+                include: {
+                    OrderItem: true
+                }
+            });
+        } else {
+            // Creación: generar un ID único disponible
+            const availableId = await findAvailableId();
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id, ...createData } = orderData; // Excluir id original del objeto de creación
+            
+            savedOrder = await prisma.order.create({
+                data: {
+                    ...createData,
+                    id: availableId // Usar el ID disponible encontrado
+                },
+                include: {
+                    OrderItem: true
+                }
+            });
+        }
 
         // Si hay OrderItems, manejarlos
         if (OrderItem && OrderItem.length > 0) {

@@ -7,10 +7,8 @@ export const getOrders = async () => {
         const orders = await prisma.order.findMany({
             include: {
                 OrderItem: true
-            },
-            orderBy: {
-                id: 'asc'
             }
+            // Removemos orderBy para ordenar en el frontend por createdAt
         });
         return {
             ok: true,

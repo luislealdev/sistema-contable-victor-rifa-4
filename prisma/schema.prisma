@@ -132,6 +132,7 @@ model Order {
     specifications String?
     totalAmount    Float?
     OrderItem      OrderItem[]
+    createdAt      DateTime?    @default(now())
 }
 
 model OrderItem {

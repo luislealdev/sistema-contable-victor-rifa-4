@@ -8,6 +8,7 @@ import { OrderForm } from './OrderForm';
 interface Props {
     orders: (Order & {
         OrderItem?: OrderItem[];
+        createdAt?: Date | null;
     })[];
 }
 
@@ -18,59 +19,57 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [showSelectionMode, setShowSelectionMode] = useState(false);
 
-    // Crear mapa de órdenes por ID
-    const ordersMap = new Map<number, Order & { OrderItem?: OrderItem[] }>();
-    orders.forEach(order => {
-        ordersMap.set(order.id, order);
+    // Ordenar órdenes por fecha de creación (del primero al último creado)
+    const sortedOrders = [...orders].sort((a, b) => {
+        // Si ambas órdenes tienen createdAt, ordenar por fecha
+        if (a.createdAt && b.createdAt) {
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        }
+        // Si solo una tiene createdAt, la que tiene va después
+        if (a.createdAt && !b.createdAt) return 1;
+        if (!a.createdAt && b.createdAt) return -1;
+        // Si ninguna tiene createdAt, ordenar por ID como fallback
+        return a.id - b.id;
     });
 
-    // Generar array de números del 1 al 75
-    const numbers = Array.from({ length: 75 }, (_, i) => i + 1);
-
-    // Función para formatear número con cero inicial si es necesario
+    // Función para formatear número secuencial
     const formatNumber = (num: number): string => {
         return num < 10 ? `0${num}` : num.toString();
     };
 
-    // Función para truncar texto largo
-    // const truncateText = (text: string, maxLength: number = 8): string => {
-    //     if (text.length <= maxLength) return text;
-    //     return text.substring(0, maxLength) + '..';
-    // };
-
-    // Función para filtrar números basado en el término de búsqueda
-    const filteredNumbers = numbers.filter(number => {
+    // Función para filtrar órdenes basado en el término de búsqueda
+    const filteredOrders = sortedOrders.filter(order => {
         if (!searchTerm.trim()) return true;
 
-        const order = ordersMap.get(number);
-        const numberStr = formatNumber(number);
         const searchLower = searchTerm.toLowerCase();
 
-        // Buscar por número
-        if (numberStr.includes(searchLower)) return true;
-
-        // Buscar por cliente si existe
-        if (order && order.client.toLowerCase().includes(searchLower)) return true;
+        // Buscar por cliente
+        if (order.client.toLowerCase().includes(searchLower)) return true;
 
         // Buscar por género si existe
-        if (order && order.gender?.toLowerCase().includes(searchLower)) return true;
+        if (order.gender?.toLowerCase().includes(searchLower)) return true;
 
         // Buscar por producto si existe
-        if (order && order.product?.toLowerCase().includes(searchLower)) return true;
+        if (order.product?.toLowerCase().includes(searchLower)) return true;
+
+        // Buscar por ID
+        if (order.id.toString().includes(searchLower)) return true;
 
         return false;
     });
 
-    const handleCreateOrder = (id: number) => {
+    const handleCreateOrder = () => {
+        // Para crear una nueva orden, no especificamos ID (se asignará automáticamente)
         setSelectedOrder({
-            id,
+            id: 0, // 0 indica nueva orden
             client: '',
             gender: null,
             product: null,
             number: null,
             specifications: null,
             totalAmount: null,
-            OrderItem: []
+            OrderItem: [],
+            createdAt: null
         });
         setShowOrderForm(true);
     };
@@ -133,17 +132,21 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
             {/* Header con controles */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 p-4">
                 <div className="flex flex-col items-center gap-4 mt-2 sm:mt-0">
-                    <h2 className="text-xl font-bold text-gray-800">Órdenes (1-75)</h2>
+                    <h2 className="text-xl font-bold text-gray-800">Órdenes ({orders.length})</h2>
 
                     {/* Estadísticas compactas */}
                     <div className="flex flex-wrap gap-4 justify-center text-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-                            <span className="text-gray-600">Con orden ({orders.length})</span>
+                            <span className="text-gray-600">Total de órdenes: {orders.length}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
-                            <span className="text-gray-600">Disponible ({75 - orders.length})</span>
+                            <button
+                                onClick={handleCreateOrder}
+                                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-xs font-medium transition-colors"
+                            >
+                                + Nueva Orden
+                            </button>
                         </div>
                     </div>
                     
@@ -220,7 +223,7 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                         </div>
                         {searchTerm && (
                             <p className="text-xs text-gray-500 mt-1">
-                                Mostrando {filteredNumbers.length} de {numbers.length} números
+                                Mostrando {filteredOrders.length} de {orders.length} órdenes
                             </p>
                         )}
                     </div>
@@ -241,172 +244,163 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                 </div>
             </div>
 
-            {/* Grid de números como tabla */}
+            {/* Grid de órdenes como tabla */}
             <div className="px-4" style={{ lineHeight: '1' }}>
-                {filteredNumbers.length === 0 ? (
+                {filteredOrders.length === 0 ? (
                     <div className="text-center py-8">
-                        <p className="text-gray-500 text-lg">No se encontraron números que coincidan con &ldquo;{searchTerm}&rdquo;</p>
-                        <button
-                            onClick={() => setSearchTerm('')}
-                            className="mt-2 text-blue-600 hover:text-blue-800 text-sm underline"
-                        >
-                            Limpiar búsqueda
-                        </button>
+                        <p className="text-gray-500 text-lg">
+                            {searchTerm 
+                                ? `No se encontraron órdenes que coincidan con "${searchTerm}"` 
+                                : 'No hay órdenes creadas aún'
+                            }
+                        </p>
+                        {searchTerm ? (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="mt-2 text-blue-600 hover:text-blue-800 text-sm underline"
+                            >
+                                Limpiar búsqueda
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleCreateOrder}
+                                className="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm font-medium transition-colors"
+                            >
+                                Crear primera orden
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="">
-                        {filteredNumbers.map(number => {
-                            const order = ordersMap.get(number);
-                            const isOccupied = !!order;
+                        {filteredOrders.map((order, index) => {
+                            const sequentialNumber = index + 1; // Numeración secuencial
 
                             return (
                                 <div
-                                    key={number}
+                                    key={order.id}
                                     className={`
                                         border border-black text-xs transition-colors cursor-pointer grid grid-cols-24 gap-1 items-center p-1 relative
-                                        ${isOccupied
-                                            ? selectedIds.includes(number)
-                                                ? 'bg-blue-200 hover:bg-blue-300'
-                                                : 'bg-green-100 hover:bg-green-200'
-                                            : 'bg-gray-50 hover:bg-gray-100'
+                                        ${selectedIds.includes(order.id)
+                                            ? 'bg-blue-200 hover:bg-blue-300'
+                                            : 'bg-green-100 hover:bg-green-200'
                                         }
                                     `}
                                     onClick={(e) => {
-                                        if (showSelectionMode && isOccupied) {
-                                            handleSelectOrder(number, e);
+                                        if (showSelectionMode) {
+                                            handleSelectOrder(order.id, e);
                                         } else {
-                                            if (isOccupied) {
-                                                handleEditOrder(order);
-                                            } else {
-                                                handleCreateOrder(number);
-                                            }
+                                            handleEditOrder(order);
                                         }
                                     }}
                                 >
                                     {/* Columna Línea */}
                                     <div className="text-center font-bold col-span-2 flex items-center justify-center gap-1">
-                                        {showSelectionMode && isOccupied && (
+                                        {showSelectionMode && (
                                             <input
                                                 type="checkbox"
-                                                checked={selectedIds.includes(number)}
+                                                checked={selectedIds.includes(order.id)}
                                                 onChange={(e) => {
                                                     e.stopPropagation();
-                                                    handleSelectOrder(number, e);
+                                                    handleSelectOrder(order.id, e);
                                                 }}
                                                 className="w-3 h-3"
                                             />
                                         )}
-                                        {formatNumber(number)}
+                                        {formatNumber(sequentialNumber)}
                                     </div>
 
                                     {/* Columna Nombre */}
                                     <div className="font-medium col-span-6 truncate text-[10px]">
-                                        {isOccupied ? order.client : '-'}
+                                        {order.client}
                                     </div>
 
                                     {/* Columna Producto */}
                                     <div className="col-span-6 truncate text-[10px]">
-                                        {isOccupied ? order.product || '-' : '-'}
+                                        {order.product || '-'}
                                     </div>
+                                    
+                                    {/* Columna Precio */}
                                     <div className="col-span-4 text-center text-[10px]">
-                                        {isOccupied ? (order.totalAmount !== null ? `$${order.totalAmount.toFixed(2)}` : '$0.00') : '-'}
+                                        {order.totalAmount !== null ? `$${order.totalAmount.toFixed(2)}` : '$0.00'}
                                     </div>
 
                                     {/* Columna Hombre */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied ? (
-                                            <>
-                                                {/* Mostrar desde OrderItem si existe */}
-                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'hombre') ? (
-                                                    <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.OrderItem.find(item => item.gender === 'hombre')?.number || '-'}
-                                                    </span>
-                                                ) :
-                                                    /* Compatibilidad con formato antiguo */
-                                                    order.gender === 'hombre' ? (
-                                                        <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
-                                                            {order.number || '-'}
-                                                        </span>
-                                                    ) : <span className="text-[10px]">-</span>}
-                                            </>
-                                        ) : <span className="text-[10px]">-</span>}
+                                        {/* Mostrar desde OrderItem si existe */}
+                                        {order.OrderItem && order.OrderItem.some((item: OrderItem) => item.gender === 'hombre') ? (
+                                            <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
+                                                {order.OrderItem.find((item: OrderItem) => item.gender === 'hombre')?.number || '-'}
+                                            </span>
+                                        ) :
+                                            /* Compatibilidad con formato antiguo */
+                                            order.gender === 'hombre' ? (
+                                                <span className="bg-blue-200 px-0.5 rounded font-bold text-[10px]">
+                                                    {order.number || '-'}
+                                                </span>
+                                            ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Dama */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied ? (
-                                            <>
-                                                {/* Mostrar desde OrderItem si existe */}
-                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'mujer') ? (
-                                                    <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.OrderItem.find(item => item.gender === 'mujer')?.number || '-'}
-                                                    </span>
-                                                ) :
-                                                    /* Compatibilidad con formato antiguo */
-                                                    order.gender === 'mujer' ? (
-                                                        <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
-                                                            {order.number || '-'}
-                                                        </span>
-                                                    ) : <span className="text-[10px]">-</span>}
-                                            </>
-                                        ) : <span className="text-[10px]">-</span>}
+                                        {/* Mostrar desde OrderItem si existe */}
+                                        {order.OrderItem && order.OrderItem.some((item: OrderItem) => item.gender === 'mujer') ? (
+                                            <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
+                                                {order.OrderItem.find((item: OrderItem) => item.gender === 'mujer')?.number || '-'}
+                                            </span>
+                                        ) :
+                                            /* Compatibilidad con formato antiguo */
+                                            order.gender === 'mujer' ? (
+                                                <span className="bg-pink-200 px-0.5 rounded font-bold text-[10px]">
+                                                    {order.number || '-'}
+                                                </span>
+                                            ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Niño */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied ? (
-                                            <>
-                                                {/* Mostrar desde OrderItem si existe */}
-                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'niño') ? (
-                                                    <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.OrderItem.find(item => item.gender === 'niño')?.number || '-'}
-                                                    </span>
-                                                ) :
-                                                    /* Compatibilidad con formato antiguo */
-                                                    order.gender === 'niño' ? (
-                                                        <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
-                                                            {order.number || '-'}
-                                                        </span>
-                                                    ) : <span className="text-[10px]">-</span>}
-                                            </>
-                                        ) : <span className="text-[10px]">-</span>}
+                                        {/* Mostrar desde OrderItem si existe */}
+                                        {order.OrderItem && order.OrderItem.some((item: OrderItem) => item.gender === 'niño') ? (
+                                            <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
+                                                {order.OrderItem.find((item: OrderItem) => item.gender === 'niño')?.number || '-'}
+                                            </span>
+                                        ) :
+                                            /* Compatibilidad con formato antiguo */
+                                            order.gender === 'niño' ? (
+                                                <span className="bg-green-200 px-0.5 rounded font-bold text-[10px]">
+                                                    {order.number || '-'}
+                                                </span>
+                                            ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Columna Niña */}
                                     <div className="text-center col-span-1.5">
-                                        {isOccupied ? (
-                                            <>
-                                                {/* Mostrar desde OrderItem si existe */}
-                                                {order.OrderItem && order.OrderItem.some(item => item.gender === 'niña') ? (
-                                                    <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
-                                                        {order.OrderItem.find(item => item.gender === 'niña')?.number || '-'}
-                                                    </span>
-                                                ) :
-                                                    /* Compatibilidad con formato antiguo */
-                                                    order.gender === 'niña' ? (
-                                                        <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
-                                                            {order.number || '-'}
-                                                        </span>
-                                                    ) : <span className="text-[10px]">-</span>}
-                                            </>
-                                        ) : <span className="text-[10px]">-</span>}
+                                        {/* Mostrar desde OrderItem si existe */}
+                                        {order.OrderItem && order.OrderItem.some((item: OrderItem) => item.gender === 'niña') ? (
+                                            <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
+                                                {order.OrderItem.find((item: OrderItem) => item.gender === 'niña')?.number || '-'}
+                                            </span>
+                                        ) :
+                                            /* Compatibilidad con formato antiguo */
+                                            order.gender === 'niña' ? (
+                                                <span className="bg-purple-200 px-0.5 rounded font-bold text-[10px]">
+                                                    {order.number || '-'}
+                                                </span>
+                                            ) : <span className="text-[10px]">-</span>}
                                     </div>
 
                                     {/* Botón eliminar */}
-                                    {isOccupied && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteOrder(order.id);
-                                            }}
-                                            className="absolute right-1 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700 opacity-60 hover:opacity-100 transition-opacity"
-                                            title="Eliminar"
-                                        >
-                                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    )}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteOrder(order.id);
+                                        }}
+                                        className="absolute right-1 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700 opacity-60 hover:opacity-100 transition-opacity"
+                                        title="Eliminar"
+                                    >
+                                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
                             );
                         })}

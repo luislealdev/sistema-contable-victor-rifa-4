@@ -101,7 +101,7 @@ export const OrderForm: React.FC<Props> = ({ order, onClose, onRefresh }) => {
     return (
         <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4">
-                {order ? `Editar Orden - Línea ${order.id}` : 'Nueva Orden'}
+                {order && order.id && order.id > 0 ? `Editar Orden ID: ${order.id}` : 'Nueva Orden'}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
