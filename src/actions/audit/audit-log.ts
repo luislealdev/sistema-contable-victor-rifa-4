@@ -55,24 +55,25 @@ export const createAuditLog = async ({
 };
 
 /**
- * Función para obtener logs de auditoría con filtros
+ * Función para obtener logs de auditoría con filtros y paginación
  */
-export const getAuditLogs = async ({
+export const getPaginatedAuditLogs = async ({
+    page = 1,
+    limit = 20,
     entity,
     entityId,
     action,
-    userId,
-    limit = 100,
-    offset = 0
+    userId
 }: {
+    page?: number;
+    limit?: number;
     entity?: string;
     entityId?: number;
     action?: 'CREATE' | 'UPDATE' | 'DELETE';
     userId?: number;
-    limit?: number;
-    offset?: number;
 } = {}) => {
     try {
+        const offset = (page - 1) * limit;
         const where: Record<string, unknown> = {};
         
         if (entity) where.entity = entity;
@@ -90,17 +91,34 @@ export const getAuditLogs = async ({
             prisma.auditLog.count({ where })
         ]);
 
+        const totalPages = Math.ceil(total / limit);
+
         return {
             ok: true,
             logs,
-            total,
-            hasMore: offset + limit < total
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems: total,
+                itemsPerPage: limit,
+                hasNext: page < totalPages,
+                hasPrevious: page > 1
+            }
         };
     } catch (error) {
-        console.error('Error al obtener logs de auditoría:', error);
+        console.error('Error al obtener logs de auditoría paginados:', error);
         return {
             ok: false,
-            error: error instanceof Error ? error.message : 'Error desconocido'
+            error: error instanceof Error ? error.message : 'Error desconocido',
+            logs: [],
+            pagination: {
+                currentPage: 1,
+                totalPages: 0,
+                totalItems: 0,
+                itemsPerPage: limit,
+                hasNext: false,
+                hasPrevious: false
+            }
         };
     }
 };
