@@ -33,9 +33,6 @@ export const createUpdateOrder = async (order: unknown) => {
         }
     }
 
-    console.log(parsedOrder);
-    
-
     try {
         const { OrderItem, ...orderData } = parsedOrder.data;
         

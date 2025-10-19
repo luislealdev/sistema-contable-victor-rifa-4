@@ -69,7 +69,6 @@ export const sendWhatsApp = async (phone: string, message: string) => {
     //     })
     // });
 
-    // console.log(resp);
 
 
 }  
