@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { orderSchema } from "@/schema/order";
 import { revalidatePath } from "next/cache";
+import { createAuditLog } from "@/actions/audit/audit-log";
 
 // Función para encontrar un ID disponible
 const findAvailableId = async (): Promise<number> => {
@@ -42,6 +43,12 @@ export const createUpdateOrder = async (order: unknown) => {
         let savedOrder;
         
         if (isUpdate) {
+            // Obtener valores anteriores para auditoría
+            const oldOrder = await prisma.order.findUnique({
+                where: { id: orderData.id },
+                include: { OrderItem: true }
+            });
+
             // Actualización: usar el ID existente
             savedOrder = await prisma.order.update({
                 where: { id: orderData.id },
@@ -57,6 +64,32 @@ export const createUpdateOrder = async (order: unknown) => {
                     OrderItem: true
                 }
             });
+
+            // Registrar auditoría para UPDATE
+            await createAuditLog({
+                action: 'UPDATE',
+                entity: 'Order',
+                entityId: savedOrder.id,
+                oldValues: oldOrder ? {
+                    client: oldOrder.client,
+                    gender: oldOrder.gender,
+                    product: oldOrder.product,
+                    number: oldOrder.number,
+                    specifications: oldOrder.specifications,
+                    totalAmount: oldOrder.totalAmount,
+                    OrderItem: oldOrder.OrderItem
+                } : undefined,
+                newValues: {
+                    client: savedOrder.client,
+                    gender: savedOrder.gender,
+                    product: savedOrder.product,
+                    number: savedOrder.number,
+                    specifications: savedOrder.specifications,
+                    totalAmount: savedOrder.totalAmount,
+                    OrderItem: savedOrder.OrderItem
+                },
+                info: `Orden actualizada para cliente: ${savedOrder.client}`
+            });
         } else {
             // Creación: generar un ID único disponible
             const availableId = await findAvailableId();
@@ -71,6 +104,23 @@ export const createUpdateOrder = async (order: unknown) => {
                 include: {
                     OrderItem: true
                 }
+            });
+
+            // Registrar auditoría para CREATE
+            await createAuditLog({
+                action: 'CREATE',
+                entity: 'Order',
+                entityId: savedOrder.id,
+                newValues: {
+                    client: savedOrder.client,
+                    gender: savedOrder.gender,
+                    product: savedOrder.product,
+                    number: savedOrder.number,
+                    specifications: savedOrder.specifications,
+                    totalAmount: savedOrder.totalAmount,
+                    OrderItem: savedOrder.OrderItem
+                },
+                info: `Nueva orden creada para cliente: ${savedOrder.client}`
             });
         }
 

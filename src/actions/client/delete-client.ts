@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { createAuditLog } from "@/actions/audit/audit-log";
 
 export async function deleteClient(clientId: number) {
     try {
@@ -30,6 +31,14 @@ export async function deleteClient(clientId: number) {
                 message: "No se puede eliminar el cliente porque tiene transacciones. Por favor, elimine las transacciones pendientes primero."
             };
         }
+
+        // Obtener datos del cliente antes de eliminarlo para auditoría
+        const clientToDelete = await prisma.client.findUnique({
+            where: { id: clientId },
+            include: {
+                section: true
+            }
+        });
 
         // Delete related records in cascade
         await prisma.$transaction(async (tx) => {
@@ -63,6 +72,23 @@ export async function deleteClient(clientId: number) {
                 }
             });
         });
+
+        // Registrar auditoría después de la eliminación exitosa
+        if (clientToDelete) {
+            await createAuditLog({
+                action: 'DELETE',
+                entity: 'Client',
+                entityId: clientId,
+                oldValues: {
+                    name: clientToDelete.name,
+                    phone: clientToDelete.phone,
+                    address: clientToDelete.address,
+                    sectionId: clientToDelete.sectionId,
+                    section: clientToDelete.section
+                },
+                info: `Cliente eliminado: ${clientToDelete.name}`
+            });
+        }
 
         revalidatePath('/app');
 

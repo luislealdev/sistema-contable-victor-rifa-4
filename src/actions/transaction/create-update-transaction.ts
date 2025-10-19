@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { transactionSchema } from "@/schema/transaction";
 import { sendWhatsApp } from "@/utils/send-whatsapp";
 import { revalidatePath } from "next/cache";
+import { createAuditLog } from "@/actions/audit/audit-log";
 
 export async function createOrUpdateTransaction(transaction: unknown) {
     const parsedTransaction = transactionSchema.safeParse(transaction);
@@ -15,7 +16,18 @@ export async function createOrUpdateTransaction(transaction: unknown) {
     }
 
     try {
-        await prisma.transaction.upsert({
+        const isUpdate = parsedTransaction.data.id && parsedTransaction.data.id > 0;
+        let oldTransaction = null;
+
+        // Si es actualización, obtener valores anteriores
+        if (isUpdate) {
+            oldTransaction = await prisma.transaction.findUnique({
+                where: { id: parsedTransaction.data.id },
+                include: { client: true }
+            });
+        }
+
+        const savedTransaction = await prisma.transaction.upsert({
             where: {
                 id: parsedTransaction.data.id || 0, // Use 0 for new transactions
             },
@@ -27,13 +39,33 @@ export async function createOrUpdateTransaction(transaction: unknown) {
                 // remaining: parsedTransaction.data.remaining || parsedTransaction.data.totalAmount,
                 ...parsedTransaction.data,
             },
+            include: { client: true }
+        });
+
+        // Registrar auditoría
+        await createAuditLog({
+            action: isUpdate ? 'UPDATE' : 'CREATE',
+            entity: 'Transaction',
+            entityId: savedTransaction.id,
+            oldValues: oldTransaction ? {
+                type: oldTransaction.type,
+                isActive: oldTransaction.isActive,
+                description: oldTransaction.description,
+                totalAmount: oldTransaction.totalAmount,
+                clientId: oldTransaction.clientId
+            } : undefined,
+            newValues: {
+                type: savedTransaction.type,
+                isActive: savedTransaction.isActive,
+                description: savedTransaction.description,
+                totalAmount: savedTransaction.totalAmount,
+                clientId: savedTransaction.clientId
+            },
+            info: `Transacción ${isUpdate ? 'actualizada' : 'creada'} para cliente: ${savedTransaction.client.name}`
         });
 
         // Get the client to send WhatsApp message
-        const client = await prisma.client.findUnique({
-            where: { id: parsedTransaction.data.clientId },
-            select: { phone: true, name: true }
-        });
+        const client = savedTransaction.client;
 
         // Total client debt calculation
         const transactionDebt = await prisma.transaction.aggregate({

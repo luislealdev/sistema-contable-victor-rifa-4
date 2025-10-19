@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { createAuditLog } from "@/actions/audit/audit-log";
 
 export async function deleteSection(id: number) {
     try {
@@ -21,6 +22,17 @@ export async function deleteSection(id: number) {
 
         const result = await prisma.section.delete({
             where: { id }
+        });
+
+        // Registrar auditoría
+        await createAuditLog({
+            action: 'DELETE',
+            entity: 'Section',
+            entityId: id,
+            oldValues: {
+                name: sectionWithClients!.name
+            },
+            info: `Sección eliminada: ${sectionWithClients!.name}`
         });
 
         revalidatePath('/app');

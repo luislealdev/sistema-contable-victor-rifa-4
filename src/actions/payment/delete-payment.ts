@@ -3,13 +3,14 @@
 import prisma from "@/lib/prisma"
 import { sendWhatsApp } from "@/utils/send-whatsapp"
 import { revalidatePath } from "next/cache"
+import { createAuditLog } from "@/actions/audit/audit-log"
 
 export const deletePayment = async (paymentId: number) => {
   try {
-    // Verificar que el pago existe
+    // Verificar que el pago existe y obtener datos para auditoría
     const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
-      // include: { transaction: true }
+      include: { client: true }
     })
 
     if (!payment) {
@@ -25,6 +26,21 @@ export const deletePayment = async (paymentId: number) => {
     // Eliminar el pago
     await prisma.payment.delete({
       where: { id: paymentId }
+    })
+
+    // Registrar auditoría
+    await createAuditLog({
+      action: 'DELETE',
+      entity: 'Payment',
+      entityId: paymentId,
+      oldValues: {
+        amount: payment.amount,
+        date: payment.date,
+        description: payment.description,
+        clientId: payment.clientId,
+        client: payment.client
+      },
+      info: `Pago eliminado del cliente: ${payment.client.name}`
     })
 
     // Si el pago estaba asociado a una transacción, recalcular el remaining

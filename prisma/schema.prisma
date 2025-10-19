@@ -132,7 +132,7 @@ model Order {
     specifications String?
     totalAmount    Float?
     OrderItem      OrderItem[]
-    createdAt      DateTime?    @default(now())
+    createdAt      DateTime?   @default(now())
 }
 
 model OrderItem {
@@ -141,4 +141,19 @@ model OrderItem {
     number  String?
     order   Order   @relation(fields: [orderId], references: [id])
     orderId Int
+}
+
+model AuditLog {
+    id        Int      @id @default(autoincrement())
+    action    String   // CREATE, UPDATE, DELETE
+    entity    String   // Order, Client, Transaction, etc.
+    entityId  Int      // ID del registro afectado
+    oldValues String?  // JSON con valores anteriores (para UPDATE/DELETE)
+    newValues String?  // JSON con valores nuevos (para CREATE/UPDATE)
+    info      String?  // Información adicional o descripción
+    timestamp DateTime @default(now())
+    userId    Int
+    
+    // Opcional: relación con User si tienes modelo User
+    // user      User     @relation(fields: [userId], references: [id])
 }

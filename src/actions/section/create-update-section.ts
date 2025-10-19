@@ -2,6 +2,7 @@
 import prisma from '@/lib/prisma';
 import { sectionSchema } from '@/schema/section';
 import { revalidatePath } from 'next/cache';
+import { createAuditLog } from '@/actions/audit/audit-log';
 
 export async function createUpdateSection(section: unknown) {
     const parsedSection = sectionSchema.safeParse(section);
@@ -14,7 +15,17 @@ export async function createUpdateSection(section: unknown) {
     }
 
     try {
-        await prisma.section.upsert({
+        const isUpdate = parsedSection.data.id && parsedSection.data.id > 0;
+        let oldSection = null;
+
+        // Si es actualización, obtener valores anteriores
+        if (isUpdate) {
+            oldSection = await prisma.section.findUnique({
+                where: { id: parsedSection.data.id }
+            });
+        }
+
+        const savedSection = await prisma.section.upsert({
             where: {
                 id: parsedSection.data.id || 0, // Use 0 for new sections
             },
@@ -24,6 +35,20 @@ export async function createUpdateSection(section: unknown) {
             update: {
                 ...parsedSection.data,
             },
+        });
+
+        // Registrar auditoría
+        await createAuditLog({
+            action: isUpdate ? 'UPDATE' : 'CREATE',
+            entity: 'Section',
+            entityId: savedSection.id,
+            oldValues: oldSection ? {
+                name: oldSection.name
+            } : undefined,
+            newValues: {
+                name: savedSection.name
+            },
+            info: `Sección ${isUpdate ? 'actualizada' : 'creada'}: ${savedSection.name}`
         });
 
         revalidatePath('/app');
