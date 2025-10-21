@@ -37,9 +37,9 @@ export const sendWhatsApp = async (phone: string, message: string) => {
                 `💳 *INFORMACIÓN PARA PAGOS*\n` +
                 `🏦 *BBVA BANCOMER*\n` +
                 `👤 Victor\n` +
-                `💳 *Transf/Dep 1:* 4152313361115939 - CN\n ` +
-                `💳 *Transf/Dep 2:* 4152314332859928 - CE\n ` +
-                `💳 *Transf/Dep 3:* 4152314332859910 - CP\n\n` +
+                `💳 *Tran 1:* 4152313361115939 - CN\n ` +
+                `💳 *Tran 2:* 4152314332859928 - CE\n ` +
+                `💳 *Tran 3:* 4152314332859910 - CP\n\n` +
                 `💡 *Recuerda enviar tu comprobante de pago*\n`,
             session: "victor",
             // file: {
