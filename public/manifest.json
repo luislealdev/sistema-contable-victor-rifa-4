@@ -1,0 +1,10 @@
+{
+  "name": "Torito",
+  "short_name": "Torito",
+  "theme_color": "#ffffffff",
+  "background_color": "#ffffffff",
+  "display": "standalone",
+  "orientation": "landscape",
+  "scope": "/",
+  "start_url": "/"
+}
