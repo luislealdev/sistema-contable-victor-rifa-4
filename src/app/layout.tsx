@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     icon: "/logo.png",
     apple: "/logo.png",
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
