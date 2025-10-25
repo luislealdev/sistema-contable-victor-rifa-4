@@ -109,6 +109,13 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
                 <div>
+                    {/* Back button */}
+                    <button
+                        onClick={() => router.back()}
+                        className="text-gray-600 hover:text-gray-900 transition-colors mb-2 bg-gray-100 px-3 py-1 rounded-md text-sm"
+                    >
+                        ← Volver
+                    </button>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Gestión de Rifas</h1>
                     <p className="text-gray-600 text-sm mt-1">
                         Total de rifas: {raffles.length}
