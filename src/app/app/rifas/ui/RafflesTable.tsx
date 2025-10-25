@@ -111,7 +111,7 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                 <div>
                     {/* Back button */}
                     <button
-                        onClick={() => router.back()}
+                        onClick={() => router.push('/app')}
                         className="text-gray-600 hover:text-gray-900 transition-colors mb-2 bg-gray-100 px-3 py-1 rounded-md text-sm"
                     >
                         ← Volver
