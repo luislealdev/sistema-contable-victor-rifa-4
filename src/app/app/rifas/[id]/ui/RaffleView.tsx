@@ -359,12 +359,12 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     const isOccupied = !!ticket;
 
                                     // Calcular el total pagado real basado en todos los pagos
-                                    let realTotalPaid = 0;
-                                    let realIsPaid = false;
-                                    if (ticket && ticket.payments) {
-                                        realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                        realIsPaid = realTotalPaid >= raffle.ticketPrice || ticket.totalPaid >= raffle.ticketPrice;
-                                    }
+                                    // let realTotalPaid = 0;
+                                    // let realIsPaid = false;
+                                    // if (ticket && ticket.payments) {
+                                    //     // realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
+                                    //     // realIsPaid = realTotalPaid >= raffle.ticketPrice || ticket.totalPaid >= raffle.ticketPrice;
+                                    // }
 
                                     return (
                                         <div
@@ -372,7 +372,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                             className={`
                                                 border-2 border-black text-12 flex items-center justify-between transition-colors
                                         ${isOccupied
-                                                    ? realIsPaid
+                                                    ? ticket.totalPaid >= raffle.ticketPrice
                                                         ? 'bg-yellow-300  text-yellow-800'
                                                         : ' text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
@@ -408,7 +408,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                         >
                                                             ✏️
                                                         </button>
-                                                        {!realIsPaid && (
+                                                        {ticket.totalPaid < raffle.ticketPrice && (
                                                             <button
                                                                 onClick={() => handleAddPayment(ticket)}
                                                                 className="text-center text-12 "
@@ -443,19 +443,19 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                     const isOccupied = !!ticket;
 
                                     // Calcular el total pagado real basado en todos los pagos
-                                    let realTotalPaid = 0;
-                                    let realIsPaid = false;
-                                    if (ticket && ticket.payments) {
-                                        realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
-                                        realIsPaid = realTotalPaid >= raffle.ticketPrice || ticket.totalPaid >= raffle.ticketPrice;
-                                    }
+                                    // let realTotalPaid = 0;
+                                    // let realIsPaid = false;
+                                    // if (ticket && ticket.payments) {
+                                    //     realTotalPaid = ticket.payments.reduce((sum, payment) => sum + payment.amount, 0);
+                                    //     realIsPaid = realTotalPaid >= raffle.ticketPrice || ticket.totalPaid >= raffle.ticketPrice;
+                                    // }
 
                                     return (
                                         <div
                                             key={number}
                                             className={`border-2 border-black text-12 flex items-center justify-between transition-colors
                                         ${isOccupied
-                                                    ? realIsPaid
+                                                    ? ticket.totalPaid >= raffle.ticketPrice
                                                         ? 'bg-yellow-300 text-yellow-800'
                                                         : ' text-black-800'
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
@@ -491,7 +491,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                         >
                                                             ✏️
                                                         </button>
-                                                        {!realIsPaid && (
+                                                        {ticket.totalPaid < raffle.ticketPrice && (
                                                             <button
                                                                 onClick={() => handleAddPayment(ticket)}
                                                                 className="text-center text-12 "
