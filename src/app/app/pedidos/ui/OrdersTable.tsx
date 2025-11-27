@@ -1,6 +1,7 @@
 'use client';
 
 import { deleteOrder } from '@/actions/order/delete-order';
+import { deleteOrders } from '@/actions/order/delete-orders';
 import { Order, OrderItem } from '@prisma/client';
 import React, { useState } from 'react';
 import { OrderForm } from './OrderForm';
@@ -85,6 +86,20 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
         }
     };
 
+    const handleDeleteSelected = async () => {
+        if (selectedIds.length === 0) return;
+        if (!confirm(`¿Estás seguro de que quieres eliminar ${selectedIds.length} orden(es)?`)) return;
+
+        const result: { ok: boolean; message?: string } = await deleteOrders(selectedIds);
+        if (result && result.ok) {
+            // limpiar selección y salir del modo selección
+            clearSelections();
+            setShowSelectionMode(false);
+        } else {
+            alert('Error al eliminar órdenes: ' + (result?.message || 'Error desconocido'));
+        }
+    };
+
     const handleCloseModal = () => {
         setShowOrderForm(false);
         setSelectedOrder(null);
@@ -118,6 +133,19 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
     const clearSelections = () => {
         setSelectedIds([]);
     };
+    
+    // Función para seleccionar/deseleccionar todos
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation();
+        if (e.target.checked) {
+            setSelectedIds(filteredOrders.map(order => order.id));
+        } else {
+            clearSelections();
+        }
+    };
+
+    // Verificar si todos están seleccionados
+    const allSelected = filteredOrders.length > 0 && selectedIds.length === filteredOrders.length;
     
     // Función para alternar modo de selección
     const toggleSelectionMode = () => {
@@ -190,6 +218,13 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                     >
                                         Limpiar selección
                                     </button>
+                                            <button
+                                                onClick={handleDeleteSelected}
+                                                className="mt-2 sm:mt-0 ml-2 px-3 py-1 rounded-md text-xs bg-red-500 text-white hover:bg-red-600 transition-colors"
+                                                disabled={selectedIds.length === 0}
+                                            >
+                                                Eliminar seleccionados
+                                            </button>
                                 </div>
                             </div>
                         )}
@@ -233,7 +268,18 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
             {/* Header de la tabla */}
             <div className="px-4 mb-2">
                 <div className="grid grid-cols-24 gap-1 text-xs font-bold text-gray-700 border-b border-gray-300 pb-1">
-                    <div className="text-center col-span-2">#</div>
+                    <div className="text-center col-span-2 flex items-center justify-center gap-1">
+                        {showSelectionMode && (
+                            <input
+                                type="checkbox"
+                                checked={allSelected}
+                                onChange={handleSelectAll}
+                                className="w-4 h-4 accent-blue-600 cursor-pointer"
+                                title="Seleccionar todos"
+                            />
+                        )}
+                        <span>#</span>
+                    </div>
                     <div className="truncate col-span-6">Nombre</div>
                     <div className="truncate col-span-6">Producto</div>
                     <div className="text-center col-span-4 text-[10px]">$</div>
@@ -303,10 +349,12 @@ export const OrdersTable: React.FC<Props> = ({ orders }) => {
                                                     e.stopPropagation();
                                                     handleSelectOrder(order.id, e);
                                                 }}
-                                                className="w-3 h-3"
+                                                className="w-4 h-4 accent-blue-600 cursor-pointer"
                                             />
                                         )}
-                                        {formatNumber(sequentialNumber)}
+                                        <span className={showSelectionMode ? 'text-xs' : ''}>
+                                            {formatNumber(sequentialNumber)}
+                                        </span>
                                     </div>
 
                                     {/* Columna Nombre */}
