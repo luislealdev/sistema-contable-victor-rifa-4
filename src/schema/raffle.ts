@@ -23,6 +23,7 @@ export const raffleTicketPayment = z.object({
     id: z.number().int().optional(),
     amount: z.number().min(0, "Amount must be a positive number"),
     date: z.date().default(() => new Date()),
+    description: z.string().optional(),
     ticketId: z.number().int()
 });
 
