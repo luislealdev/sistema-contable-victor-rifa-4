@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export async function getPaginatedClients(page: number = 1, sectionId?: number, search?: string) {
 
-    const pageSize = 1000;
+    const pageSize = 50;
     if (page < 1 || pageSize < 1) {
         page = 1;
     }
