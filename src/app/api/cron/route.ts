@@ -1,18 +1,68 @@
 import { NextResponse } from 'next/server';
 import { sendWhatsApp } from '@/utils/send-whatsapp';
-import { getRafflesForTomorrow } from '@/actions/raffles/get-raffles-for-tomorrow';
+import prisma from '@/lib/prisma';
+
+// Función auxiliar para obtener rifas con fechas específicas
+async function getRafflesForTomorrowCustom(startDate: Date, endDate: Date) {
+    try {
+        const raffles = await prisma.raffle.findMany({
+            where: {
+                drawDate: {
+                    gte: startDate,
+                    lt: endDate,
+                },
+            },
+            include: {
+                tickets: {
+                    include: {
+                        client: true,
+                        payments: true,
+                    },
+                },
+            },
+        });
+
+        return {
+            success: true,
+            raffles,
+        };
+    } catch (error) {
+        console.error('Error fetching raffles for custom dates:', error);
+        return {
+            success: false,
+            error: 'Error al obtener las rifas para las fechas especificadas',
+        };
+    }
+}
 
 export async function GET(req: Request) {
     if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('🎲 Cron job de rifas ejecutado en:', new Date().toISOString());
+    // Usar zona horaria de México (UTC-6)
+    const now = new Date();
+    const mexicoTime = new Date(now.getTime() - (6 * 60 * 60 * 1000));
+    
+    console.log('🎲 Cron job de rifas ejecutado en:', now.toISOString());
+    console.log('🇲🇽 Hora de México:', mexicoTime.toLocaleString('es-MX', { timeZone: 'America/Mexico_City' }));
     console.log('');
 
     try {
-        // Obtener rifas cuyo sorteo es mañana
-        const rafflesResult = await getRafflesForTomorrow();
+        // Calcular mañana en zona horaria de México
+        const tomorrow = new Date(mexicoTime);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        
+        const endOfTomorrow = new Date(tomorrow);
+        endOfTomorrow.setHours(23, 59, 59, 999);
+
+        console.log(`🗓️ Buscando rifas para: ${tomorrow.toLocaleDateString('es-MX')}`);
+        console.log(`🕐 Rango de búsqueda: ${tomorrow.toISOString()} a ${endOfTomorrow.toISOString()}`);
+        console.log('');
+
+        // Obtener rifas cuyo sorteo es mañana (con fechas calculadas localmente)
+        const rafflesResult = await getRafflesForTomorrowCustom(tomorrow, endOfTomorrow);
 
         if (!rafflesResult.success) {
             console.log('❌ Error al obtener rifas de mañana:', rafflesResult.error);
