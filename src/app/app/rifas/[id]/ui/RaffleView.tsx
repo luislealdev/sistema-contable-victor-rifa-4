@@ -328,14 +328,17 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                 </p>
                             )}
                         </div>
-                            <div>
-                                <button
-                                    onClick={() => setShowMoneyQuantity(!showMoneyQuantity)}
-                                    className="mt-2 text-blue-600 hover:text-blue-800 text-12 underline"
-                                >
-                                    {showMoneyQuantity ? 'Ocultar Cantidad' : 'Mostrar Cantidad'}
-                                </button>
-                            </div>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setShowMoneyQuantity(!showMoneyQuantity)}
+                                className="text-blue-600 hover:text-blue-800 text-12 underline"
+                            >
+                                {showMoneyQuantity ? 'Ocultar Cantidad' : 'Mostrar Cantidad'}
+                            </button>
+                            <h3 className="text-gray-800 font-semibold">
+                                {raffle.title}
+                            </h3>
+                        </div>
                     </div>
                 </div>
 
@@ -400,7 +403,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                 {isOccupied ? (
                                                     <div className="flex items-center">
                                                         <span className="text-12 mr-1">
-                                                             { showMoneyQuantity && ticket.totalPaid}
+                                                            {showMoneyQuantity && ticket.totalPaid}
                                                         </span>
                                                         <button
                                                             onClick={() => handleEditTicket(ticket)}
@@ -483,7 +486,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                                 {isOccupied ? (
                                                     <div className="flex items-center">
                                                         <span className="text-12 mr-1">
-                                                            { showMoneyQuantity && ticket.totalPaid}
+                                                            {showMoneyQuantity && ticket.totalPaid}
                                                         </span>
                                                         <button
                                                             onClick={() => handleEditTicket(ticket)}
