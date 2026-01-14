@@ -85,11 +85,11 @@ export const createUpdateRaffleTicket = async (ticket: unknown) => {
             // Get ticket price 
             const raffle = await prisma.raffle.findUnique({
                 where: { id: savedTicket.raffleId },
-                select: { ticketPrice: true, prize: true, drawDate: true }
+                select: { ticketPrice: true, prize: true, drawDate: true, title: true }
             });
 
             const message = `¡Hola ${client.name}! 🎉\n\n` +
-                `Se ha registrado un nuevo ticket de rifa en tu cuenta. Aquí tienes los detalles:\n\n` +
+                `Se ha registrado un nuevo ticket de la rifa "${raffle!.title}" en tu cuenta. Aquí tienes los detalles:\n\n` +
                 `🎟️ *Número de ticket*: ${savedTicket.number.toString().padStart(2, '0')}\n` +
                 `💰 *Precio del ticket*: $${raffle!.ticketPrice.toFixed(2)}\n` +
                 `💵 *Total pagado*: $${savedTicket.totalPaid.toFixed(2)}\n` +
