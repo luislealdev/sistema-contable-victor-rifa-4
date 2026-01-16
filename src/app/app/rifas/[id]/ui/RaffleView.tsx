@@ -92,6 +92,73 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
         return name.substring(0, maxLength) + '..';
     };
 
+    // Verificar si es la rifa del Cadillac 2025
+    const isCadillacRaffle = (): boolean => {
+        return raffle.title.toLowerCase().includes('cadillac 2025 sport');
+    };
+
+    // Analizar patrón de pagos semanales desde 27 de enero 2025 (viernes)
+    const analyzeWeeklyPaymentPattern = (payments: RaffleTicketPayment[]): boolean => {
+        if (!isCadillacRaffle() || !payments || payments.length === 0) return false;
+
+        const startDate = new Date('2025-01-27'); // 27 de enero 2025 (viernes)
+        const today = new Date();
+        
+        // Ordenar pagos por fecha
+        const sortedPayments = payments.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        
+        // Calcular semanas desde el inicio (cada semana = viernes a viernes)
+        const getWeekNumber = (date: Date): number => {
+            const timeDiff = date.getTime() - startDate.getTime();
+            const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+            return Math.floor(daysDiff / 7);
+        };
+
+        const currentWeek = getWeekNumber(today);
+        if (currentWeek < 0) return false; // Antes del inicio
+
+        // Agrupar pagos por semana
+        const paymentsByWeek: { [week: number]: number } = {};
+        
+        sortedPayments.forEach(payment => {
+            const paymentDate = new Date(payment.date);
+            const week = getWeekNumber(paymentDate);
+            if (week >= 0) {
+                paymentsByWeek[week] = (paymentsByWeek[week] || 0) + payment.amount;
+            }
+        });
+
+        // Verificar que cada semana desde la primera hasta la actual tenga al menos $1000
+        for (let week = 0; week <= currentWeek; week++) {
+            if (!paymentsByWeek[week] || paymentsByWeek[week] < 1000) {
+                return false; // Falló en cumplir una semana
+            }
+        }
+
+        return true;
+    };
+
+    // Determinar clase de color para el ticket
+    const getTicketColorClass = (ticket: RaffleTicket & { payments: RaffleTicketPayment[] }): string => {
+        // PRIORIDAD 1: Color amarillo para boletos pagados completamente
+        if (ticket.totalPaid >= raffle.ticketPrice) {
+            return 'bg-yellow-300 text-yellow-800';
+        }
+
+        // PRIORIDAD 2: Color verde para cumplimiento semanal en Cadillac 2025 (disciplina de pago)
+        if (analyzeWeeklyPaymentPattern(ticket.payments)) {
+            return 'bg-green-300 text-green-800';
+        }
+
+        // PRIORIDAD 3: Color azul para $5000+ abonados (cantidad alta pero sin patrón semanal)
+        if (ticket.totalPaid >= 5000) {
+            return 'bg-blue-300 text-blue-800';
+        }
+        
+        // PRIORIDAD 4: No pagado completamente (color normal)
+        return 'text-black-800';
+    };
+
     // Función para filtrar números basado en el término de búsqueda
     const filteredNumbers = numbers.filter(number => {
         if (!searchTerm.trim()) return true;
@@ -283,7 +350,15 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                         </div>
                         <div className="flex flex-wrap gap-4 justify-center">
                             <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+                                <div className="w-4 h-4 bg-blue-300 border border-blue-400 rounded"></div>
+                                <span className="text-12 text-gray-600">$5,000+ Abonado</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-green-300 border border-green-400 rounded"></div>
+                                <span className="text-12 text-gray-600">Cumplimiento Semanal</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-yellow-300 border border-yellow-400 rounded"></div>
                                 <span className="text-12 text-gray-600">Pagado</span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -375,9 +450,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                             className={`
                                                 border-2 border-black text-12 flex items-center justify-between transition-colors
                                         ${isOccupied
-                                                    ? ticket.totalPaid >= raffle.ticketPrice
-                                                        ? 'bg-yellow-300  text-yellow-800'
-                                                        : ' text-black-800'
+                                                    ? getTicketColorClass(ticket)
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
@@ -458,9 +531,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
                                             key={number}
                                             className={`border-2 border-black text-12 flex items-center justify-between transition-colors
                                         ${isOccupied
-                                                    ? ticket.totalPaid >= raffle.ticketPrice
-                                                        ? 'bg-yellow-300 text-yellow-800'
-                                                        : ' text-black-800'
+                                                    ? getTicketColorClass(ticket)
                                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                                 }
                                     `}
