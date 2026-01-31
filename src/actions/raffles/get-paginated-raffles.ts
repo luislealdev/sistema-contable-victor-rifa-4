@@ -8,6 +8,9 @@ export async function getPaginatedRaffles(page: number = 1, search?: string) {
         page = 1;
     }
 
+    const today = new Date();
+    const adjustedTodayDate = new Date(today.getTime() - today.getTimezoneOffset() / 60000);
+
     try {
         const raffles = await prisma.raffle.findMany({
             skip: (page - 1) * pageSize,
@@ -17,7 +20,8 @@ export async function getPaginatedRaffles(page: number = 1, search?: string) {
                     OR: [
                         { title: { contains: search, mode: 'insensitive' } },
                     ]
-                })
+                }),
+                drawDate: {gte: adjustedTodayDate},
             },
             orderBy: {
                 createdAt: 'desc',
