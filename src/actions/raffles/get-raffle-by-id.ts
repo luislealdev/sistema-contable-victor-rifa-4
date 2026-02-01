@@ -15,12 +15,7 @@ export async function getRaffleById(raffleId: number) {
                     },
                     include: {
                         payments: true,
-                        client: {
-                            select: {
-                                id: true,
-                                name: true,
-                            }
-                        }
+                        client: true
                     }
                 },
                 PreRaffle: {

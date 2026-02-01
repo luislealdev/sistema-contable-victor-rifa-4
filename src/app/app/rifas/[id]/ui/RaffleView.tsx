@@ -6,22 +6,14 @@ import RaffleTicketForm from "@/components/forms/RaffleTicket"
 import RaffleTicketPaymentForm from "@/components/forms/RaffleTicketPaymentForm"
 import PreRaffleForm from "@/components/forms/PreRaffleForm"
 import PreRafflesTable from "@/components/raffle/PreRafflesTable"
+import { IRaffleExtended } from "@/interfaces";
 
 interface Props {
-    raffle: Raffle & {
-        tickets: (RaffleTicket & {
-            payments: RaffleTicketPayment[],
-            client: {
-                id: number
-                name: string
-                clientAlias?: string
-            }
-        })[],
-        PreRaffle: PreRaffle[]
-    } | null
+    raffle: IRaffleExtended | null,
+    fullScreen?: boolean
 }
 
-export const RaffleView: FC<Props> = ({ raffle }) => {
+export const RaffleView: FC<Props> = ({ raffle, fullScreen = true }) => {
     const [showTicketForm, setShowTicketForm] = useState(false);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showPreRaffleForm, setShowPreRaffleForm] = useState(false);
@@ -103,10 +95,10 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
 
         const startDate = new Date('2025-01-27'); // 27 de enero 2025 (viernes)
         const today = new Date();
-        
+
         // Ordenar pagos por fecha
         const sortedPayments = payments.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        
+
         // Calcular semanas desde el inicio (cada semana = viernes a viernes)
         const getWeekNumber = (date: Date): number => {
             const timeDiff = date.getTime() - startDate.getTime();
@@ -119,7 +111,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
 
         // Agrupar pagos por semana
         const paymentsByWeek: { [week: number]: number } = {};
-        
+
         sortedPayments.forEach(payment => {
             const paymentDate = new Date(payment.date);
             const week = getWeekNumber(paymentDate);
@@ -154,7 +146,7 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
         if (ticket.totalPaid >= 5000) {
             return 'bg-blue-300 text-blue-800';
         }
-        
+
         // PRIORIDAD 4: No pagado completamente (color normal)
         return 'text-black-800';
     };
@@ -238,102 +230,108 @@ export const RaffleView: FC<Props> = ({ raffle }) => {
             </div>
 
             {/* Información de la rifa */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{raffle.title}</h1>
-                            {isRaffleExpired() && (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-12 font-medium bg-red-100 text-red-800">
-                                    Terminada
-                                </span>
-                            )}
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <p className="text-12 text-gray-600">Fecha del sorteo</p>
-                                <p className="text-lg font-semibold text-gray-800">{formatDate(raffle.drawDate)}</p>
+            {
+                fullScreen && <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{raffle.title}</h1>
+                                {isRaffleExpired() && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-12 font-medium bg-red-100 text-red-800">
+                                        Terminada
+                                    </span>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p className="text-12 text-gray-600">Fecha del sorteo</p>
+                                    <p className="text-lg font-semibold text-gray-800">{formatDate(raffle.drawDate)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-12 text-gray-600">Precio por boleto</p>
+                                    <p className="text-lg font-semibold text-green-600">{formatMoney(raffle.ticketPrice)}</p>
+                                </div>
                             </div>
                             <div>
-                                <p className="text-12 text-gray-600">Precio por boleto</p>
-                                <p className="text-lg font-semibold text-green-600">{formatMoney(raffle.ticketPrice)}</p>
+                                <p className="text-12 text-gray-600 mb-2">Premio</p>
+                                <p className="text-gray-800 bg-gray-50 p-3 rounded-md">{raffle.prize}</p>
                             </div>
                         </div>
-                        <div>
-                            <p className="text-12 text-gray-600 mb-2">Premio</p>
-                            <p className="text-gray-800 bg-gray-50 p-3 rounded-md">{raffle.prize}</p>
-                        </div>
-                    </div>
 
-                    {/* Estadísticas */}
-                    <div className="bg-gray-50 rounded-lg p-4 min-w-64">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-3">Estadísticas</h3>
-                        <div className="space-y-2">
-                            {/* Boletos */}
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Vendidos:</span>
-                                <span className="font-semibold text-blue-600">{totalSold}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Disponibles:</span>
-                                <span className="font-semibold text-gray-600">{totalAvailable}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Total números:</span>
-                                <span className="font-semibold">{raffle.totalNumbers}</span>
-                            </div>
+                        {/* Estadísticas */}
+                        <div className="bg-gray-50 rounded-lg p-4 min-w-64">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">Estadísticas</h3>
+                            <div className="space-y-2">
+                                {/* Boletos */}
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Vendidos:</span>
+                                    <span className="font-semibold text-blue-600">{totalSold}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Disponibles:</span>
+                                    <span className="font-semibold text-gray-600">{totalAvailable}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Total números:</span>
+                                    <span className="font-semibold">{raffle.totalNumbers}</span>
+                                </div>
 
-                            <hr className="my-2" />
+                                <hr className="my-2" />
 
-                            {/* Montos */}
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Recaudado:</span>
-                                <span className="font-semibold text-green-600">{formatMoney(totalRecaudado)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Por recaudar:</span>
-                                <span className="font-semibold text-orange-600">{formatMoney(restantePorRecaudar)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Restante venta:</span>
-                                <span className="font-semibold text-red-600">{formatMoney(restanteDeVenta)}</span>
-                            </div>
+                                {/* Montos */}
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Recaudado:</span>
+                                    <span className="font-semibold text-green-600">{formatMoney(totalRecaudado)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Por recaudar:</span>
+                                    <span className="font-semibold text-orange-600">{formatMoney(restantePorRecaudar)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Restante venta:</span>
+                                    <span className="font-semibold text-red-600">{formatMoney(restanteDeVenta)}</span>
+                                </div>
 
-                            <hr className="my-2" />
+                                <hr className="my-2" />
 
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Potencial total:</span>
-                                <span className="font-semibold text-purple-600">{formatMoney(potencialTotal)}</span>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Potencial total:</span>
+                                    <span className="font-semibold text-purple-600">{formatMoney(potencialTotal)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div >
+                </div >
+            }
+
 
             {/* Sección de Pre-Rifas */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Pre-Rifas</h2>
-                    <button
-                        onClick={() => {
-                            setSelectedPreRaffle(null);
+            {
+                fullScreen && <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold text-gray-800">Pre-Rifas</h2>
+                        <button
+                            onClick={() => {
+                                setSelectedPreRaffle(null);
+                                setShowPreRaffleForm(true);
+                            }}
+                            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+                        >
+                            + Nueva Pre-Rifa
+                        </button>
+                    </div>
+
+                    <PreRafflesTable
+                        preRaffles={raffle.PreRaffle}
+                        onEdit={(preRaffle) => {
+                            setSelectedPreRaffle(preRaffle);
                             setShowPreRaffleForm(true);
                         }}
-                        className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
-                    >
-                        + Nueva Pre-Rifa
-                    </button>
+                        onRefresh={() => window.location.reload()}
+                    />
                 </div>
+            }
 
-                <PreRafflesTable
-                    preRaffles={raffle.PreRaffle}
-                    onEdit={(preRaffle) => {
-                        setSelectedPreRaffle(preRaffle);
-                        setShowPreRaffleForm(true);
-                    }}
-                    onRefresh={() => window.location.reload()}
-                />
-            </div>
 
             {/* Lista de números */}
             < div className="bg-white rounded-lg shadow-md" >

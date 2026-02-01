@@ -19,7 +19,7 @@ const RafflesPage = async ({ searchParams }: {
     );
 
     return (
-        <RafflesTable raffles={raffles || []} />
+        <RafflesTable search={search} raffles={raffles || []} />
     )
 }
 

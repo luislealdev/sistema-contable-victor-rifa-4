@@ -9,7 +9,9 @@ export async function getPaginatedRaffles(page: number = 1, search?: string) {
     }
 
     const today = new Date();
-    const adjustedTodayDate = new Date(today.getTime() - today.getTimezoneOffset() / 60000);
+    const adjustedTodayDate = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+    );
 
     try {
         const raffles = await prisma.raffle.findMany({
@@ -19,15 +21,30 @@ export async function getPaginatedRaffles(page: number = 1, search?: string) {
                 ...(search && {
                     OR: [
                         { title: { contains: search, mode: 'insensitive' } },
+                        {
+                            tickets: {
+                                some: {
+                                    client: {
+                                        name: { contains: search, mode: 'insensitive' }
+                                    }
+                                }
+                            }
+                        }
                     ]
                 }),
-                drawDate: {gte: adjustedTodayDate},
+                drawDate: { gte: adjustedTodayDate },
             },
             orderBy: {
                 createdAt: 'desc',
             },
             include: {
-                PreRaffle: true
+                PreRaffle: true,
+                tickets:{
+                    include: {
+                        client: true,
+                        payments: true
+                    }
+                }
             }
         });
 

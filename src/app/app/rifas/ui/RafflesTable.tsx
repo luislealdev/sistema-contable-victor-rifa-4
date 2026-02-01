@@ -5,12 +5,15 @@ import React, { FC, useState } from 'react'
 import RaffleForm from '@/components/forms/RaffleForm'
 import { deleteRaffle } from '@/actions/raffles/delete-raffle'
 import { useRouter } from 'next/navigation'
+import { RaffleView } from '../[id]/ui/RaffleView'
+import { IRaffleExtended } from '@/interfaces'
 
 interface Props {
-    raffles: Raffle[]
+    raffles: IRaffleExtended[];
+    search: string;
 }
 
-export const RafflesTable: FC<Props> = ({ raffles }) => {
+export const RafflesTable: FC<Props> = ({ raffles, search }) => {
     const [showRaffleForm, setShowRaffleForm] = useState(false);
     const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -68,6 +71,13 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
         setEditingRaffle(null);
     };
 
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const query = formData.get('search') as string;
+        router.push(`/app/rifas?search=${encodeURIComponent(query)}`);
+    }
+
     // Manejar eliminar rifa
     const handleDeleteRaffle = async (raffleId: number, raffleTitle: string) => {
         if (!confirm(`¿Estás seguro de que quieres eliminar la rifa "${raffleTitle}"? Esta acción no se puede deshacer.`)) {
@@ -121,12 +131,23 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                         Total de rifas: {raffles.length}
                     </p>
                 </div>
-                <button
-                    onClick={handleNewRaffle}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-                >
-                    + Nueva Rifa
-                </button>
+                <div className='flex'>
+                    <form onSubmit={(e) => handleSearch(e)} className="flex items-center">
+                        <input
+                            type="text"
+                            name="search"
+                            placeholder="Buscar cliente..."
+                            defaultValue={search}
+                            className="border border-gray-300 rounded-md px-3 py-2 mr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        />
+                    </form>
+                    <button
+                        onClick={handleNewRaffle}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                        + Nueva Rifa
+                    </button>
+                </div>
             </div>
 
             {/* Tabla */}
@@ -207,6 +228,10 @@ export const RafflesTable: FC<Props> = ({ raffles }) => {
                                     <span className="text-gray-600 text-sm">Premio:</span>
                                     <p className="text-sm text-gray-800 truncate">{raffle.prize}</p>
                                 </div>
+                                {
+                                    search && <RaffleView fullScreen={false} raffle={raffle} />
+                                }
+
                             </div>
                         ))}
                     </div>
