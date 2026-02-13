@@ -229,7 +229,7 @@ export const RafflesTable: FC<Props> = ({ raffles, search }) => {
                                     <p className="text-sm text-gray-800 truncate">{raffle.prize}</p>
                                 </div>
                                 {
-                                    search && <RaffleView fullScreen={false} raffle={raffle} />
+                                    search && <RaffleView search={search} fullScreen={false} raffle={raffle} />
                                 }
 
                             </div>

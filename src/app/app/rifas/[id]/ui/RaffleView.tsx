@@ -10,17 +10,18 @@ import { IRaffleExtended } from "@/interfaces";
 
 interface Props {
     raffle: IRaffleExtended | null,
-    fullScreen?: boolean
+    fullScreen?: boolean,
+    search?: string
 }
 
-export const RaffleView: FC<Props> = ({ raffle, fullScreen = true }) => {
+export const RaffleView: FC<Props> = ({ raffle, fullScreen = true, search = '' }) => {
     const [showTicketForm, setShowTicketForm] = useState(false);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showPreRaffleForm, setShowPreRaffleForm] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState<RaffleTicket | null>(null);
     const [selectedPayment, setSelectedPayment] = useState<RaffleTicketPayment | null>(null);
     const [selectedPreRaffle, setSelectedPreRaffle] = useState<PreRaffle | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(search);
     const [showMoneyQuantity, setShowMoneyQuantity] = useState(true)
 
     if (!raffle) {
