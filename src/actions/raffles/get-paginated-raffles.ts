@@ -12,6 +12,10 @@ export async function getPaginatedRaffles(page: number = 1, search?: string) {
     const adjustedTodayDate = new Date(
         today.getTime() - today.getTimezoneOffset() * 60000
     );
+    // Restar 7 días (una semana)
+    const oneWeekBefore = new Date(
+        adjustedTodayDate.getTime() - 7 * 24 * 60 * 60 * 1000
+    );
 
     try {
         const raffles = await prisma.raffle.findMany({
@@ -32,7 +36,7 @@ export async function getPaginatedRaffles(page: number = 1, search?: string) {
                         }
                     ]
                 }),
-                drawDate: { gte: adjustedTodayDate },
+                drawDate: { gte: oneWeekBefore },
             },
             orderBy: {
                 createdAt: 'desc',
