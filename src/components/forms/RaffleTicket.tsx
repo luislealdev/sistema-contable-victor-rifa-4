@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { createUpdateRaffleTicket } from '@/actions/raffles/create-update-raffle-ticket';
-import { Client, RaffleTicket, Section } from '@prisma/client';
+import { Client, RaffleTicket, Section, User } from '@prisma/client';
 import { deleteRaffleTicket } from '@/actions/raffles';
-import { getPaginatedClients } from '@/actions/client';
+import { getClientInfoById, getPaginatedClients } from '@/actions/client';
 import { getSections } from '@/actions/section/get-sections';
 import ClientForm from './ClientForm';
 
@@ -49,7 +49,21 @@ export default function RaffleTicketForm({
     const [clients, setClients] = useState<Client[]>([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [loadingClients, setLoadingClients] = useState(false);
-    
+    const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+
+    useEffect(() => {
+        if (formData.clientId) {
+            const fetchClientName = async () => {
+                const result = await getClientInfoById(Number(formData.clientId));
+                if (result.ok) {
+                    setSelectedClient(result.data);
+                }
+            };
+            fetchClientName();
+        }
+    }, [formData.clientId]);
+
+
     // Estados para el modal de crear cliente
     const [showCreateClientModal, setShowCreateClientModal] = useState(false);
     const [sections, setSections] = useState<Section[]>([]);
@@ -352,10 +366,10 @@ export default function RaffleTicketForm({
                     )}
 
                     {/* Selected client info */}
-                    {formData.clientId && (
+                    {formData.clientId && selectedClient && (
                         <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
                             <div className="text-sm text-green-800">
-                                ✓ Cliente seleccionado (ID: {formData.clientId})
+                                ✓ Cliente seleccionado: (ID: {formData.clientId} - {selectedClient.name} - {selectedClient.phone})
                             </div>
                         </div>
                     )}
