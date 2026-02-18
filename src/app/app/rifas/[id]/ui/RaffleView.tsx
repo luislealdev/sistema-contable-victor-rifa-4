@@ -466,7 +466,7 @@ export const RaffleView: FC<Props> = ({ raffle, fullScreen = true, search = '' }
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <div className="text-gray-500 italic text-12 ">Disponible</div>
+                                                        <div className="text-green-500 italic text-12 ">Disponible</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -547,7 +547,7 @@ export const RaffleView: FC<Props> = ({ raffle, fullScreen = true, search = '' }
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <div className="text-gray-500 italic text-12 ">Disponible</div>
+                                                        <div className="text-green-500 italic text-12 ">Disponible</div>
                                                     )}
                                                 </div>
                                             </div>
