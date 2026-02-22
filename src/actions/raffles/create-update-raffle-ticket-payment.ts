@@ -82,10 +82,10 @@ export const createUpdateRaffleTicketPayment = async (payment: unknown) => {
 
 
 
-        revalidatePath('/app/rifas');
+        revalidatePath('//rifas');
 
         if (updatedTicket) {
-            revalidatePath(`/app/rifas/${updatedTicket.raffleId}`);
+            revalidatePath(`//rifas/${updatedTicket.raffleId}`);
         }
 
         return {

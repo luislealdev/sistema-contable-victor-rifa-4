@@ -94,8 +94,8 @@ export const deletePayment = async (paymentId: number) => {
 
     }
 
-    revalidatePath('/app')
-    revalidatePath(`/app/${clientId}`)
+    revalidatePath('/')
+    revalidatePath(`//${clientId}`)
 
     return {
       ok: true,

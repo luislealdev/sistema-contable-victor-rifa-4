@@ -54,7 +54,7 @@ export async function deleteRaffle(raffleId: number) {
             info: `Rifa eliminada: ${raffleToDelete.title}`
         });
 
-        revalidatePath('/app/rifas');
+        revalidatePath('//rifas');
 
         return {
             ok: true,

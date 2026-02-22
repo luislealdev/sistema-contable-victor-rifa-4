@@ -104,8 +104,8 @@ export const createUpdateRaffleTicket = async (ticket: unknown) => {
             sendWhatsApp(client.phone, message);
         }
 
-        revalidatePath('/app/rifas');
-        revalidatePath(`/app/rifas/${savedTicket.raffleId}`);
+        revalidatePath('//rifas');
+        revalidatePath(`//rifas/${savedTicket.raffleId}`);
 
         return {
             ok: true,

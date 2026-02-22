@@ -68,8 +68,8 @@ export const deleteTransaction = async (transactionId: number) => {
       sendWhatsApp(client.phone, message);
     }
 
-    revalidatePath('/app')
-    revalidatePath(`/app/${clientId}`)
+    revalidatePath('/')
+    revalidatePath(`//${clientId}`)
 
     return {
       ok: true,

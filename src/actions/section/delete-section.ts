@@ -35,7 +35,7 @@ export async function deleteSection(id: number) {
             info: `Sección eliminada: ${sectionWithClients!.name}`
         });
 
-        revalidatePath('/app');
+        revalidatePath('/');
 
         return {
             ok: true,

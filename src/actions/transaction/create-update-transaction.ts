@@ -108,8 +108,8 @@ export async function createOrUpdateTransaction(transaction: unknown) {
         }
 
 
-        revalidatePath('/app');
-        revalidatePath(`/app/` + parsedTransaction.data.clientId);
+        revalidatePath('/');
+        revalidatePath(`//` + parsedTransaction.data.clientId);
 
         return {
             ok: true,

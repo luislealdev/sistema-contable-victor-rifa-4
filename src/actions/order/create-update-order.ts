@@ -167,7 +167,7 @@ export const createUpdateOrder = async (order: unknown) => {
             }
         }
 
-        revalidatePath('/app/pedidos')
+        revalidatePath('//pedidos')
 
         return {
             ok: true,

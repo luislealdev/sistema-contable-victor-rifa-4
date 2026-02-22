@@ -221,14 +221,14 @@ export const RaffleView: FC<Props> = ({ raffle, fullScreen = true, search = '' }
     return (
         <div className="container mx-auto p-4 md:p-6">
             {/* Botón de volver */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
                 <Link
-                    href="/app/rifas"
+                    href="//rifas"
                     className="inline-flex items-center px-4 py-2 text-12 font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                     ← Volver a Rifas
                 </Link>
-            </div>
+            </div> */}
 
             {/* Información de la rifa */}
             {

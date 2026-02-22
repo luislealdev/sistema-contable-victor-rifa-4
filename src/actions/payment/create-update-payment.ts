@@ -134,8 +134,8 @@ export async function createOrUpdatePayment(payment: unknown) {
             sendWhatsApp(client.phone, message);
         }
 
-        revalidatePath('/app');
-        revalidatePath(`/app/${parsedPayment.data.clientId}`);
+        revalidatePath('/');
+        revalidatePath(`//${parsedPayment.data.clientId}`);
 
         return {
             ok: true,

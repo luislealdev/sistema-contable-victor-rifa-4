@@ -58,7 +58,7 @@ export async function createOrUpdateRaffle(raffle: unknown) {
             info: `Rifa ${isUpdate ? 'actualizada' : 'creada'}: ${savedRaffle.title}`
         });
 
-        revalidatePath('/app/rifas');
+        revalidatePath('//rifas');
 
         return {
             ok: true,

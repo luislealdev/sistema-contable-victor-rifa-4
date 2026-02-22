@@ -19,7 +19,7 @@ const LoginPage = () => {
             const result = await login(username, password);
 
             if (result.ok) {
-                router.push('/app');
+                router.push('/');
                 router.refresh();
             } else {
                 setError(result.message || "Credenciales inválidas");

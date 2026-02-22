@@ -90,7 +90,7 @@ export async function deleteClient(clientId: number) {
             });
         }
 
-        revalidatePath('/app');
+        revalidatePath('/');
 
         return { ok: true, message: "El cliente y su información se eliminó correctamente" };
     } catch (error) {

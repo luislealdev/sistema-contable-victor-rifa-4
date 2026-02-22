@@ -41,7 +41,7 @@ export const deleteOrder = async (id: number) => {
             });
         }
 
-        revalidatePath('/app/pedidos');
+        revalidatePath('//pedidos');
 
         return {
             ok: true,

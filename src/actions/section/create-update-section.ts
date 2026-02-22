@@ -51,7 +51,7 @@ export async function createUpdateSection(section: unknown) {
             info: `Sección ${isUpdate ? 'actualizada' : 'creada'}: ${savedSection.name}`
         });
 
-        revalidatePath('/app');
+        revalidatePath('/');
 
         return {
             ok: true,

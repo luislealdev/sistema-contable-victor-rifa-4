@@ -11,7 +11,7 @@ export const deletePreRaffle = async (id: number) => {
         });
 
         // Revalidate the path to ensure the latest data is fetched
-        revalidatePath('/app/rifas');
+        revalidatePath('//rifas');
 
         return {
             ok: true,

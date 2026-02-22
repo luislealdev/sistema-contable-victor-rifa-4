@@ -58,7 +58,7 @@ export async function createOrUpdateClient(client: unknown) {
             info: `Cliente ${isUpdate ? 'actualizado' : 'creado'}: ${savedClient.name}`
         });
 
-        revalidatePath('/app');
+        revalidatePath('/');
         revalidatePath('/rifas/');
 
         return {

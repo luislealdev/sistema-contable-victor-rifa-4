@@ -22,13 +22,13 @@ export const sendWhatsApp = async (phone: string, message: string) => {
     const sendTo = formattedPhone;
 
     // await fetch('https://whatsapp-api.creativa2020.com.mx/api/sendText', {
-    await fetch('https://luislealsoftware-whatsapp-api.creativa2020.com.mx/api/sendText', {
+    await fetch(process.env.WHATSAPP_API_URL || '', {
 
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-Api-Key': process.env.WAHA_API_KEY || '', //
+            'X-Api-Key': `Bearer ${process.env.WHATSURVEY_API_KEY || ''}`,
         },
 
         body: JSON.stringify({
@@ -55,7 +55,7 @@ export const sendWhatsApp = async (phone: string, message: string) => {
     //     method: 'POST',
     //     headers: {
     //         'Content-Type': 'application/json',
-    //         'X-Api-Key': process.env.WAHA_API_KEY || '', //
+    //         'X-Api-Key': `Bearer ${process.env.WHATSURVEY_API_KEY || ''}`,
     //     },
 
     //     body: JSON.stringify({

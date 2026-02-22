@@ -35,8 +35,8 @@ export const deleteRaffleTicket = async (ticketId: number) => {
             sendWhatsApp(client.phone, message);
         }
 
-        revalidatePath('/app/rifas');
-        revalidatePath(`/app/rifas/${deletedTicket.raffleId}`);
+        revalidatePath('//rifas');
+        revalidatePath(`//rifas/${deletedTicket.raffleId}`);
 
         return {
             ok: true,
