@@ -4,7 +4,7 @@ import { getRaffleById } from '../../actions/raffles';
 
 export default async function RafflePage() {
 
-    const { ok, raffle } = await getRaffleById(6);
+    const { ok, raffle } = await getRaffleById(16);
 
     if (!ok || !raffle) {
         notFound();
